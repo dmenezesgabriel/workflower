@@ -10,7 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 from pytz import utc
 
-from workflower.alteryx import run_workflow
+from job import load
 
 logging.basicConfig()
 
@@ -60,23 +60,14 @@ def run():
                     workflow_yaml_config_path = os.path.join(root, file)
                     with open(workflow_yaml_config_path) as yf:
                         configuration_dict = yaml.safe_load(yf)
-                    # TODO
-                    # Load as kwargs?
-                    workflow_name = configuration_dict["name"]
-                    workflow_path = configuration_dict["path"]
+                    job_config = load(configuration_dict)
+                    workflow_name = job_config["name"]
                     print(f"Scheduling {workflow_name}")
                     # TODO
                     # Move to another function
                     # Update job if yaml file has been modified
                     try:
-                        scheduler.add_job(
-                            func=run_workflow,
-                            trigger="interval",
-                            minutes=1,
-                            id=workflow_name,
-                            args=[workflow_path],
-                            executor="default",
-                        )
+                        scheduler.add_job(**job_config)
                     except ConflictingIdError:
                         print(f"{workflow_name}, already scheduled")
                         continue
