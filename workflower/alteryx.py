@@ -7,8 +7,9 @@ def run_workflow(path):
     from datetime import timedelta
 
     import pandas as pd
+    from config import Config
 
-    con = sqlite3.connect("test.db")
+    con = sqlite3.connect(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
 
     def workflow_runner(location):
         start = time.time()
@@ -33,7 +34,7 @@ def run_workflow(path):
         warn = re.compile(r"\d+\swarnings")
         error = re.compile(r"\d+\serrors")
         conversion_err = re.compile(r"\d+\sfield conversion errors")
-        seconds = re.compile(r"\d+\.\d\d\d")
+        # seconds = re.compile(r"\d+\.\d\d\d")
         t = time.localtime()
         current_time = time.strftime("%m/%d/%Y %H:%M:%S", t)
 
