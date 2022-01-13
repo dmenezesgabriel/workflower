@@ -1,4 +1,15 @@
-def run_workflow(path):
+"""
+Alteryx helper module
+"""
+from typing import Tuple
+
+import pandas as pd
+
+
+def run_workflow(path: str) -> pd.DataFrame:
+    """
+    Run Alteryx workflow through command line executable AlteryxEngineCmd.exe.
+    """
     import re
     import sqlite3
     import subprocess
@@ -11,7 +22,11 @@ def run_workflow(path):
 
     con = sqlite3.connect(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
 
-    def workflow_runner(location):
+    def workflow_runner(location: str) -> Tuple:
+        """
+        Run Alteryx workflow through command line executable
+        AlteryxEngineCmd.exe.
+        """
         start = time.time()
         try:
             output = subprocess.check_output(
@@ -30,7 +45,11 @@ def run_workflow(path):
         end = time.time() - start
         return output, end
 
-    def result_parser(output, end):
+    def result_parser(output, end) -> pd.DataFrame:
+        """
+        Parse shell execution of Alteryx workflow through
+        command line executable AlteryxEngineCmd.exe
+        """
         warn = re.compile(r"\d+\swarnings")
         error = re.compile(r"\d+\serrors")
         conversion_err = re.compile(r"\d+\sfield conversion errors")
@@ -95,6 +114,6 @@ def run_workflow(path):
 
     results, finish = workflow_runner(path)
     _df = result_parser(results, finish)
-    _df.to_sql(con=con, name="workflow_log", if_exists="append")
+    _df.to_sql(con=con, name="alteryx_workflows", if_exists="append")
 
     return _df

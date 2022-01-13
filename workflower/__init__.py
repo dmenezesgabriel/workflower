@@ -14,6 +14,8 @@ from workflower.alteryx import run_workflow
 
 logging.basicConfig()
 
+# TODO
+# Move to config file
 jobstores = {
     "default": SQLAlchemyJobStore(url=Config.JOB_DATABASE_URL),
 }
@@ -22,6 +24,8 @@ executors = {
 }
 
 
+# TODO
+# Make an workflow dependencies check event
 def job_runs(event):
     if event.exception:
         print("job did not run")
@@ -48,15 +52,22 @@ scheduler.start()
 def run():
     while True:
         print("Loading Workflows")
+        # TODO
+        # Move to a modules loader
         for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
             for file in files:
                 if file.endswith(".yml"):
                     workflow_yaml_config_path = os.path.join(root, file)
                     with open(workflow_yaml_config_path) as yf:
                         configuration_dict = yaml.safe_load(yf)
+                    # TODO
+                    # Load as kwargs?
                     workflow_name = configuration_dict["name"]
                     workflow_path = configuration_dict["path"]
                     print(f"Scheduling {workflow_name}")
+                    # TODO
+                    # Move to another function
+                    # Update job if yaml file has been modified
                     try:
                         scheduler.add_job(
                             func=run_workflow,
