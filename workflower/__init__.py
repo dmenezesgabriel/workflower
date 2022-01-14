@@ -7,7 +7,6 @@ from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
-from pytz import utc
 
 from workflower import job
 
@@ -42,7 +41,7 @@ scheduler.add_listener(job_return_val, EVENT_JOB_EXECUTED)
 scheduler.configure(
     jobstores=jobstores,
     executors=executors,
-    timezone=utc,
+    timezone=Config.TIME_ZONE,
 )
 
 
