@@ -2,4 +2,4 @@
 *.sqlite
 *.env*
 *venv
-papermill_sample_output.ipynb
+*_output.ipynb
