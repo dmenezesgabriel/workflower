@@ -10,7 +10,16 @@ from config import Config
 
 from workflower import job
 
-logging.basicConfig()
+log_format = (
+    "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
+    " %(message)s"
+)
+logging.basicConfig(
+    encoding="utf-8",
+    level=logging.DEBUG,
+    format=log_format,
+)
+logger = logging.getLogger(__name__)
 
 # TODO
 # Move to config file
@@ -26,9 +35,9 @@ executors = {
 # Make an workflow dependencies check event
 def job_runs(event):
     if event.exception:
-        print("job did not run")
+        logger.warning("Job did not run")
     else:
-        print("job completed")
+        logger.info("Job successfully executed")
 
 
 def job_return_val(event):

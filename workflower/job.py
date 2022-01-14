@@ -1,8 +1,11 @@
+import logging
 import os
 
 from apscheduler.jobstores.base import ConflictingIdError
 
 from workflower.alteryx import run_workflow
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_date_trigger_options(configuration_dict: dict) -> dict:
@@ -10,7 +13,7 @@ def prepare_date_trigger_options(configuration_dict: dict) -> dict:
     Prepare a dict with date trigger options.
     """
     date_string_options = [
-        "run_date ",
+        "run_date",
         "timezone",
     ]
 
@@ -107,6 +110,7 @@ def get_trigger_options(configuration_dict: dict) -> dict:
     """
     trigger_config = {}
     job_trigger = configuration_dict.get("trigger")
+    logger.debug(f"Job trigger{job_trigger}")
     #  interval trigger
     if job_trigger == "interval":
         trigger_config.update(dict(trigger="interval"))
@@ -137,7 +141,7 @@ def get_job_uses(configuration_dict: dict) -> dict:
     if job_uses in ["alteryx", "jupyter", "knime"]:
         job_path = configuration_dict.get("path")
         if not os.path.isfile(job_path):
-            print("Not a valid job path")
+            logger.error("Not a valid job path")
         uses_config.update(dict(args=[job_path]))
 
     if job_uses == "alteryx":
@@ -170,11 +174,12 @@ def schedule_one(scheduler, configuration_dict: dict) -> None:
     """
     job_config = prepare(configuration_dict)
     job_id = job_config["id"]
-    print(f"scheduling {job_id}")
+    logger.debug(f"scheduling {job_id}")
     # TODO
     # Move to another function
     # Update job if yaml file has been modified
+    logger.debug(job_config)
     try:
         scheduler.add_job(**job_config)
     except ConflictingIdError:
-        print(f"{job_id}, already scheduled")
+        logger.warning(f"{job_id}, already scheduled")
