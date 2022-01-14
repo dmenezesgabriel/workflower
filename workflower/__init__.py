@@ -8,7 +8,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 
-from workflower import job
+from workflower import workflow
 
 log_format = (
     "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
@@ -66,6 +66,6 @@ def run():
                     workflow_yaml_config_path = os.path.join(root, file)
                     with open(workflow_yaml_config_path) as yf:
                         configuration_dict = yaml.safe_load(yf)
-                    job.schedule_one(scheduler, configuration_dict)
+                    workflow.schedule_jobs(scheduler, configuration_dict)
         scheduler.print_jobs()
         time.sleep(Config.CYCLE)

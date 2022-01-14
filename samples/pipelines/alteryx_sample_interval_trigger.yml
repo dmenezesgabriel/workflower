@@ -1,5 +1,0 @@
-uses: alteryx
-name: "alteryx_sample_interval_trigger"
-path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
-trigger: interval
-minutes: 1
