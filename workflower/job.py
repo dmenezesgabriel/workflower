@@ -2,6 +2,7 @@ import logging
 import os
 
 from apscheduler.jobstores.base import ConflictingIdError
+from papermill import execute_notebook
 
 from workflower.alteryx import run_workflow
 
@@ -137,15 +138,30 @@ def get_job_uses(configuration_dict: dict) -> dict:
     """
     uses_config = {}
     job_uses = configuration_dict.get("uses")
-
-    if job_uses in ["alteryx", "jupyter", "knime"]:
+    # Alteryx
+    if job_uses == "alteryx":
         job_path = configuration_dict.get("path")
         if not os.path.isfile(job_path):
             logger.error("Not a valid job path")
         uses_config.update(dict(args=[job_path]))
-
-    if job_uses == "alteryx":
         uses_config.update(dict(func=run_workflow))
+    # Papermill
+    if job_uses == "papermill":
+        input_path = configuration_dict.get("input_path")
+        if not os.path.isfile(input_path):
+            logger.error("Not a valid job path")
+        output_path = configuration_dict.get("output_path")
+        uses_config.update(dict(func=execute_notebook))
+        uses_config.update(
+            dict(
+                kwargs=dict(
+                    input_path=input_path,
+                    output_path=output_path,
+                    log_output=True,
+                    progress_bar=False,
+                )
+            )
+        )
 
     return uses_config
 

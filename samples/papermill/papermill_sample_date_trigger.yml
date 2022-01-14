@@ -1,0 +1,9 @@
+# Job general config
+uses: papermill
+name: "papermill_sample_date_trigger"
+# Papermill paths
+input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\papermill\\papermill_sample.ipynb"
+output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\papermill\\papermill_sample_output.ipynb"
+# trigger config
+trigger: date
+run_date: "2022-01-14 19:21:05"
