@@ -5,7 +5,24 @@ from apscheduler.jobstores.base import ConflictingIdError
 from workflower.alteryx import run_workflow
 
 
-def prepare_interval_trigger(configuration_dict: dict) -> dict:
+def prepare_date_trigger_options(configuration_dict: dict) -> dict:
+    """
+    Prepare a dict with date trigger options.
+    """
+    date_string_options = [
+        "run_date ",
+        "timezone",
+    ]
+
+    date_string_options_dict = {
+        date_option: str(configuration_dict.get(date_option))
+        for date_option in date_string_options
+        if configuration_dict.get(date_option)
+    }
+    return date_string_options_dict
+
+
+def prepare_interval_trigger_options(configuration_dict: dict) -> dict:
     """
     Prepare a dict with interval trigger options.
     """
@@ -93,7 +110,9 @@ def get_trigger_options(configuration_dict: dict) -> dict:
     #  interval trigger
     if job_trigger == "interval":
         trigger_config.update(dict(trigger="interval"))
-        interval_trigger_options = prepare_interval_trigger(configuration_dict)
+        interval_trigger_options = prepare_interval_trigger_options(
+            configuration_dict
+        )
         trigger_config.update(interval_trigger_options)
     #  Cron trigger
     elif job_trigger == "cron":
@@ -102,7 +121,9 @@ def get_trigger_options(configuration_dict: dict) -> dict:
         trigger_config.update(cron_trigger_options)
     #  Date trigger
     elif job_trigger == "date":
-        pass
+        trigger_config.update(dict(trigger="date"))
+        date_trigger_options = prepare_date_trigger_options(configuration_dict)
+        trigger_config.update(date_trigger_options)
         return trigger_config
 
 
