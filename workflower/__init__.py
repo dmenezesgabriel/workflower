@@ -4,13 +4,12 @@ import time
 
 import yaml
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
-from apscheduler.jobstores.base import ConflictingIdError
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 from pytz import utc
 
-from job import load
+from workflower import job
 
 logging.basicConfig()
 
@@ -46,10 +45,9 @@ scheduler.configure(
     timezone=utc,
 )
 
-scheduler.start()
-
 
 def run():
+    scheduler.start()
     while True:
         print("Loading Workflows")
         # TODO
@@ -60,16 +58,6 @@ def run():
                     workflow_yaml_config_path = os.path.join(root, file)
                     with open(workflow_yaml_config_path) as yf:
                         configuration_dict = yaml.safe_load(yf)
-                    job_config = load(configuration_dict)
-                    workflow_name = job_config["name"]
-                    print(f"Scheduling {workflow_name}")
-                    # TODO
-                    # Move to another function
-                    # Update job if yaml file has been modified
-                    try:
-                        scheduler.add_job(**job_config)
-                    except ConflictingIdError:
-                        print(f"{workflow_name}, already scheduled")
-                        continue
+                    job.schedule_one(scheduler, configuration_dict)
         scheduler.print_jobs()
-        time.sleep(5)
+        time.sleep(Config.CYCLE)
