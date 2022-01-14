@@ -124,7 +124,7 @@ def get_trigger_options(configuration_dict: dict) -> dict:
         trigger_config.update(dict(trigger="date"))
         date_trigger_options = prepare_date_trigger_options(configuration_dict)
         trigger_config.update(date_trigger_options)
-        return trigger_config
+    return trigger_config
 
 
 def get_job_uses(configuration_dict: dict) -> dict:
