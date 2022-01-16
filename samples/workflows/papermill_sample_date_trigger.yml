@@ -1,3 +1,4 @@
+version: "1.0"
 workflow:
   name: alteryx_sample_date_trigger
   jobs:
