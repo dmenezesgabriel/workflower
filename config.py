@@ -1,30 +1,17 @@
 """
 Application configuration class
 """
+import os
 
 
 class Config:
-    DEBUG = False
-    TESTING = False
-    CYCLE = 5
-    TIME_ZONE = "America/Sao_Paulo"
-    WORKFLOWS_CONFIG_PATH = "./samples/workflows"
-    JOB_DATABASE_URL = "sqlite:///jobs.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower.db"
-
-
-class ProductionConfig(Config):
-    DEBUG = False
-
-
-class DevelopmentConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
-    JOB_DATABASE_URL = "sqlite:///jobs-dev.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower-dev.db"
-
-
-class TestingConfig(Config):
-    TESTING = True
-    JOB_DATABASE_URL = "sqlite:///jobs-test.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower-test.db"
+    DEBUG = os.getenv("DEBUG")
+    TESTING = os.getenv("TESTING")
+    DEVELOPMENT = os.getenv("DEVELOPMENT")
+    CYCLE = int(os.getenv("CYCLE"))
+    TIME_ZONE = os.getenv("TIME_ZONE")
+    WORKFLOWS_CONFIG_PATH = os.getenv("WORKFLOWS_CONFIG_PATH")
+    JOB_DATABASE_URL = os.getenv("JOB_DATABASE_URL")
+    WORKFLOWS_EXECUTION_DATABASE_URL = os.getenv(
+        "WORKFLOWS_EXECUTION_DATABASE_URL"
+    )
