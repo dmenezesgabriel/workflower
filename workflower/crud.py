@@ -12,6 +12,12 @@ def get_workflow(db: Session, workflow_id: int):
     )
 
 
+def get_workflow_by_name(db: Session, name: str):
+    return (
+        db.query(models.Workflow).filter(models.Workflow.name == name).first()
+    )
+
+
 def get_workflows(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Workflow).offset(skip).limit(limit).all()
 
