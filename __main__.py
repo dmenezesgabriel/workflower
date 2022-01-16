@@ -1,4 +1,6 @@
-from workflower import run
+from workflower import App
 
 if __name__ == "__main__":
-    run()
+    app = App()
+    app.setup()
+    app.run()

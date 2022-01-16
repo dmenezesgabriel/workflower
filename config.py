@@ -10,7 +10,7 @@ class Config:
     TIME_ZONE = "America/Sao_Paulo"
     WORKFLOWS_CONFIG_PATH = "./samples/workflows"
     JOB_DATABASE_URL = "sqlite:///jobs.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "workflower.db"
+    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower.db"
 
 
 class ProductionConfig(Config):
@@ -20,11 +20,11 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    JOB_DATABASE_URL = "sqlite:///jobs-test.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "workflower-test.db"
+    JOB_DATABASE_URL = "sqlite:///jobs-dev.sqlite"
+    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower-dev.db"
 
 
 class TestingConfig(Config):
     TESTING = True
     JOB_DATABASE_URL = "sqlite:///jobs-test.sqlite"
-    WORKFLOWS_EXECUTION_DATABASE_URL = "workflower-test.db"
+    WORKFLOWS_EXECUTION_DATABASE_URL = "sqlite:///workflower-test.db"

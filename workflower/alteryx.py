@@ -11,16 +11,16 @@ def run_workflow(path: str) -> pd.DataFrame:
     Run Alteryx workflow through command line executable AlteryxEngineCmd.exe.
     """
     import re
-    import sqlite3
     import subprocess
     import time
     from datetime import time as timeobj
     from datetime import timedelta
 
     import pandas as pd
+    import sqlalchemy
     from config import Config
 
-    con = sqlite3.connect(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
+    con = sqlalchemy.create_engine(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
 
     def workflow_runner(location: str) -> Tuple:
         """

@@ -4,7 +4,7 @@ Workflower Models
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from db import Base
+from workflower.database import Base
 
 # TODO
 # - Workflow Model

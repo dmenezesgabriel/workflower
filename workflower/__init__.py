@@ -21,15 +21,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# TODO
-# Move to config file
-jobstores = {
-    "default": SQLAlchemyJobStore(url=Config.JOB_DATABASE_URL),
-}
-executors = {
-    "default": {"type": "threadpool", "max_workers": 20},
-}
-
 
 # TODO
 # Make an workflow dependencies check event
@@ -44,28 +35,43 @@ def job_return_val(event):
     return event.retval
 
 
-scheduler = BackgroundScheduler()
-scheduler.add_listener(job_runs, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
-scheduler.add_listener(job_return_val, EVENT_JOB_EXECUTED)
-scheduler.configure(
-    jobstores=jobstores,
-    executors=executors,
-    timezone=Config.TIME_ZONE,
-)
+class App:
+    def __init__(self):
+        self.scheduler = BackgroundScheduler()
 
+    def setup(self):
+        jobstores = {
+            "default": SQLAlchemyJobStore(url=Config.JOB_DATABASE_URL),
+        }
+        executors = {
+            "default": {"type": "threadpool", "max_workers": 20},
+        }
 
-def run():
-    scheduler.start()
-    while True:
-        print("Loading Workflows")
-        # TODO
-        # Move to a modules loader
-        for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
-            for file in files:
-                if file.endswith(".yml"):
-                    workflow_yaml_config_path = os.path.join(root, file)
-                    with open(workflow_yaml_config_path) as yf:
-                        configuration_dict = yaml.safe_load(yf)
-                    workflow.schedule_jobs(scheduler, configuration_dict)
-        scheduler.print_jobs()
-        time.sleep(Config.CYCLE)
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.add_listener(
+            job_runs, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+        )
+        self.scheduler.add_listener(job_return_val, EVENT_JOB_EXECUTED)
+        self.scheduler.configure(
+            jobstores=jobstores,
+            executors=executors,
+            timezone=Config.TIME_ZONE,
+        )
+
+    def run(self):
+        self.scheduler.start()
+        while True:
+            print("Loading Workflows")
+            # TODO
+            # Move to a modules loader
+            for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
+                for file in files:
+                    if file.endswith(".yml"):
+                        workflow_yaml_config_path = os.path.join(root, file)
+                        with open(workflow_yaml_config_path) as yf:
+                            configuration_dict = yaml.safe_load(yf)
+                        workflow.schedule_jobs(
+                            self.scheduler, configuration_dict
+                        )
+            self.scheduler.print_jobs()
+            time.sleep(Config.CYCLE)

@@ -1,29 +1,22 @@
 from sqlalchemy.orm import Session
 
-import models
-import schemas
+from workflower.models import Job, Workflow
 
 
 def get_workflow(db: Session, workflow_id: int):
-    return (
-        db.query(models.Workflow)
-        .filter(models.Workflow.id == workflow_id)
-        .first()
-    )
+    return db.query(Workflow).filter(Workflow.id == workflow_id).first()
 
 
 def get_workflow_by_name(db: Session, name: str):
-    return (
-        db.query(models.Workflow).filter(models.Workflow.name == name).first()
-    )
+    return db.query(Workflow).filter(Workflow.name == name).first()
 
 
 def get_workflows(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Workflow).offset(skip).limit(limit).all()
+    return db.query(Workflow).offset(skip).limit(limit).all()
 
 
-def create_workflow(db: Session, workflow: schemas.UserCreate):
-    db_workflow = models.Workflow(name=workflow.name)
+def create_workflow(db: Session, workflow: Workflow):
+    db_workflow = Workflow(name=workflow.name)
     db.add(db_workflow)
     db.commit()
     db.refresh(db_workflow)
@@ -31,11 +24,11 @@ def create_workflow(db: Session, workflow: schemas.UserCreate):
 
 
 def get_jobs(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Job).offset(skip).limit(limit).all()
+    return db.query(Job).offset(skip).limit(limit).all()
 
 
-def create_workflow_job(db: Session, job: schemas.JobCreate, workflow_id: int):
-    db_job = models.Job(**job.dict(), workflow_id=workflow_id)
+def create_workflow_job(db: Session, job: Job, workflow_id: int):
+    db_job = Job(job.id, job.name, workflow_id=workflow_id)
     db.add(db_job)
     db.commit()
     db.refresh(db_job)
