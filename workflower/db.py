@@ -1,8 +1,6 @@
 """
 Database class
 """
-from venv import create
-
 from config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
