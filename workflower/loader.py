@@ -53,10 +53,10 @@ def validate_schema(configuration_dict: dict) -> bool:
             raise InvalidSchemaError(
                 "The job must have all of it's keys: " f"{', '.join(job_keys)}"
             )
-        if not isinstance(workflow["name"], str):
+        if not isinstance(job["name"], str):
             raise InvalidTypeError("Name must be type string")
         #  Job uses
-        if not isinstance(workflow["uses"], str):
+        if not isinstance(job["uses"], str):
             raise InvalidTypeError("Name must be type string")
         if job["uses"] not in job_uses_options:
             raise InvalidTypeError(
@@ -76,7 +76,7 @@ def validate_schema(configuration_dict: dict) -> bool:
                     "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
                 )
         # Job triggers
-        if not isinstance(workflow["trigger"], str):
+        if not isinstance(job["trigger"], str):
             raise InvalidTypeError("Name must be type string")
         if job["trigger"] not in job_trigger_options:
             raise InvalidTypeError(

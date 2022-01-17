@@ -1,20 +1,25 @@
 import pytest
 import workflower.loader as loader
+import yaml
+from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 
 
 def test_validate_true():
-    configuration_dict = dict(
-        version="1.0",
-        workflow={
-            "name": "workflow_name",
-            "jobs": [
-                {
-                    "name": "job_name",
-                    "uses": "job_uses",
-                    "trigger": "job_trigger",
-                },
-            ],
-        },
-    )
-
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: papermill
+          input_path: ""
+          output_path: ""
+          trigger: cron
+          minute: "*/5"
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
     assert loader.validate_schema(configuration_dict) is True
+
+
+def test_validate_missing_version():
+    pass
