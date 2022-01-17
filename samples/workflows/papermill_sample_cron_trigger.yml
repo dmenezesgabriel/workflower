@@ -1,0 +1,12 @@
+version: "1.0"
+workflow:
+  name: papermill_sample_date_trigger
+  jobs:
+    - name: "papermill_sample"
+      uses: papermill
+      # Papermill paths
+      input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample.ipynb"
+      output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample_output.ipynb"
+      # trigger config
+      trigger: cron
+      minute: "*/5"

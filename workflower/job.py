@@ -75,9 +75,9 @@ class Job:
             "day",
             "week",
             "day_of_week",
-            "hours",
-            "minutes",
-            "seconds",
+            "hour",
+            "minute",
+            "second",
         ]
         interval_string_options = [
             "start_date",
