@@ -1,8 +1,8 @@
 version: "1.0"
 workflow:
-  name: alteryx_sample_date_trigger
+  name: papermill_sample_date_trigger
   jobs:
-    - name: "papermill_sample_date_trigger"
+    - name: "papermill_sample"
       uses: papermill
       # Papermill paths
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample.ipynb"

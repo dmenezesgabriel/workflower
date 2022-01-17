@@ -26,9 +26,11 @@ def load_one(workflow_yaml_config_path):
 
 
 def load_all():
+    workflows = []
     for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
         for file in files:
             if file.endswith(".yml"):
                 workflow_yaml_config_path = os.path.join(root, file)
                 workflow = load_one(workflow_yaml_config_path)
-                yield workflow
+                workflows.append(workflow)
+    return workflows

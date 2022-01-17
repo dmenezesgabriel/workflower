@@ -2,6 +2,7 @@ import logging
 import time
 
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
@@ -14,7 +15,7 @@ log_format = (
 )
 logging.basicConfig(
     encoding="utf-8",
-    level=logging.DEBUG,
+    level=logging.INFO,
     format=log_format,
 )
 logger = logging.getLogger(__name__)
@@ -36,6 +37,7 @@ def job_return_val(event):
 class App:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
+        self.workflows = None
 
     def setup(self):
         jobstores = {
@@ -59,11 +61,36 @@ class App:
     def run(self):
         self.scheduler.start()
         while True:
-            print("Loading Workflows")
-            # TODO
-            # Move to a modules loader
+            logger.info("Loading Workflows")
             workflows = load_all()
-            for workflow in workflows:
+            # TODO
+            # improve this ugly code
+            # Update schedule if file is changed
+            logger.info("Unscheduling removed workflows")
+            if self.workflows:
+                scheduled_jobs = [
+                    job[0].name
+                    for job in [workflow.jobs for workflow in self.workflows]
+                ]
+                loaded_jobs = [
+                    job[0].name
+                    for job in [workflow.jobs for workflow in workflows]
+                ]
+                removed_jobs = [
+                    job_name
+                    for job_name in scheduled_jobs
+                    if job_name not in loaded_jobs
+                ]
+                print(removed_jobs)
+                for job_id in removed_jobs:
+                    logger.info(f"Removing: {removed_jobs}")
+                    try:
+                        self.scheduler.remove_job(job_id)
+                    except JobLookupError:
+                        logger.debug(f"{removed_jobs} was not scheduled")
+            # schedule jobs
+            self.workflows = workflows
+            for workflow in self.workflows:
                 workflow.schedule_jobs(self.scheduler)
-            self.scheduler.print_jobs()
+            logger.info(f"Sleeping {Config.CYCLE} seconds")
             time.sleep(Config.CYCLE)
