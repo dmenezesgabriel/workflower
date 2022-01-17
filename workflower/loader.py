@@ -60,7 +60,7 @@ def validate_schema(configuration_dict: dict) -> bool:
         if not isinstance(job["uses"], str):
             raise InvalidTypeError("Name must be type string")
         if job["uses"] not in job_uses_options:
-            raise InvalidTypeError(
+            raise InvalidSchemaError(
                 f"Job trigger must be: {', '.join(job_uses_options)}"
             )
         if job["uses"] == "papermill":
@@ -80,7 +80,7 @@ def validate_schema(configuration_dict: dict) -> bool:
         if not isinstance(job["trigger"], str):
             raise InvalidTypeError("Name must be type string")
         if job["trigger"] not in job_trigger_options:
-            raise InvalidTypeError(
+            raise InvalidSchemaError(
                 f"Job trigger must be: {', '.join(job_trigger_options)}"
             )
         # TODO

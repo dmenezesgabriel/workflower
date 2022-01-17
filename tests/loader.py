@@ -128,6 +128,57 @@ def test_validate_job_has_uses():
         loader.validate_schema(configuration_dict)
 
 
+def test_validate_invalid_uses():
+    with pytest.raises(InvalidSchemaError):
+        yaml_config = """
+        version: "1.0"
+        workflow:
+          name: papermill_sample_date_trigger
+          jobs:
+            - name: "papermill_sample"
+              uses: something
+              input_path: ""
+              output_path: ""
+              trigger: cron
+              minute: "*/5"
+        """
+        configuration_dict = yaml.safe_load(yaml_config)
+        loader.validate_schema(configuration_dict)
+
+
+def test_validate_uses_alteryx():
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: alteryx
+          path: ""
+          trigger: cron
+          minute: "*/5"
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
+    assert loader.validate_schema(configuration_dict) is True
+
+
+def test_validate_uses_papermill():
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: papermill
+          input_path: ""
+          output_path: ""
+          trigger: cron
+          minute: "*/5"
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
+    assert loader.validate_schema(configuration_dict) is True
+
+
 def test_validate_job_has_trigger():
     with pytest.raises(InvalidSchemaError):
         yaml_config = """
@@ -142,3 +193,69 @@ def test_validate_job_has_trigger():
         """
         configuration_dict = yaml.safe_load(yaml_config)
         loader.validate_schema(configuration_dict)
+
+
+def test_validate_invalid_trigger():
+    with pytest.raises(InvalidSchemaError):
+        yaml_config = """
+        version: "1.0"
+        workflow:
+          name: papermill_sample_date_trigger
+          jobs:
+            - name: "papermill_sample"
+              uses: papermill
+              input_path: ""
+              output_path: ""
+              trigger: something
+              minute: "*/5"
+        """
+        configuration_dict = yaml.safe_load(yaml_config)
+        loader.validate_schema(configuration_dict)
+
+
+def test_validate_trigger_date():
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: papermill
+          input_path: ""
+          output_path: ""
+          trigger: date
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
+    assert loader.validate_schema(configuration_dict) is True
+
+
+def test_validate_trigger_cron():
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: papermill
+          input_path: ""
+          output_path: ""
+          trigger: cron
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
+    assert loader.validate_schema(configuration_dict) is True
+
+
+def test_validate_trigger_interval():
+    yaml_config = """
+    version: "1.0"
+    workflow:
+      name: papermill_sample_date_trigger
+      jobs:
+        - name: "papermill_sample"
+          uses: papermill
+          input_path: ""
+          output_path: ""
+          trigger: interval
+    """
+    configuration_dict = yaml.safe_load(yaml_config)
+    assert loader.validate_schema(configuration_dict) is True
