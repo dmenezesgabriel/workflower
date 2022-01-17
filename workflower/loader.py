@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 def validate_schema(configuration_dict):
+    """
+    Validate pipeline file schema
+    """
     logger.debug("Validating yml schema")
     #  Pipeline
     pipeline_keys = ["version", "workflow"]
@@ -36,25 +39,36 @@ def validate_schema(configuration_dict):
             f"{', '.join(workflow_keys)}"
         )
     if not isinstance(workflow["name"], str):
-        raise InvalidTypeError("Version must be type string")
+        raise InvalidTypeError("Name must be type string")
     # Jobs
     workflow_jobs = workflow["jobs"]
     job_keys = ["name", "uses", "trigger"]
+    job_trigger_options = ["date", "cron", "interval"]
     for job in workflow_jobs:
         if not all(key in job.keys() for key in job_keys):
             raise InvalidSchemaError(
                 "The job must have all of it's keys: " f"{', '.join(job_keys)}"
             )
+        if not isinstance(workflow["name"], str):
+            raise InvalidTypeError("Name must be type string")
+        if not isinstance(workflow["uses"], str):
+            raise InvalidTypeError("Name must be type string")
+        if not isinstance(workflow["trigger"], str):
+            raise InvalidTypeError("Name must be type string")
+        if job["trigger"] not in job_trigger_options:
+            raise InvalidTypeError(
+                f"Job trigger must be: {', '.join(job_trigger_options)}"
+            )
     return True
 
 
 def load_one(workflow_yaml_config_path):
-    logger.debug("Loading pipeline")
+    logger.info(f"Loading pipeline file: {workflow_yaml_config_path}")
     with open(workflow_yaml_config_path) as yf:
         configuration_dict = yaml.safe_load(yf)
     validate_schema(configuration_dict)
     workflow_name = configuration_dict["workflow"]["name"]
-    logger.debug(f"Workflow found: {workflow_name}")
+    logger.info(f"Workflow found: {workflow_name}")
     #  Preparing jobs
     jobs = []
     workflow_jobs = configuration_dict["workflow"]["jobs"]
