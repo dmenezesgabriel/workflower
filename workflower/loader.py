@@ -44,21 +44,35 @@ def validate_schema(configuration_dict):
     workflow_jobs = workflow["jobs"]
     job_keys = ["name", "uses", "trigger"]
     job_trigger_options = ["date", "cron", "interval"]
+    job_uses_options = ["alteryx", "papermill"]
     for job in workflow_jobs:
+        # Job keys
         if not all(key in job.keys() for key in job_keys):
             raise InvalidSchemaError(
                 "The job must have all of it's keys: " f"{', '.join(job_keys)}"
             )
         if not isinstance(workflow["name"], str):
             raise InvalidTypeError("Name must be type string")
+        #  Job uses
         if not isinstance(workflow["uses"], str):
             raise InvalidTypeError("Name must be type string")
+        if job["uses"] not in job_uses_options:
+            raise InvalidTypeError(
+                f"Job trigger must be: {', '.join(job_uses_options)}"
+            )
+        # Job triggers
         if not isinstance(workflow["trigger"], str):
             raise InvalidTypeError("Name must be type string")
         if job["trigger"] not in job_trigger_options:
             raise InvalidTypeError(
                 f"Job trigger must be: {', '.join(job_trigger_options)}"
             )
+        if job["trigger"] == "date":
+            pass
+        if job["trigger"] == "cron":
+            pass
+        if job["trigger"] == "interval":
+            pass
     return True
 
 
