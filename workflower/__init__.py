@@ -66,28 +66,61 @@ class App:
             # TODO
             # improve this ugly code
             # Update schedule if file is changed
-            logger.info("Unscheduling removed workflows")
+            logger.info("Checking workflows")
             if self.workflows:
+                logger.info("Checking scheduled jobs")
+                # This jobs were scheduled on past cycle
                 scheduled_jobs = [
                     job[0].name
                     for job in [workflow.jobs for workflow in self.workflows]
                 ]
+                logger.info("Checking loaded jobs")
+                # This jobs were loaded on most recent cycle
                 loaded_jobs = [
                     job[0].name
                     for job in [workflow.jobs for workflow in workflows]
                 ]
+                logger.info("Checking removed jobs")
+                # Get removed jobs, this will remove job's
+                # file has been removed
                 removed_jobs = [
                     job_name
                     for job_name in scheduled_jobs
                     if job_name not in loaded_jobs
                 ]
-                for job_id in removed_jobs:
+                logger.info("Checking modified jobs")
+                # Get modified jobs, this will remove job if has been modified
+                # to reschedule it after
+                for new_workflow in workflows:
+                    # Modified workflows according to file modification time
+                    modified_workflows = [
+                        workflow
+                        for workflow in self.workflows
+                        if (new_workflow.name == workflow.name)
+                        and (new_workflow.modified_at != workflow.modified_at)
+                    ]
+                    # Modified jobs according to workflow modification time
+                    modified_jobs = [
+                        job[0].name
+                        for job in [
+                            workflow.jobs for workflow in modified_workflows
+                        ]
+                    ]
+                logger.info("Removing jobs jobs")
+                # Remove deleted or modified jobs from scheduler
+                remove_jobs = removed_jobs.extend(modified_jobs)
+                for job_id in remove_jobs:
                     logger.info(f"Removing: {removed_jobs}")
                     try:
                         self.scheduler.remove_job(job_id)
                     except JobLookupError:
-                        logger.debug(f"{removed_jobs} was not scheduled")
+                        logger.warning(
+                            f"tried to remove {job_id}, "
+                            "but it was not scheduled"
+                        )
+
             # schedule jobs
+            logger.info("Scheduling jobs")
             self.workflows = workflows
             for workflow in self.workflows:
                 workflow.schedule_jobs(self.scheduler)

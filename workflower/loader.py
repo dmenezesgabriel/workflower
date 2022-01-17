@@ -100,6 +100,10 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
+def get_file_modification_date(file_path):
+    return os.path.getmtime(file_path)
+
+
 def load_one(workflow_yaml_config_path: str) -> Workflow:
     """
     Load one workflow from a yaml file.
@@ -120,7 +124,10 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
         job = Job(name=new_job_name, config=workflow_job)
         jobs.append(job)
     #  Creating workflow object
-    workflow = Workflow(name=workflow_name, jobs=jobs)
+    workflow_modified_at = os.path.getmtime(workflow_yaml_config_path)
+    workflow = Workflow(
+        name=workflow_name, jobs=jobs, modified_at=workflow_modified_at
+    )
     return workflow
 
 
