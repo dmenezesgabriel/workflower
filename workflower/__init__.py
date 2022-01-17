@@ -14,8 +14,7 @@ log_format = (
     " %(message)s"
 )
 logging.basicConfig(
-    filename=Config.LOGGING_FILE,
-    encoding="utf-8",
+    # filename=Config.LOGGING_FILE,
     level=logging.INFO,
     format=log_format,
 )
