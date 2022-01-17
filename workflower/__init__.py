@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 # Make an workflow dependencies check event
 def job_runs(event):
     if event.exception:
-        logger.warning("Job did not run")
+        logger.warning(f"Job: {event.job_id}, did not run: {event.exception}")
     else:
-        logger.info("Job successfully executed")
+        logger.info(f"Job: {event.job_id}, successfully executed")
 
 
 def job_return_val(event):
