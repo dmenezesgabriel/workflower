@@ -1,6 +1,5 @@
 import logging
 import os
-from tkinter import E
 from typing import List
 
 import yaml
