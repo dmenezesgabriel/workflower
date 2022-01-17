@@ -22,4 +22,17 @@ def test_validate_true():
 
 
 def test_validate_missing_version():
-    pass
+    with pytest.raises(InvalidSchemaError):
+        yaml_config = """
+        workflow:
+        name: papermill_sample_date_trigger
+        jobs:
+          - name: "papermill_sample"
+            uses: papermill
+            input_path: ""
+            output_path: ""
+            trigger: cron
+            minute: "*/5"
+        """
+        configuration_dict = yaml.safe_load(yaml_config)
+        loader.validate_schema(configuration_dict)
