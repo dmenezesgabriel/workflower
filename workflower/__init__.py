@@ -108,16 +108,19 @@ class App:
                     ]
                 logger.info("Removing jobs jobs")
                 # Remove deleted or modified jobs from scheduler
-                remove_jobs = removed_jobs.extend(modified_jobs)
-                for job_id in remove_jobs:
-                    logger.info(f"Removing: {removed_jobs}")
-                    try:
-                        self.scheduler.remove_job(job_id)
-                    except JobLookupError:
-                        logger.warning(
-                            f"tried to remove {job_id}, "
-                            "but it was not scheduled"
-                        )
+                jobs_to_remove = []
+                if jobs_to_remove:
+                    jobs_to_remove.extend(modified_jobs)
+                    jobs_to_remove.extend(removed_jobs)
+                    for job_id in jobs_to_remove:
+                        logger.info(f"Removing: {removed_jobs}")
+                        try:
+                            self.scheduler.remove_job(job_id)
+                        except JobLookupError:
+                            logger.warning(
+                                f"tried to remove {job_id}, "
+                                "but it was not scheduled"
+                            )
 
             # schedule jobs
             logger.info("Scheduling jobs")
