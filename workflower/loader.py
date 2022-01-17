@@ -70,12 +70,17 @@ def validate_schema(configuration_dict: dict) -> bool:
                     "Papermill jobs must contain: "
                     f"{', '.join(papermill_keys)}"
                 )
+            # TODO
+            # Validate if input_path ends with ipynb and file exists
+            # and output_path ends with ipynb and dir exists
         if job["uses"] == "alteryx":
             alteryx_keys = ["path"]
             if not all(key in job.keys() for key in alteryx_keys):
                 raise InvalidSchemaError(
                     "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
                 )
+            # TODO
+            # Validate if path ends with alteryx extension and file exists
         # Job triggers
         if not isinstance(job["trigger"], str):
             raise InvalidTypeError("Name must be type string")
@@ -119,7 +124,7 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
 
 def load_all(workflows_path: str = Config.WORKFLOWS_FILES_PATH) -> List:
     """
-    Load all
+    Load all.
     """
     workflows = []
     for root, dirs, files in os.walk(workflows_path):
