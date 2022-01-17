@@ -1,6 +1,7 @@
 import logging
 import os
 from tkinter import E
+from typing import List
 
 import yaml
 from config import Config
@@ -12,10 +13,12 @@ from workflower.workflow import Workflow
 logger = logging.getLogger(__name__)
 
 
-def validate_schema(configuration_dict):
+def validate_schema(configuration_dict: dict) -> bool:
     """
     Validate pipeline file schema
     """
+    # TODO
+    #  Break in smaller functions
     logger.debug("Validating yml schema")
     #  Pipeline
     pipeline_keys = ["version", "workflow"]
@@ -60,6 +63,19 @@ def validate_schema(configuration_dict):
             raise InvalidTypeError(
                 f"Job trigger must be: {', '.join(job_uses_options)}"
             )
+        if job["uses"] == "papermill":
+            papermill_keys = ["input_path", "output_path"]
+            if not all(key in job.keys() for key in papermill_keys):
+                raise InvalidSchemaError(
+                    "Papermill jobs must contain: "
+                    f"{', '.join(papermill_keys)}"
+                )
+        if job["uses"] == "alteryx":
+            alteryx_keys = ["path"]
+            if not all(key in job.keys() for key in alteryx_keys):
+                raise InvalidSchemaError(
+                    "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
+                )
         # Job triggers
         if not isinstance(workflow["trigger"], str):
             raise InvalidTypeError("Name must be type string")
@@ -67,6 +83,7 @@ def validate_schema(configuration_dict):
             raise InvalidTypeError(
                 f"Job trigger must be: {', '.join(job_trigger_options)}"
             )
+        # TODO
         if job["trigger"] == "date":
             pass
         if job["trigger"] == "cron":
@@ -76,7 +93,10 @@ def validate_schema(configuration_dict):
     return True
 
 
-def load_one(workflow_yaml_config_path):
+def load_one(workflow_yaml_config_path: str) -> Workflow:
+    """
+    Load one workflow from a yaml file.
+    """
     logger.info(f"Loading pipeline file: {workflow_yaml_config_path}")
     with open(workflow_yaml_config_path) as yf:
         configuration_dict = yaml.safe_load(yf)
@@ -97,9 +117,12 @@ def load_one(workflow_yaml_config_path):
     return workflow
 
 
-def load_all():
+def load_all(workflows_path: str = Config.WORKFLOWS_FILES_PATH) -> List:
+    """
+    Load all
+    """
     workflows = []
-    for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
+    for root, dirs, files in os.walk(workflows_path):
         for file in files:
             if file.endswith(".yml"):
                 workflow_yaml_config_path = os.path.join(root, file)
