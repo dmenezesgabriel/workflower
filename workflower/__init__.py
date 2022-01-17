@@ -1,14 +1,12 @@
 import logging
-import os
 import time
 
-import yaml
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 
-from workflower import workflow
+from workflower.loader import load_all
 
 log_format = (
     "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
@@ -64,14 +62,8 @@ class App:
             print("Loading Workflows")
             # TODO
             # Move to a modules loader
-            for root, dirs, files in os.walk(Config.WORKFLOWS_CONFIG_PATH):
-                for file in files:
-                    if file.endswith(".yml"):
-                        workflow_yaml_config_path = os.path.join(root, file)
-                        with open(workflow_yaml_config_path) as yf:
-                            configuration_dict = yaml.safe_load(yf)
-                        workflow.schedule_jobs(
-                            self.scheduler, configuration_dict
-                        )
+            workflows = load_all()
+            for workflow in workflows:
+                workflow.schedule_jobs(self.scheduler)
             self.scheduler.print_jobs()
             time.sleep(Config.CYCLE)

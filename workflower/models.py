@@ -1,7 +1,7 @@
 """
 Workflower Models
 """
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from workflower.database import Base
