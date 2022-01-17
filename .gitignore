@@ -5,4 +5,4 @@
 !*.template
 *venv
 *_output.ipynb
-*.log
+*.log*

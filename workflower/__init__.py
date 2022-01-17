@@ -8,17 +8,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 
 from workflower.loader import load_all
+from workflower.logger import setup_logger
 
-log_format = (
-    "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
-    " %(message)s"
-)
-logging.basicConfig(
-    # filename=Config.LOGGING_FILE,
-    level=logging.INFO,
-    format=log_format,
-)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 # TODO
@@ -57,6 +49,7 @@ class App:
             executors=executors,
             timezone=Config.TIME_ZONE,
         )
+        setup_logger()
 
     def run(self):
         self.scheduler.start()

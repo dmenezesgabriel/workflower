@@ -10,6 +10,7 @@ class Config:
     DEVELOPMENT = os.getenv("DEVELOPMENT")
     CYCLE = int(os.getenv("CYCLE"))
     TIME_ZONE = os.getenv("TIME_ZONE")
+    LOGGING_PATH = os.getenv("LOGGING_PATH")
     LOGGING_FILE = os.getenv("LOGGING_FILE")
     WORKFLOWS_FILES_PATH = os.getenv("WORKFLOWS_FILES_PATH")
     JOB_DATABASE_URL = os.getenv("JOB_DATABASE_URL")
