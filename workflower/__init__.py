@@ -14,6 +14,7 @@ log_format = (
     " %(message)s"
 )
 logging.basicConfig(
+    filename="log.log",
     encoding="utf-8",
     level=logging.INFO,
     format=log_format,
@@ -81,7 +82,6 @@ class App:
                     for job_name in scheduled_jobs
                     if job_name not in loaded_jobs
                 ]
-                print(removed_jobs)
                 for job_id in removed_jobs:
                     logger.info(f"Removing: {removed_jobs}")
                     try:
