@@ -63,6 +63,7 @@ def validate_schema(configuration_dict: dict) -> bool:
             raise InvalidSchemaError(
                 f"Job trigger must be: {', '.join(job_uses_options)}"
             )
+        # Papermill
         if job["uses"] == "papermill":
             papermill_keys = ["input_path", "output_path"]
             if not all(key in job.keys() for key in papermill_keys):
@@ -73,6 +74,7 @@ def validate_schema(configuration_dict: dict) -> bool:
             # TODO
             # Validate if input_path ends with ipynb and file exists
             # and output_path ends with ipynb and dir exists
+        # Alteryx
         if job["uses"] == "alteryx":
             alteryx_keys = ["path"]
             if not all(key in job.keys() for key in alteryx_keys):
