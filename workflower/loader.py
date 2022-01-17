@@ -30,9 +30,7 @@ def validate_schema(configuration_dict: dict) -> bool:
         raise InvalidTypeError("Version must be type string")
     #  Workflow
     if not isinstance(configuration_dict["workflow"], dict):
-        raise InvalidTypeError(
-            "Workflow must contain name and job information"
-        )
+        raise InvalidTypeError("Workflow wrong definition")
     workflow_keys = ["name", "jobs"]
     workflow = configuration_dict["workflow"]
     if not all(key in workflow.keys() for key in workflow_keys):
@@ -43,7 +41,10 @@ def validate_schema(configuration_dict: dict) -> bool:
     if not isinstance(workflow["name"], str):
         raise InvalidTypeError("Name must be type string")
     # Jobs
+
     workflow_jobs = workflow["jobs"]
+    if not isinstance(workflow_jobs, list):
+        raise InvalidTypeError("Workflow jobs wrong definition")
     job_keys = ["name", "uses", "trigger"]
     job_trigger_options = ["date", "cron", "interval"]
     job_uses_options = ["alteryx", "papermill"]
