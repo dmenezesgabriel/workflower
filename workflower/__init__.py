@@ -54,11 +54,25 @@ class App:
         while True:
             logger.info("Loading Workflows")
             workflows = load_all()
+            for workflow in workflows:
+                logger.debug(
+                    f"Found workflow: {workflow.name} - "
+                    f"last modified at: {workflow.modified_at}"
+                )
             # TODO
             # improve this ugly code
             # Update schedule if file is changed
             logger.info("Checking workflows")
+            logger.info(f"Workflows Loaded {len(workflows)}")
             if self.workflows:
+                for loaded_workflow in self.workflows:
+                    logger.debug(
+                        f"Stored workflow: {loaded_workflow.name} - "
+                        f"last modified at: {loaded_workflow.modified_at}"
+                    )
+                logger.info(
+                    f"Current scheduled workflows {len(self.workflows)}"
+                )
                 logger.info("Checking scheduled jobs")
                 # This jobs were scheduled on past cycle
                 scheduled_jobs = [
@@ -79,48 +93,35 @@ class App:
                     for job_name in scheduled_jobs
                     if job_name not in loaded_jobs
                 ]
-                logger.info("Checking modified jobs")
                 # Get modified jobs, this will remove job if has been modified
                 # to reschedule it after
+                modified_jobs = []
                 for new_workflow in workflows:
-                    # TODO
-                    # Modification monitor not working properly
                     # Modified workflows according to file modification time
-                    modified_workflows = []
-                    for scheduled_workflow in self.workflows:
-                        logger.debug(f"New workflow name: {new_workflow.name}")
-                        logger.debug(
-                            "New workflow modified at: "
-                            f"{new_workflow.modified_at}"
-                        )
-
-                        logger.debug(
-                            "Scheduled workflow name: "
-                            f"{scheduled_workflow.name}"
-                        )
-                        logger.debug(
-                            "Scheduled workflow modified at: "
-                            f"{scheduled_workflow.modified_at}"
-                        )
-
-                        if (new_workflow.name == scheduled_workflow.name) and (
-                            new_workflow.modified_at
-                            != scheduled_workflow.modified_at
-                        ):
-                            modified_workflows.append(scheduled_workflow)
-                    # Modified jobs according to workflow modification time
-                    modified_jobs = [
-                        job[0].name
-                        for job in [
-                            workflow.jobs for workflow in modified_workflows
-                        ]
+                    modified_workflows = [
+                        workflow
+                        for workflow in self.workflows
+                        if (new_workflow.name == workflow.name)
+                        and (new_workflow.modified_at != workflow.modified_at)
                     ]
+                    # Modified jobs according to workflow modification time
+                    modified_jobs.extend(
+                        [
+                            job[0].name
+                            for job in [
+                                workflow.jobs
+                                for workflow in modified_workflows
+                            ]
+                        ]
+                    )
                 logger.info("Removing jobs")
                 # Remove deleted or modified jobs from scheduler
+                logger.debug(f"_Removed jobs: {removed_jobs}")
+                logger.debug(f"_Modified jobs: {modified_jobs}")
                 jobs_to_remove = []
                 if removed_jobs or modified_jobs:
-                    logger.debug(f"Removed jobs: {removed_jobs}")
-                    logger.debug(f"Modified jobs: {modified_jobs}")
+                    logger.info(f"Removed jobs: {removed_jobs}")
+                    logger.info(f"Modified jobs: {modified_jobs}")
                     jobs_to_remove.extend(modified_jobs)
                     jobs_to_remove.extend(removed_jobs)
                     for job_id in jobs_to_remove:
