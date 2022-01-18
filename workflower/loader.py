@@ -112,8 +112,22 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
     with open(workflow_yaml_config_path) as yf:
         configuration_dict = yaml.safe_load(yf)
     validate_schema(configuration_dict)
+    # File name must match with workflow name to workflow be loaded
+    workflow_file_name = os.path.splitext(
+        os.path.basename(workflow_yaml_config_path)
+    )[0]
+    logger.debug(f"Workflow file name: {workflow_file_name}")
     workflow_name = configuration_dict["workflow"]["name"]
+    logger.debug(f"Workflow name: {workflow_name}")
+
     logger.info(f"Workflow found: {workflow_name}")
+    if workflow_name != workflow_file_name:
+        logger.warning(
+            f"Workflow name from {workflow_name}"
+            f"don't match with file name {workflow_yaml_config_path}, "
+            "skipping load"
+        )
+        return
     #  Preparing jobs
     jobs = []
     workflow_jobs = configuration_dict["workflow"]["jobs"]
@@ -138,11 +152,12 @@ def load_all(workflows_path: str = Config.WORKFLOWS_FILES_PATH) -> List:
     workflows = []
     for root, dirs, files in os.walk(workflows_path):
         for file in files:
-            if file.endswith(".yml"):
+            if file.endswith(".yml") or file.endswith(".yaml"):
                 workflow_yaml_config_path = os.path.join(root, file)
                 try:
                     workflow = load_one(workflow_yaml_config_path)
-                    workflows.append(workflow)
+                    if workflow:
+                        workflows.append(workflow)
                 except Exception as error:
                     logger.error(error)
     return workflows

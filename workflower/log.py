@@ -26,7 +26,7 @@ def setup_loggers():
     file_handler = RotatingFileHandler(
         log_file_path,
         maxBytes=50000,
-        backupCount=10,
+        backupCount=3,
     )
     file_handler.setFormatter(formatter)
     # App logger
