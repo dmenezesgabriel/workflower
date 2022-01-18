@@ -1,11 +1,15 @@
+import logging
+
 from workflower import App
-from workflower.logger import app_logger
+from workflower.log import setup_loggers
 
 app = App()
 
 if __name__ == "__main__":
+    setup_loggers()
+    logger = logging.getLogger("workflower")
     app.setup()
-    app_logger.info("Starting Workflower")
+    logger.info("Starting Workflower")
     try:
         app.run()
     except KeyboardInterrupt:

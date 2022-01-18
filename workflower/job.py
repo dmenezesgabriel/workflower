@@ -10,7 +10,7 @@ from papermill import execute_notebook
 
 from workflower.alteryx import run_workflow
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("workflower.job")
 
 
 class Job:

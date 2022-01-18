@@ -8,18 +8,17 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 
 from workflower.loader import load_all
-from workflower.logger import app_logger
+
+logger = logging.getLogger("workflower")
 
 
 # TODO
 # Make an workflow dependencies check event
 def job_runs(event):
     if event.exception:
-        app_logger.warning(
-            f"Job: {event.job_id}, did not run: {event.exception}"
-        )
+        logger.warning(f"Job: {event.job_id}, did not run: {event.exception}")
     else:
-        app_logger.info(f"Job: {event.job_id}, successfully executed")
+        logger.info(f"Job: {event.job_id}, successfully executed")
 
 
 def job_return_val(event):
@@ -53,26 +52,26 @@ class App:
     def run(self):
         self.scheduler.start()
         while True:
-            app_logger.info("Loading Workflows")
+            logger.info("Loading Workflows")
             workflows = load_all()
             # TODO
             # improve this ugly code
             # Update schedule if file is changed
-            app_logger.info("Checking workflows")
+            logger.info("Checking workflows")
             if self.workflows:
-                app_logger.info("Checking scheduled jobs")
+                logger.info("Checking scheduled jobs")
                 # This jobs were scheduled on past cycle
                 scheduled_jobs = [
                     job[0].name
                     for job in [workflow.jobs for workflow in self.workflows]
                 ]
-                app_logger.info("Checking loaded jobs")
+                logger.info("Checking loaded jobs")
                 # This jobs were loaded on most recent cycle
                 loaded_jobs = [
                     job[0].name
                     for job in [workflow.jobs for workflow in workflows]
                 ]
-                app_logger.info("Checking removed jobs")
+                logger.info("Checking removed jobs")
                 # Get removed jobs, this will remove job's
                 # file has been removed
                 removed_jobs = [
@@ -80,7 +79,7 @@ class App:
                     for job_name in scheduled_jobs
                     if job_name not in loaded_jobs
                 ]
-                app_logger.info("Checking modified jobs")
+                logger.info("Checking modified jobs")
                 # Get modified jobs, this will remove job if has been modified
                 # to reschedule it after
                 for new_workflow in workflows:
@@ -98,26 +97,26 @@ class App:
                             workflow.jobs for workflow in modified_workflows
                         ]
                     ]
-                app_logger.info("Removing jobs jobs")
+                logger.info("Removing jobs jobs")
                 # Remove deleted or modified jobs from scheduler
                 jobs_to_remove = []
                 if jobs_to_remove:
                     jobs_to_remove.extend(modified_jobs)
                     jobs_to_remove.extend(removed_jobs)
                     for job_id in jobs_to_remove:
-                        app_logger.info(f"Removing: {removed_jobs}")
+                        logger.info(f"Removing: {removed_jobs}")
                         try:
                             self.scheduler.remove_job(job_id)
                         except JobLookupError:
-                            app_logger.warning(
+                            logger.warning(
                                 f"tried to remove {job_id}, "
                                 "but it was not scheduled"
                             )
 
             # schedule jobs
-            app_logger.info("Scheduling jobs")
+            logger.info("Scheduling jobs")
             self.workflows = workflows
             for workflow in self.workflows:
                 workflow.schedule_jobs(self.scheduler)
-            app_logger.info(f"Sleeping {Config.CYCLE} seconds")
+            logger.info(f"Sleeping {Config.CYCLE} seconds")
             time.sleep(Config.CYCLE)
