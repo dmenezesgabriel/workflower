@@ -100,7 +100,9 @@ class App:
                 logger.info("Removing jobs")
                 # Remove deleted or modified jobs from scheduler
                 jobs_to_remove = []
-                if jobs_to_remove:
+                if removed_jobs or modified_jobs:
+                    logger.debug(f"Removed jobs: {removed_jobs}")
+                    logger.debug(f"Modified jobs: {modified_jobs}")
                     jobs_to_remove.extend(modified_jobs)
                     jobs_to_remove.extend(removed_jobs)
                     for job_id in jobs_to_remove:
