@@ -18,6 +18,7 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
 
     import papermill as pm
 
+    # Logging configuration
     string_buffer = StringBuffer()
 
     def papermill_log_output_filter(record):
@@ -43,20 +44,30 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     papermill_logger.addHandler(stream_handler)
     papermill_logger.addFilter(papermill_log_output_filter)
     papermill_logger.addFilter(customize_logger_record)
+
     # Run notebook
-    pm.execute_notebook(
-        input_path=input_path,
-        output_path=output_path,
-        log_output=True,
-        progress_bar=False,
-    )
+    def execute_notebook(input_path, output_path):
+        try:
+            pm.execute_notebook(
+                input_path=input_path,
+                output_path=output_path,
+                log_output=True,
+                progress_bar=False,
+            )
+        except Exception as error:
+            papermill_logger.error(f"Execution error: {error}")
+
+    execute_notebook(input_path, output_path)
     # Make DataFrame from logs
     log_contents = string_buffer.getvalue()
     dict_pattern = r"(\{[^{}]+\})"
     matches = re.findall(dict_pattern, log_contents)
+    _df = None
     if matches:
         log_list = [json.loads(log) for log in matches]
         _df = pd.DataFrame(log_list)
-        string_buffer.close()
         _df.to_sql(con=con, name="papermill_executions", if_exists="append")
-        return _df
+    # TODO
+    # Close buffer without error
+    # string_buffer.close()
+    return _df

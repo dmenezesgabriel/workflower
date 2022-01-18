@@ -83,13 +83,31 @@ class App:
                 # Get modified jobs, this will remove job if has been modified
                 # to reschedule it after
                 for new_workflow in workflows:
+                    # TODO
+                    # Modification monitor not working properly
                     # Modified workflows according to file modification time
-                    modified_workflows = [
-                        workflow
-                        for workflow in self.workflows
-                        if (new_workflow.name == workflow.name)
-                        and (new_workflow.modified_at != workflow.modified_at)
-                    ]
+                    modified_workflows = []
+                    for scheduled_workflow in self.workflows:
+                        logger.debug(f"New workflow name: {new_workflow.name}")
+                        logger.debug(
+                            "New workflow modified at: "
+                            f"{new_workflow.modified_at}"
+                        )
+
+                        logger.debug(
+                            "Scheduled workflow name: "
+                            f"{scheduled_workflow.name}"
+                        )
+                        logger.debug(
+                            "Scheduled workflow modified at: "
+                            f"{scheduled_workflow.modified_at}"
+                        )
+
+                        if (new_workflow.name == scheduled_workflow.name) and (
+                            new_workflow.modified_at
+                            != scheduled_workflow.modified_at
+                        ):
+                            modified_workflows.append(scheduled_workflow)
                     # Modified jobs according to workflow modification time
                     modified_jobs = [
                         job[0].name
