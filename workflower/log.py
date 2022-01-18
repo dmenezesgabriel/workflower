@@ -17,6 +17,7 @@ def setup_loggers():
         "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
         " %(message)s"
     )
+    log_level = getattr(logging, Config.LOG_LEVEL)
     formatter = logging.Formatter(default_log_format)
     # Handlers
     # Console
@@ -31,11 +32,11 @@ def setup_loggers():
     file_handler.setFormatter(formatter)
     # App logger
     app_logger = logging.getLogger("workflower")
-    app_logger.setLevel(logging.INFO)
+    app_logger.setLevel(log_level)
     app_logger.addHandler(stream_handler)
     app_logger.addHandler(file_handler)
     # Scheduler logger
     scheduler_logger = logging.getLogger("apscheduler")
-    scheduler_logger.setLevel(logging.INFO)
+    scheduler_logger.setLevel(log_level)
     scheduler_logger.addHandler(stream_handler)
     scheduler_logger.addHandler(file_handler)

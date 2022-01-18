@@ -97,7 +97,7 @@ class App:
                             workflow.jobs for workflow in modified_workflows
                         ]
                     ]
-                logger.info("Removing jobs jobs")
+                logger.info("Removing jobs")
                 # Remove deleted or modified jobs from scheduler
                 jobs_to_remove = []
                 if jobs_to_remove:
