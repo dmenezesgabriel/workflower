@@ -4,11 +4,11 @@ Workflow class.
 
 
 class Workflow:
-    def __init__(self, name, jobs, modified_at):
+    def __init__(self, name, jobs, last_modified_at):
         self.name = name
         self.jobs = jobs
-        self.modified_at = modified_at
+        self.last_modified_at = last_modified_at
 
     def schedule_jobs(self, scheduler):
         for job in self.jobs:
-            job.schedule_one(scheduler)
+            job.schedule(scheduler)

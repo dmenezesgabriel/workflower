@@ -5,99 +5,11 @@ from typing import List
 import yaml
 from config import Config
 
-from workflower.exceptions import InvalidSchemaError, InvalidTypeError
-from workflower.models.job import Job
+from workflower.models.job import JobWrapper
 from workflower.models.workflow import Workflow
+from workflower.utils.schema import parse_job, validate_schema
 
 logger = logging.getLogger("workflower.loader")
-
-
-def validate_schema(configuration_dict: dict) -> bool:
-    """
-    Validate pipeline file schema
-    """
-    # TODO
-    #  Break in smaller functions
-    logger.debug("Validating yml schema")
-    #  Pipeline
-    pipeline_keys = ["version", "workflow"]
-    if not all(key in configuration_dict.keys() for key in pipeline_keys):
-        raise InvalidSchemaError(
-            "The pipeline must have all of it's keys: "
-            f"{', '.join(pipeline_keys)}"
-        )
-    if not isinstance(configuration_dict["version"], str):
-        raise InvalidTypeError("Version must be type string")
-    #  Workflow
-    if not isinstance(configuration_dict["workflow"], dict):
-        raise InvalidTypeError("Workflow wrong definition")
-    workflow_keys = ["name", "jobs"]
-    workflow = configuration_dict["workflow"]
-    if not all(key in workflow.keys() for key in workflow_keys):
-        raise InvalidSchemaError(
-            "The workflow must have all of it's keys: "
-            f"{', '.join(workflow_keys)}"
-        )
-    if not isinstance(workflow["name"], str):
-        raise InvalidTypeError("Name must be type string")
-    # Jobs
-
-    workflow_jobs = workflow["jobs"]
-    if not isinstance(workflow_jobs, list):
-        raise InvalidTypeError("Workflow jobs wrong definition")
-    job_keys = ["name", "uses", "trigger"]
-    job_trigger_options = ["date", "cron", "interval"]
-    job_uses_options = ["alteryx", "papermill"]
-    for job in workflow_jobs:
-        # Job keys
-        if not all(key in job.keys() for key in job_keys):
-            raise InvalidSchemaError(
-                "The job must have all of it's keys: " f"{', '.join(job_keys)}"
-            )
-        if not isinstance(job["name"], str):
-            raise InvalidTypeError("Name must be type string")
-        #  Job uses
-        if not isinstance(job["uses"], str):
-            raise InvalidTypeError("Name must be type string")
-        if job["uses"] not in job_uses_options:
-            raise InvalidSchemaError(
-                f"Job trigger must be: {', '.join(job_uses_options)}"
-            )
-        # Papermill
-        if job["uses"] == "papermill":
-            papermill_keys = ["input_path", "output_path"]
-            if not all(key in job.keys() for key in papermill_keys):
-                raise InvalidSchemaError(
-                    "Papermill jobs must contain: "
-                    f"{', '.join(papermill_keys)}"
-                )
-            # TODO
-            # Validate if input_path ends with ipynb and file exists
-            # and output_path ends with ipynb and dir exists
-        # Alteryx
-        if job["uses"] == "alteryx":
-            alteryx_keys = ["path"]
-            if not all(key in job.keys() for key in alteryx_keys):
-                raise InvalidSchemaError(
-                    "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
-                )
-            # TODO
-            # Validate if path ends with alteryx extension and file exists
-        # Job triggers
-        if not isinstance(job["trigger"], str):
-            raise InvalidTypeError("Name must be type string")
-        if job["trigger"] not in job_trigger_options:
-            raise InvalidSchemaError(
-                f"Job trigger must be: {', '.join(job_trigger_options)}"
-            )
-        # TODO
-        if job["trigger"] == "date":
-            pass
-        if job["trigger"] == "cron":
-            pass
-        if job["trigger"] == "interval":
-            pass
-    return True
 
 
 def get_file_modification_date(file_path):
@@ -108,9 +20,12 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
     """
     Load one workflow from a yaml file.
     """
+    # TODO
+    # Pytest this function
     logger.info(f"Loading pipeline file: {workflow_yaml_config_path}")
     with open(workflow_yaml_config_path) as yf:
         configuration_dict = yaml.safe_load(yf)
+    # Validate file
     validate_schema(configuration_dict)
     # File name must match with workflow name to workflow be loaded
     workflow_file_name = os.path.splitext(
@@ -118,8 +33,6 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
     )[0]
     logger.debug(f"Workflow file name: {workflow_file_name}")
     workflow_name = configuration_dict["workflow"]["name"]
-    logger.debug(f"Workflow name: {workflow_name}")
-
     logger.info(f"Workflow found: {workflow_name}")
     if workflow_name != workflow_file_name:
         logger.warning(
@@ -128,19 +41,27 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
             "skipping load"
         )
         return
-    #  Preparing jobs
+    # Preparing jobs
     jobs = []
     workflow_jobs = configuration_dict["workflow"]["jobs"]
     for workflow_job in workflow_jobs:
+        job_uses = workflow_job["uses"]
+        job_definition = parse_job(workflow_job)
+        # Job name must be unique
         job_name = workflow_job["name"]
-        new_job_name = workflow_name + "_" + job_name
-        workflow_job.update({"name": new_job_name})
-        job = Job(name=new_job_name, config=workflow_job)
+        unique_job_id = workflow_name + "_" + job_name
+        job_definition.update({"id": unique_job_id})
+        # Adding job's relevant information
+        job = JobWrapper(
+            name=unique_job_id, uses=job_uses, definition=job_definition
+        )
         jobs.append(job)
     #  Creating workflow object
-    workflow_modified_at = os.path.getmtime(workflow_yaml_config_path)
+    workflow_last_modified_at = os.path.getmtime(workflow_yaml_config_path)
     workflow = Workflow(
-        name=workflow_name, jobs=jobs, modified_at=workflow_modified_at
+        name=workflow_name,
+        jobs=jobs,
+        last_modified_at=workflow_last_modified_at,
     )
     return workflow
 
@@ -149,6 +70,8 @@ def load_all(workflows_path: str = Config.WORKFLOWS_FILES_PATH) -> List:
     """
     Load all.
     """
+    # TODO
+    # Pytest this function
     workflows = []
     for root, dirs, files in os.walk(workflows_path):
         for file in files:

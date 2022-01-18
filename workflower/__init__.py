@@ -12,23 +12,31 @@ from workflower.loader import load_all
 logger = logging.getLogger("workflower")
 
 
-# TODO
-# Make an workflow dependencies check event
-def job_runs(event):
-    if event.exception:
-        logger.warning(f"Job: {event.job_id}, did not run: {event.exception}")
-    else:
-        logger.info(f"Job: {event.job_id}, successfully executed")
-
-
-def job_return_val(event):
-    return event.retval
-
-
 class App:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.workflows = None
+
+    def job_runs(self, event):
+        if event.exception:
+            logger.warning(
+                f"Job: {event.job_id}, did not run: {event.exception}"
+            )
+        else:
+            logger.info(f"Job: {event.job_id}, successfully executed")
+
+    def job_return_val(self, event):
+        job = self.scheduler.get_job(event.job_id)
+        logger.debug(f"job id {job.id}")
+        job_object = [
+            scheduled_job[0]
+            for scheduled_job in [workflow.jobs for workflow in self.workflows]
+            if scheduled_job[0].name == job.id
+        ][0]
+        logger.debug(f"Job object: {job_object.name}")
+        logger.debug(f"Job returned {job.id} result")
+        logger.debug(f"job nextrun {job.next_run_time}")
+        return event.retval
 
     def setup(self):
         jobstores = {
@@ -40,9 +48,9 @@ class App:
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_listener(
-            job_runs, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+            self.job_runs, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
         )
-        self.scheduler.add_listener(job_return_val, EVENT_JOB_EXECUTED)
+        self.scheduler.add_listener(self.job_return_val, EVENT_JOB_EXECUTED)
         self.scheduler.configure(
             jobstores=jobstores,
             executors=executors,
@@ -57,7 +65,7 @@ class App:
             for workflow in workflows:
                 logger.debug(
                     f"Found workflow: {workflow.name} - "
-                    f"last modified at: {workflow.modified_at}"
+                    f"last modified at: {workflow.last_modified_at}"
                 )
             # TODO
             # improve this ugly code
@@ -68,7 +76,7 @@ class App:
                 for loaded_workflow in self.workflows:
                     logger.debug(
                         f"Stored workflow: {loaded_workflow.name} - "
-                        f"last modified at: {loaded_workflow.modified_at}"
+                        f"last modified at: {loaded_workflow.last_modified_at}"
                     )
                 logger.info(
                     f"Current scheduled workflows {len(self.workflows)}"
@@ -102,7 +110,10 @@ class App:
                         workflow
                         for workflow in self.workflows
                         if (new_workflow.name == workflow.name)
-                        and (new_workflow.modified_at != workflow.modified_at)
+                        and (
+                            new_workflow.last_modified_at
+                            != workflow.last_modified_at
+                        )
                     ]
                     # Modified jobs according to workflow modification time
                     modified_jobs.extend(

@@ -1,5 +1,5 @@
 import pytest
-import workflower.loader as loader
+import workflower.utils.schema as schema
 import yaml
 from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 
@@ -18,7 +18,7 @@ def test_validate_true():
           minute: "*/5"
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
 
 
 def test_validate_missing_version():
@@ -35,7 +35,7 @@ def test_validate_missing_version():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_invalid_version_type():
@@ -53,7 +53,7 @@ def test_validate_invalid_version_type():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_invalid_workflow_name_type():
@@ -71,7 +71,7 @@ def test_validate_invalid_workflow_name_type():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_missing_workflow():
@@ -80,7 +80,7 @@ def test_validate_missing_workflow():
         version: "1.0"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_missing_jobs():
@@ -91,7 +91,7 @@ def test_validate_missing_jobs():
           name: papermill_sample_date_trigger
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_job_has_name():
@@ -108,7 +108,7 @@ def test_validate_job_has_name():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_job_has_uses():
@@ -125,7 +125,7 @@ def test_validate_job_has_uses():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_invalid_uses():
@@ -143,7 +143,7 @@ def test_validate_invalid_uses():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_uses_alteryx():
@@ -159,7 +159,7 @@ def test_validate_uses_alteryx():
           minute: "*/5"
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
 
 
 def test_validate_uses_papermill():
@@ -176,7 +176,7 @@ def test_validate_uses_papermill():
           minute: "*/5"
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
 
 
 def test_validate_job_has_trigger():
@@ -192,7 +192,7 @@ def test_validate_job_has_trigger():
               output_path: ""
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_invalid_trigger():
@@ -210,7 +210,7 @@ def test_validate_invalid_trigger():
               minute: "*/5"
         """
         configuration_dict = yaml.safe_load(yaml_config)
-        loader.validate_schema(configuration_dict)
+        schema.validate_schema(configuration_dict)
 
 
 def test_validate_trigger_date():
@@ -226,7 +226,7 @@ def test_validate_trigger_date():
           trigger: date
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
 
 
 def test_validate_trigger_cron():
@@ -242,7 +242,7 @@ def test_validate_trigger_cron():
           trigger: cron
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
 
 
 def test_validate_trigger_interval():
@@ -258,4 +258,4 @@ def test_validate_trigger_interval():
           trigger: interval
     """
     configuration_dict = yaml.safe_load(yaml_config)
-    assert loader.validate_schema(configuration_dict) is True
+    assert schema.validate_schema(configuration_dict) is True
