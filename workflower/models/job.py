@@ -4,7 +4,10 @@ Job class.
 
 import logging
 
+import pandas as pd
+import sqlalchemy
 from apscheduler.jobstores.base import ConflictingIdError
+from config import Config
 
 logger = logging.getLogger("workflower.job")
 
@@ -14,6 +17,7 @@ class JobWrapper:
         self.name = name
         self.uses = uses
         self.definition = definition
+        self.job = None
 
     def schedule(self, scheduler) -> None:
         """
@@ -21,11 +25,23 @@ class JobWrapper:
         """
         job_id = self.definition["id"]
         logger.debug(f"scheduling {job_id}")
-        # TODO
-        # Move to another function
-        # Update job if yaml file has been modified
         logger.debug(self.definition)
         try:
-            scheduler.add_job(**self.definition)
+            self.job = scheduler.add_job(**self.definition)
         except ConflictingIdError:
             logger.warning(f"{job_id}, already scheduled")
+
+    def save_execution(self, dataframe: pd.DataFrame):
+        engine = sqlalchemy.create_engine(
+            Config.WORKFLOWS_EXECUTION_DATABASE_URL
+        )
+        connection = engine.raw_connection()
+        if self.uses == "papermill":
+            dataframe.to_sql(
+                con=connection, name="papermill_executions", if_exists="append"
+            )
+        if self.uses == "alteryx":
+            dataframe.to_sql(
+                con=connection, name="alteryx_executions", if_exists="append"
+            )
+        connection.close()

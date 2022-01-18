@@ -10,11 +10,7 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     import re
 
     import pandas as pd
-    import sqlalchemy
-    from config import Config
     from pythonjsonlogger import jsonlogger
-
-    con = sqlalchemy.create_engine(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
 
     import papermill as pm
 
@@ -66,7 +62,6 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     if matches:
         log_list = [json.loads(log) for log in matches]
         _df = pd.DataFrame(log_list)
-        _df.to_sql(con=con, name="papermill_executions", if_exists="append")
     # TODO
     # Close buffer without error
     # string_buffer.close()

@@ -3,7 +3,6 @@ Workflower Models
 """
 from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-
 from workflower.database import Base
 
 # TODO
@@ -23,6 +22,7 @@ class Job(Base):
     __tablename__ = "jobs"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    definition = Column(JSON, index=True)
     workflow_id = Column(Integer, ForeignKey("workflows.id"))
 
     workflow = relationship("Workflow", back_populates="jobs")

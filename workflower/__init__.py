@@ -1,6 +1,7 @@
 import logging
 import time
 
+import pandas as pd
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -16,27 +17,41 @@ class App:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.workflows = None
+        self.is_running = False
 
-    def job_runs(self, event):
+    def job_execution(self, event):
         if event.exception:
             logger.warning(
                 f"Job: {event.job_id}, did not run: {event.exception}"
             )
         else:
-            logger.info(f"Job: {event.job_id}, successfully executed")
+            job = self.scheduler.get_job(event.job_id)
+            if job:
+                logger.info(f"Job: {event.job_id}, successfully executed")
+                logger.debug(f"job nextrun {job.next_run_time}")
 
-    def job_return_val(self, event):
-        job = self.scheduler.get_job(event.job_id)
-        logger.debug(f"job id {job.id}")
-        job_object = [
-            scheduled_job[0]
-            for scheduled_job in [workflow.jobs for workflow in self.workflows]
-            if scheduled_job[0].name == job.id
-        ][0]
-        logger.debug(f"Job object: {job_object.name}")
-        logger.debug(f"Job returned {job.id} result")
-        logger.debug(f"job nextrun {job.next_run_time}")
-        return event.retval
+    def save_job_execution(self, event):
+        if event.exception:
+            return
+        else:
+            job = self.scheduler.get_job(event.job_id)
+            if job:
+                logger.debug(f"job id {job.id}")
+                job_wrapper = [
+                    scheduled_job[0]
+                    for scheduled_job in [
+                        workflow.jobs for workflow in self.workflows
+                    ]
+                    if scheduled_job[0].name == job.id
+                ][0]
+                if job_wrapper:
+                    logger.debug(f"Job uses: {job_wrapper.uses}")
+                    return_value = event.retval
+                    if isinstance(return_value, pd.DataFrame):
+                        self.scheduler.add_job(
+                            func=job_wrapper.save_execution,
+                            kwargs=dict(dataframe=return_value),
+                        )
 
     def setup(self):
         jobstores = {
@@ -48,9 +63,11 @@ class App:
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_listener(
-            self.job_runs, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+            self.job_execution, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
         )
-        self.scheduler.add_listener(self.job_return_val, EVENT_JOB_EXECUTED)
+        self.scheduler.add_listener(
+            self.save_job_execution, EVENT_JOB_EXECUTED
+        )
         self.scheduler.configure(
             jobstores=jobstores,
             executors=executors,
@@ -59,7 +76,8 @@ class App:
 
     def run(self):
         self.scheduler.start()
-        while True:
+        self.is_running = True
+        while self.is_running:
             logger.info("Loading Workflows")
             workflows = load_all()
             for workflow in workflows:

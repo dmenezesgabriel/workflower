@@ -17,10 +17,6 @@ def run_workflow(path: str) -> pd.DataFrame:
     from datetime import timedelta
 
     import pandas as pd
-    import sqlalchemy
-    from config import Config
-
-    con = sqlalchemy.create_engine(Config.WORKFLOWS_EXECUTION_DATABASE_URL)
 
     def workflow_runner(location: str) -> Tuple:
         """
@@ -114,6 +110,4 @@ def run_workflow(path: str) -> pd.DataFrame:
 
     results, finish = workflow_runner(path)
     _df = result_parser(results, finish)
-    _df.to_sql(con=con, name="alteryx_executions", if_exists="append")
-
     return _df
