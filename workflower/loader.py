@@ -6,8 +6,8 @@ import yaml
 from config import Config
 
 from workflower.exceptions import InvalidSchemaError, InvalidTypeError
-from workflower.job import Job
-from workflower.workflow import Workflow
+from workflower.models.job import Job
+from workflower.models.workflow import Workflow
 
 logger = logging.getLogger("workflower.loader")
 

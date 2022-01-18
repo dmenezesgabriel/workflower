@@ -6,9 +6,8 @@ import logging
 import os
 
 from apscheduler.jobstores.base import ConflictingIdError
-
-from workflower.alteryx import run_workflow
-from workflower.papermill import run_notebook
+from workflower.operators.alteryx import run_workflow
+from workflower.operators.papermill import run_notebook
 
 logger = logging.getLogger("workflower.job")
 

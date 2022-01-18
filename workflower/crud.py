@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from workflower.models import Job, Workflow
+from workflower.models.models import Job, Workflow
 
 
 def get_workflow(db: Session, workflow_id: int):
