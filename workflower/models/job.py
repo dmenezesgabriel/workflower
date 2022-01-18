@@ -13,10 +13,11 @@ logger = logging.getLogger("workflower.job")
 
 
 class JobWrapper:
-    def __init__(self, name, uses=None, definition=None):
+    def __init__(self, name, uses=None, definition=None, depends_on=None):
         self.name = name
         self.uses = uses
         self.definition = definition
+        self.depends_on = depends_on
         self.job = None
 
     def schedule(self, scheduler) -> None:
@@ -29,7 +30,7 @@ class JobWrapper:
         try:
             self.job = scheduler.add_job(**self.definition)
         except ConflictingIdError:
-            logger.warning(f"{job_id}, already scheduled")
+            logger.warning(f"{job_id}, already scheduled, skipping.")
 
     def save_execution(self, dataframe: pd.DataFrame):
         engine = sqlalchemy.create_engine(

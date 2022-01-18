@@ -7,7 +7,7 @@ from config import Config
 
 from workflower.models.job import JobWrapper
 from workflower.models.workflow import Workflow
-from workflower.utils.schema import parse_job, validate_schema
+from workflower.utils.schema import make_job_definition, validate_schema
 
 logger = logging.getLogger("workflower.loader")
 
@@ -43,19 +43,34 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
         return
     # Preparing jobs
     jobs = []
+    # TODO
+    # Wrap workflow name + job name operations on a separated function
     workflow_jobs = configuration_dict["workflow"]["jobs"]
     for workflow_job in workflow_jobs:
-        job_uses = workflow_job["uses"]
-        job_definition = parse_job(workflow_job)
-        # Job name must be unique
         job_name = workflow_job["name"]
+        logger.debug(f"Job name: {job_name}")
+        job_uses = workflow_job["uses"]
+        logger.debug(f"Job uses: {job_uses}")
+        # job_depends_on must point to another job of same workflow
+        # Then the event listener will trigger the job by it's id
+        job_depends_on = workflow_job.get("depends_on", None)
+        if job_depends_on:
+            job_depends_on = workflow_name + "_" + job_depends_on
+        logger.debug(f"Job depends on: {job_depends_on}")
+        # Make apscheduler job definition
+        job_definition = make_job_definition(workflow_job)
+        # Job name must be unique
         unique_job_id = workflow_name + "_" + job_name
         job_definition.update({"id": unique_job_id})
         # Adding job's relevant information
         job = JobWrapper(
-            name=unique_job_id, uses=job_uses, definition=job_definition
+            name=unique_job_id,
+            uses=job_uses,
+            definition=job_definition,
+            depends_on=job_depends_on,
         )
         jobs.append(job)
+    logger.debug(f"Workflow jobs {[job.name for job in jobs]}")
     #  Creating workflow object
     workflow_last_modified_at = os.path.getmtime(workflow_yaml_config_path)
     workflow = Workflow(

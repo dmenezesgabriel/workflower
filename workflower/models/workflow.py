@@ -11,4 +11,8 @@ class Workflow:
 
     def schedule_jobs(self, scheduler):
         for job in self.jobs:
+            # If job has dependencies wait till the event of
+            # it's job dependency occurs
+            if job.depends_on:
+                continue
             job.schedule(scheduler)

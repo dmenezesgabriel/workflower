@@ -41,13 +41,13 @@ def validate_schema(configuration_dict: dict) -> bool:
     if not isinstance(workflow["name"], str):
         raise InvalidTypeError("Name must be type string")
     # Jobs
-
     workflow_jobs = workflow["jobs"]
     if not isinstance(workflow_jobs, list):
         raise InvalidTypeError("Workflow jobs wrong definition")
     job_keys = ["name", "uses", "trigger"]
-    job_trigger_options = ["date", "cron", "interval"]
+    job_trigger_options = ["date", "cron", "interval", "dependency"]
     job_uses_options = ["alteryx", "papermill"]
+    jobs_names = []
     for job in workflow_jobs:
         # Job keys
         if not all(key in job.keys() for key in job_keys):
@@ -57,6 +57,7 @@ def validate_schema(configuration_dict: dict) -> bool:
         if not isinstance(job["name"], str):
             raise InvalidTypeError("Name must be type string")
         #  Job uses
+        jobs_names.append(job["name"])
         if not isinstance(job["uses"], str):
             raise InvalidTypeError("Name must be type string")
         if job["uses"] not in job_uses_options:
@@ -97,6 +98,19 @@ def validate_schema(configuration_dict: dict) -> bool:
             pass
         if job["trigger"] == "interval":
             pass
+        if job["trigger"] == "dependency":
+            dependency_options = ["depends_on"]
+            if not all(key in job.keys() for key in dependency_options):
+                raise InvalidSchemaError(
+                    "Dependency triggered job must have keys: "
+                    f"{', '.join(dependency_options)}"
+                )
+            if not job["depends_on"] in jobs_names:
+                raise InvalidSchemaError(
+                    "Job depends_on must have a valid job name reference "
+                    "from the same workflow"
+                )
+
     return True
 
 
@@ -202,7 +216,7 @@ def parse_job_trigger_options(configuration_dict) -> dict:
     """
     trigger_config = {}
     job_trigger = configuration_dict.get("trigger")
-    logger.debug(f"Job trigger{job_trigger}")
+    logger.debug(f"Job trigger {job_trigger}")
     #  interval trigger
     if job_trigger == "interval":
         trigger_config.update(dict(trigger="interval"))
@@ -224,6 +238,10 @@ def parse_job_trigger_options(configuration_dict) -> dict:
             configuration_dict
         )
         trigger_config.update(date_trigger_options)
+    elif job_trigger == "dependency":
+        # Trigger "dependency" is not recognized by apscheduler, so it must be
+        # removed from job definition
+        configuration_dict.pop("trigger", None)
     return trigger_config
 
 
@@ -259,7 +277,7 @@ def parse_job_uses(configuration_dict) -> dict:
     return uses_config
 
 
-def parse_job(configuration_dict) -> dict:
+def make_job_definition(configuration_dict) -> dict:
     # TODO
     # Verify and build job config
     # Maybe build a config file verifier on a web page with
