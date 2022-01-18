@@ -114,6 +114,6 @@ def run_workflow(path: str) -> pd.DataFrame:
 
     results, finish = workflow_runner(path)
     _df = result_parser(results, finish)
-    _df.to_sql(con=con, name="alteryx_workflows", if_exists="append")
+    _df.to_sql(con=con, name="alteryx_executions", if_exists="append")
 
     return _df

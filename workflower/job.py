@@ -6,9 +6,9 @@ import logging
 import os
 
 from apscheduler.jobstores.base import ConflictingIdError
-from papermill import execute_notebook
 
 from workflower.alteryx import run_workflow
+from workflower.papermill import run_notebook
 
 logger = logging.getLogger("workflower.job")
 
@@ -155,14 +155,12 @@ class Job:
             if not os.path.isfile(input_path):
                 logger.error("Not a valid job path")
             output_path = self.config.get("output_path")
-            uses_config.update(dict(func=execute_notebook))
+            uses_config.update(dict(func=run_notebook))
             uses_config.update(
                 dict(
                     kwargs=dict(
                         input_path=input_path,
                         output_path=output_path,
-                        log_output=True,
-                        progress_bar=False,
                     )
                 )
             )

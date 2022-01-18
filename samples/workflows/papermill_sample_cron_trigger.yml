@@ -9,4 +9,4 @@ workflow:
       output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample_output.ipynb"
       # trigger config
       trigger: cron
-      minute: "*/5"
+      minute: "*/1"
