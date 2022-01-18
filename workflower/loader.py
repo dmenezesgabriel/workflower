@@ -9,7 +9,7 @@ from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 from workflower.job import Job
 from workflower.workflow import Workflow
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("workflower.loader")
 
 
 def validate_schema(configuration_dict: dict) -> bool:
