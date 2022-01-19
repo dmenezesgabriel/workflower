@@ -21,60 +21,61 @@ class App:
         self.jobs = None
         self.is_running = False
 
-    def job_execution(self, event) -> None:
+    def trigger_job_dependency(self, job):
+        """
+        Trigger a job that depends on another.
+        """
+        logger.debug("Checking if need to trigger a dependency job")
+        dependency_jobs = [
+            scheduled_job
+            for scheduled_job in self.jobs
+            if scheduled_job.depends_on == job.id
+        ]
+        if dependency_jobs:
+            for dependency_job in dependency_jobs:
+                logger.debug(f"Dependency job {dependency_job.name} triggered")
+                dependency_job.schedule(self.scheduler)
+
+    def save_job_returned_value(self, job, event):
+        """
+        Save the return value of a job.
+        """
+        # TODO
+        # Check why not saving on a job with dependency trigger
+        logger.debug("Checking if can save job returned value")
+        scheduled_job = [
+            scheduled_job
+            for scheduled_job in self.jobs
+            if scheduled_job.name == job.id
+        ]
+        if scheduled_job:
+            scheduled_job = scheduled_job[0]
+            logger.debug(f"{scheduled_job.name}")
+            return_value = event.retval
+            if isinstance(return_value, pd.DataFrame):
+                logger.debug(f"Saving {scheduled_job.name}, return value")
+                self.scheduler.add_job(
+                    func=scheduled_job.save_execution,
+                    kwargs=dict(dataframe=return_value),
+                )
+            else:
+                logger.debug("Return value not a DataFrame")
+
+    def on_job_finished(self, event) -> None:
+        logger.debug("Checking for dependency jobs")
+        # On job failed
         if event.exception:
             logger.warning(
                 f"Job: {event.job_id}, did not run: {event.exception}"
             )
+        #  On job success
         else:
             job = self.scheduler.get_job(event.job_id)
             if job:
                 logger.info(f"Job: {event.job_id}, successfully executed")
                 logger.debug(f"job nextrun {job.next_run_time}")
-
-    def save_job_execution(self, event) -> None:
-        logger.debug("Checking if should save job execution")
-        if event.exception:
-            return
-        else:
-            job = self.scheduler.get_job(event.job_id)
-            if job:
-                logger.debug(f"job id {job.id}")
-                job_wrapper = [
-                    scheduled_job
-                    for scheduled_job in self.jobs
-                    if scheduled_job.name == job.id
-                ]
-                if job_wrapper:
-                    job_wrapper = job_wrapper[0]
-                    logger.debug(f"Job uses: {job_wrapper.uses}")
-                    return_value = event.retval
-                    if isinstance(return_value, pd.DataFrame):
-                        self.scheduler.add_job(
-                            func=job_wrapper.save_execution,
-                            kwargs=dict(dataframe=return_value),
-                        )
-
-    def run_dependency_job(self, event) -> None:
-        logger.debug("Checking for dependency jobs")
-        if event.exception:
-            return
-        else:
-            job = self.scheduler.get_job(event.job_id)
-            if job:
-                logger.debug(f"job id {job.id}")
-                job_wrapper = [
-                    scheduled_job
-                    for scheduled_job in self.jobs
-                    if scheduled_job.depends_on == job.id
-                ]
-                logger.debug(f"dependency object: {job_wrapper}")
-                if job_wrapper:
-                    job_wrapper = job_wrapper[0]
-                    logger.debug(
-                        f"Dependency job {job_wrapper.name} triggered"
-                    )
-                    job_wrapper.schedule(self.scheduler)
+                self.trigger_job_dependency(job)
+                self.save_job_returned_value(job, event)
 
     def setup(self) -> None:
         jobstores = {
@@ -86,13 +87,7 @@ class App:
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_listener(
-            self.job_execution, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
-        )
-        self.scheduler.add_listener(
-            self.save_job_execution, EVENT_JOB_EXECUTED
-        )
-        self.scheduler.add_listener(
-            self.run_dependency_job, EVENT_JOB_EXECUTED
+            self.on_job_finished, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
         )
         self.scheduler.configure(
             jobstores=jobstores,
