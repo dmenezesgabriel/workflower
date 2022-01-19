@@ -10,6 +10,10 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     import re
 
     import pandas as pd
+
+    # TODO
+    # Change logger to CSV formatter
+    # limit workbook output log with custom filter
     from pythonjsonlogger import jsonlogger
 
     import papermill as pm
@@ -17,8 +21,9 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     # Logging configuration
     string_buffer = StringBuffer()
 
-    def papermill_log_output_filter(record):
-        return record.funcName == "log_output_message"
+    # This filter will hide errors on papermill execution
+    # def papermill_log_output_filter(record):
+    #     return record.funcName == "log_output_message"
 
     def customize_logger_record(record):
         """Add notebook name to log records"""
@@ -38,7 +43,7 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     papermill_logger = logging.getLogger("papermill")
     papermill_logger.setLevel(logging.INFO)
     papermill_logger.addHandler(stream_handler)
-    papermill_logger.addFilter(papermill_log_output_filter)
+    # papermill_logger.addFilter(papermill_log_output_filter)
     papermill_logger.addFilter(customize_logger_record)
 
     # Run notebook
