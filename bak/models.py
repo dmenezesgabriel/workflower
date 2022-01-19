@@ -2,12 +2,10 @@
 Workflower Models
 """
 from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from workflower.database import Base
 
-# TODO
-# - Workflow Model
-# - Job Model
+Base = declarative_base()
 
 
 class Workflow(Base):
@@ -26,3 +24,16 @@ class Job(Base):
     workflow_id = Column(Integer, ForeignKey("workflows.id"))
 
     workflow = relationship("Workflow", back_populates="jobs")
+
+
+class Event(Base):
+    """
+    TODO
+    https://apscheduler.readthedocs.io/en/3.x/modules/events.html?highlight=events#apscheduler.events.JobEvent
+    """
+
+    __tablename__ = "events"
+    id = Column(Integer, primary_key=True, index=True)
+    model = Column(String)  # Executor, Job, Jobstore, Workflow
+    model_id = Column(String)
+    name = Column(String)
