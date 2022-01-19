@@ -3,9 +3,11 @@
 Workflow is defined on a `.yml` file and can contain multiple jobs.
 
 - Workflow name must be unique
-- Workflow file name must be the same of workflow name
+- Workflow file name must be the same of workflow name, if not won't load
+- If a workflow file has been modified, modifications will be applied on next cycle
+- If a workflow file has been removed, the scheduled for all it's jobs will be removed
 
-Example:
+  Example:
 
 ```yml
 version: "1.0"
