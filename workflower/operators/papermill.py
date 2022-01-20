@@ -70,9 +70,11 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
 
     execute_notebook(input_path, output_path)
     # Make DataFrame from logs
-    log_contents = string_buffer.getvalue()
+    log_contents = (
+        string_buffer.getvalue().encode().decode("latin").replace("\n", " ")
+    )
     log_contents = ast.literal_eval(log_contents)
-    dict_pattern = r"(\{[^{}]+\})"
+    dict_pattern = r'(\{"[^{}]+"\})'
     matches = re.findall(dict_pattern, log_contents)
     _df = None
     if matches:
