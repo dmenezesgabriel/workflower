@@ -6,7 +6,7 @@ import yaml
 from config import Config
 
 from workflower.models.job import JobWrapper
-from workflower.models.workflow import Workflow
+from workflower.models.workflow import WorkflowWrapper
 from workflower.utils.schema import make_job_definition, validate_schema
 
 logger = logging.getLogger("workflower.loader")
@@ -16,7 +16,7 @@ def get_file_modification_date(file_path):
     return os.path.getmtime(file_path)
 
 
-def load_one(workflow_yaml_config_path: str) -> Workflow:
+def load_one(workflow_yaml_config_path: str) -> WorkflowWrapper:
     """
     Load one workflow from a yaml file.
     """
@@ -73,7 +73,7 @@ def load_one(workflow_yaml_config_path: str) -> Workflow:
     logger.debug(f"Workflow jobs {[job.name for job in jobs]}")
     #  Creating workflow object
     workflow_last_modified_at = os.path.getmtime(workflow_yaml_config_path)
-    workflow = Workflow(
+    workflow = WorkflowWrapper(
         name=workflow_name,
         jobs=jobs,
         last_modified_at=workflow_last_modified_at,

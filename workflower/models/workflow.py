@@ -3,7 +3,7 @@ Workflow class.
 """
 
 
-class Workflow:
+class WorkflowWrapper:
     def __init__(self, name, jobs, last_modified_at):
         self.name = name
         self.jobs = jobs

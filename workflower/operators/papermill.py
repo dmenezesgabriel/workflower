@@ -105,14 +105,14 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     # Handlers
     # Console
     buffer_handler = logging.StreamHandler(string_buffer)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
+    # stream_handler = logging.StreamHandler()
+    # stream_handler.setFormatter(formatter)
     buffer_handler.setFormatter(formatter)
     # File
     papermill_logger = logging.getLogger("papermill")
     papermill_logger.setLevel(logging.INFO)
     papermill_logger.addHandler(buffer_handler)
-    papermill_logger.addHandler(stream_handler)
+    # papermill_logger.addHandler(stream_handler)
 
     papermill_logger.addFilter(customize_logger_record)
     # papermill_logger.addFilter(papermill_log_output_filter)
