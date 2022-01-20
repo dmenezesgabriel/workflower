@@ -2,7 +2,6 @@ import pandas as pd
 
 
 def run_notebook(input_path, output_path) -> pd.DataFrame:
-    import ast
     import json
     import logging
     import os
@@ -70,10 +69,7 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
 
     execute_notebook(input_path, output_path)
     # Make DataFrame from logs
-    log_contents = (
-        string_buffer.getvalue().encode().decode("latin").replace("\n", " ")
-    )
-    log_contents = ast.literal_eval(log_contents)
+    log_contents = string_buffer.getvalue().replace("\n", " ")
     dict_pattern = r'(\{"[^{}]+"\})'
     matches = re.findall(dict_pattern, log_contents)
     _df = None
@@ -81,7 +77,7 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
         log_list = []
         for log in matches:
             try:
-                log_dict = ast.literal_eval(log)
+                log_dict = json.loads(log)
                 log_list.append(log_dict)
             except Exception:
                 continue
