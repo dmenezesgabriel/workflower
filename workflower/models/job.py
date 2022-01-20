@@ -31,6 +31,12 @@ class JobWrapper:
             self.job = scheduler.add_job(**self.definition)
         except ConflictingIdError:
             logger.warning(f"{job_id}, already scheduled, skipping.")
+        except ValueError as error:
+            # If someone set an invalid date value it will lead
+            # to this exception
+            logger.error(f"Value error: {error}")
+        except Exception as error:
+            logger.error(f"Error: {error}")
 
     def save_execution(self, dataframe: pd.DataFrame):
         engine = sqlalchemy.create_engine(

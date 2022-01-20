@@ -1,13 +1,13 @@
-from io import StringIO as StringBuffer
-
 import pandas as pd
 
 
 def run_notebook(input_path, output_path) -> pd.DataFrame:
+    import ast
     import json
     import logging
     import os
     import re
+    from io import StringIO as StringBuffer
 
     import pandas as pd
 
@@ -28,9 +28,15 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
         record.current_notebook = os.path.basename(input_path)
         return True
 
-    def treat_message(record):
+    def clean_record(record):
         """Add notebook name to log records"""
         record.msg = record.msg[:250]
+        record.msg = [
+            character
+            for character in record.msg
+            if character.isalnum() or character == " "
+        ]
+
         return True
 
     default_log_format = (
@@ -46,9 +52,9 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     papermill_logger = logging.getLogger("papermill")
     papermill_logger.setLevel(logging.INFO)
     papermill_logger.addHandler(stream_handler)
-    # papermill_logger.addFilter(papermill_log_output_filter)
     papermill_logger.addFilter(customize_logger_record)
-    papermill_logger.addFilter(treat_message)
+    # papermill_logger.addFilter(papermill_log_output_filter)
+    # papermill_logger.addFilter(clean_record)
 
     # Run notebook
     def execute_notebook(input_path, output_path):
@@ -65,11 +71,18 @@ def run_notebook(input_path, output_path) -> pd.DataFrame:
     execute_notebook(input_path, output_path)
     # Make DataFrame from logs
     log_contents = string_buffer.getvalue()
+    log_contents = ast.literal_eval(log_contents)
     dict_pattern = r"(\{[^{}]+\})"
     matches = re.findall(dict_pattern, log_contents)
     _df = None
     if matches:
-        log_list = [json.loads(log) for log in matches]
+        log_list = []
+        for log in matches:
+            try:
+                log_dict = ast.literal_eval(log)
+                log_list.append(log_dict)
+            except Exception:
+                continue
         _df = pd.DataFrame(log_list)
     # TODO
     # Close buffer without error
