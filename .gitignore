@@ -7,3 +7,5 @@
 *_output.ipynb
 *.log*
 .pytest_cache
+environments/
+kernel_specs/

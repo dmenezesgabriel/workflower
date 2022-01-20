@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 from functools import reduce
 
@@ -79,6 +80,9 @@ class App:
         self.save_job_returned_value(event)
 
     def setup(self) -> None:
+        if not os.path.isdir(Config.ENVIRONMENTS_FOLDER):
+            os.makedirs(Config.ENVIRONMENTS_FOLDER)
+
         jobstores = {
             "default": SQLAlchemyJobStore(url=Config.JOB_DATABASE_URL),
         }
