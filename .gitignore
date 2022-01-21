@@ -1,5 +1,5 @@
 *.db
-*.sqlite
+*.sqlite*
 *.env*
 *.env*
 !*.template
@@ -9,3 +9,4 @@
 .pytest_cache
 environments/
 kernel_specs/
+__pycache__

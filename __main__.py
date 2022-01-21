@@ -10,8 +10,9 @@ logger = logging.getLogger("workflower")
 
 if __name__ == "__main__":
     app.setup()
+    app.init()
     logger.info("Starting Workflower")
     try:
         app.run()
     except KeyboardInterrupt:
-        app.scheduler.shutdown()
+        app.stop()

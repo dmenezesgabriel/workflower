@@ -1,16 +1,16 @@
 import logging
 import os
 import time
-from functools import reduce
 
-import pandas as pd
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
-from apscheduler.jobstores.base import JobLookupError
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
 
-from workflower.loader import load_all
+from workflower.loader import Loader
+from workflower.models.base import database
+from workflower.models.job import Job
+from workflower.models.workflow import Workflow
 
 logger = logging.getLogger("workflower")
 
@@ -18,24 +18,27 @@ logger = logging.getLogger("workflower")
 class App:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
-        self.workflows = None
-        self.jobs = None
         self.is_running = False
+
+    # TODO
+    # Create events model
+    def on_job_error(self, event) -> None:
+        if event.exception:
+            logger.warning(
+                f"Job: {event.job_id}, did not run: {event.exception}"
+            )
+
+    def on_job_finished(self, event) -> None:
+        logger.info(f"Job: {event.job_id}, successfully executed")
+        self.trigger_job_dependency(event)
+        self.save_job_returned_value(event)
 
     def trigger_job_dependency(self, event):
         """
         Trigger a job that depends on another.
         """
         logger.debug("Checking if need to trigger a dependency job")
-        dependency_jobs = [
-            scheduled_job
-            for scheduled_job in self.jobs
-            if scheduled_job.depends_on == event.job_id
-        ]
-        if dependency_jobs:
-            for dependency_job in dependency_jobs:
-                logger.debug(f"Dependency job {dependency_job.name} triggered")
-                dependency_job.schedule(self.scheduler)
+        Job.trigger_dependencies(event.job_id, self.scheduler)
 
     def save_job_returned_value(self, event):
         """
@@ -45,39 +48,7 @@ class App:
         # Check why not saving on a job with dependency trigger
         logger.debug("Checking if can save job returned value")
         logger.debug(f"Job id {event.job_id}")
-
-        scheduled_job = [
-            scheduled_job
-            for scheduled_job in self.jobs
-            if scheduled_job.name == event.job_id
-        ]
-
-        if scheduled_job:
-            scheduled_job = scheduled_job[0]
-            logger.debug(f"Job to save returned value {scheduled_job.name}")
-            return_value = event.retval
-            logger.debug(f"Return type {type(return_value)}")
-            if isinstance(return_value, pd.DataFrame):
-                logger.debug(f"Saving {scheduled_job.name}, return value")
-                self.scheduler.add_job(
-                    func=scheduled_job.save_execution,
-                    kwargs=dict(dataframe=return_value),
-                )
-            else:
-                logger.debug("Return value not a DataFrame")
-
-    def on_job_error(self, event) -> None:
-        if event.exception:
-            logger.warning(
-                f"Job: {event.job_id}, did not run: {event.exception}"
-            )
-
-    def on_job_finished(self, event) -> None:
-        # TODO
-        # Save job events on database
-        logger.info(f"Job: {event.job_id}, successfully executed")
-        self.trigger_job_dependency(event)
-        self.save_job_returned_value(event)
+        Job.save_returned_value(event.job_id, event.retval, self.scheduler)
 
     def setup(self) -> None:
         if not os.path.isdir(Config.ENVIRONMENTS_FOLDER):
@@ -100,105 +71,26 @@ class App:
             timezone=Config.TIME_ZONE,
         )
 
+    def init(self):
+        database.connect()
+
     def run(self) -> None:
+        """
+        Run app.
+        """
         self.scheduler.start()
         self.is_running = True
         while self.is_running:
             logger.info("Loading Workflows")
-            workflows = load_all()
-            jobs = reduce(
-                lambda x, y: x + y,
-                [workflow.jobs for workflow in workflows],
-            )
-            for workflow in workflows:
-                logger.debug(
-                    f"Found workflow: {workflow.name} - "
-                    f"last modified at: {workflow.last_modified_at}"
-                )
-            # TODO
-            # improve this ugly code
-            # Update schedule if file is changed
-            logger.info("Checking workflows")
+            workflows_loader = Loader()
+            workflows_loader.load_all()
+            workflows = Workflow.get_all()
             logger.info(f"Workflows Loaded {len(workflows)}")
-            if self.workflows:
-                for loaded_workflow in self.workflows:
-                    logger.debug(
-                        f"Stored workflow: {loaded_workflow.name} - "
-                        f"last modified at: {loaded_workflow.last_modified_at}"
-                    )
-                logger.info(
-                    f"Current scheduled workflows {len(self.workflows)}"
-                )
-                logger.info("Checking scheduled jobs")
-                # This jobs were scheduled on past cycle
-                scheduled_jobs = [job.name for job in self.jobs]
-                logger.info("Checking loaded jobs")
-                # This jobs were loaded on most recent cycle
-                loaded_jobs = [job.name for job in jobs]
-                logger.info("Checking removed jobs")
-                # Get removed jobs, this will remove job's
-                # file has been removed
-                removed_jobs = [
-                    job_name
-                    for job_name in scheduled_jobs
-                    if job_name not in loaded_jobs
-                ]
-                # Get modified jobs, this will remove job if has been modified
-                # to reschedule it after
-                modified_jobs = []
-                for new_workflow in workflows:
-                    # Modified workflows according to file modification time
-                    modified_workflows = [
-                        workflow
-                        for workflow in self.workflows
-                        if (new_workflow.name == workflow.name)
-                        and (
-                            new_workflow.last_modified_at
-                            != workflow.last_modified_at
-                        )
-                    ]
-                    # Modified jobs according to workflow modification time
-                    if modified_workflows:
-                        modified_jobs.extend(
-                            [
-                                job.name
-                                for job in reduce(
-                                    lambda x, y: x + y,
-                                    [
-                                        workflow.jobs
-                                        for workflow in modified_workflows
-                                    ],
-                                )
-                            ]
-                        )
-                logger.info("Removing jobs")
-                # Remove deleted or modified jobs from scheduler
-                logger.debug(f"_Removed jobs: {removed_jobs}")
-                logger.debug(f"_Modified jobs: {modified_jobs}")
-                jobs_to_remove = []
-                if removed_jobs or modified_jobs:
-                    logger.info(f"Removed jobs: {removed_jobs}")
-                    logger.info(f"Modified jobs: {modified_jobs}")
-                    jobs_to_remove.extend(modified_jobs)
-                    jobs_to_remove.extend(removed_jobs)
-                    for job_id in jobs_to_remove:
-                        logger.info(f"Removing: {removed_jobs}")
-                        try:
-                            self.scheduler.remove_job(job_id)
-                        except JobLookupError:
-                            logger.warning(
-                                f"tried to remove {job_id}, "
-                                "but it was not scheduled"
-                            )
-
-            # schedule jobs
-            logger.info("Scheduling jobs")
-            self.workflows = workflows
-            self.jobs = reduce(
-                lambda x, y: x + y,
-                [workflow.jobs for workflow in self.workflows],
-            )
-            for workflow in self.workflows:
-                workflow.schedule_jobs(self.scheduler)
+            Workflow.schedule_all_jobs(self.scheduler)
             logger.info(f"Sleeping {Config.CYCLE} seconds")
             time.sleep(Config.CYCLE)
+
+    def stop(self):
+        self.is_running = False
+        self.scheduler.shutdown()
+        database.close()

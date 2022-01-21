@@ -40,3 +40,8 @@ def setup_loggers():
     scheduler_logger.setLevel(log_level)
     scheduler_logger.addHandler(stream_handler)
     scheduler_logger.addHandler(file_handler)
+    # sqlalchemy
+    # sqlalchemy_logger = logging.getLogger("sqlalchemy")
+    # sqlalchemy_logger.setLevel(log_level)
+    # sqlalchemy_logger.addHandler(stream_handler)
+    # sqlalchemy_logger.addHandler(file_handler)
