@@ -5,14 +5,14 @@ then
     find . -name "*output.ipynb" -type f -delete
 elif [ $1 == "dev" ];
 then
-    . .env.dev.template & \
-    python init_db.py & \
+    eval "$(cat .env.dev.template)"  && \
+    python init_db.py && \
     python .
 elif [ $1 == "test" ];
 then
-    . .env.test.template & \
+    eval "$(cat .env.test.template)" && \
     python -m pytest -s tests/
 else
-    . .env.prod.template & \
+    eval "$(cat .env.prod.template)"  && \
     python .
 fi
