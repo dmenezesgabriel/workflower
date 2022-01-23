@@ -2,8 +2,6 @@ import logging
 import os
 
 from workflower.exceptions import InvalidSchemaError, InvalidTypeError
-from workflower.operators.alteryx import run_workflow
-from workflower.operators.papermill import run_notebook
 
 logger = logging.getLogger("workflower.utils.schema")
 
@@ -257,14 +255,14 @@ def parse_job_uses(configuration_dict) -> dict:
         if not os.path.isfile(job_path):
             logger.error("Not a valid job path")
         uses_config.update(dict(args=[job_path]))
-        uses_config.update(dict(func=run_workflow))
+        uses_config.update(dict(func="run_workflow"))
     # Papermill
     if job_uses == "papermill":
         input_path = configuration_dict.get("input_path")
         if not os.path.isfile(input_path):
             logger.error("Not a valid job path")
         output_path = configuration_dict.get("output_path")
-        uses_config.update(dict(func=run_notebook))
+        uses_config.update(dict(func="run_notebook"))
         uses_config.update(
             dict(
                 kwargs=dict(
