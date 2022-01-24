@@ -35,7 +35,10 @@ class AlteryxOperator(BaseOperator):
         with process.stdout:
             try:
                 for line in iter(process.stdout.readline, b""):
-                    logger.info(line)
+                    decoded_line = line.decode(
+                        "utf-8", errors="ignore"
+                    ).rstrip()
+                    logger.info(decoded_line)
 
             except CalledProcessError as e:
                 logger.error(f"{str(e)}")
