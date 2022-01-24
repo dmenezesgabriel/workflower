@@ -62,48 +62,49 @@ class Job(BaseModel):
         with database.session_scope() as session:
             # Get parent workflow
             workflow = crud.get_one(session, Workflow, name=workflow_name)
-            # Get job attributes from dict
-            job_name = job_dict["name"]
-            logger.debug(f"Job name: {job_name}")
-            # ---
-            job_uses = job_dict["uses"]
-            logger.debug(f"Job uses: {job_uses}")
-            # job_depends_on must point to another job of same workflow
-            # Then the event listener will trigger the job by it's id
-            job_depends_on = job_dict.get("depends_on", None)
-            if job_depends_on:
-                job_depends_on = workflow.name + "_" + job_depends_on
-            logger.debug(f"Job depends on: {job_depends_on}")
-            # Make apscheduler job definition
-            job_definition = make_job_definition(job_dict)
-            # Job name must be unique
-            unique_job_id = workflow.name + "_" + job_name
-            job_definition.update({"id": unique_job_id})
+            if workflow:
+                # Get job attributes from dict
+                job_name = job_dict["name"]
+                logger.debug(f"Job name: {job_name}")
+                # ---
+                job_uses = job_dict["uses"]
+                logger.debug(f"Job uses: {job_uses}")
+                # job_depends_on must point to another job of same workflow
+                # Then the event listener will trigger the job by it's id
+                job_depends_on = job_dict.get("depends_on", None)
+                if job_depends_on:
+                    job_depends_on = workflow.name + "_" + job_depends_on
+                logger.debug(f"Job depends on: {job_depends_on}")
+                # Make apscheduler job definition
+                job_definition = make_job_definition(job_dict)
+                # Job name must be unique
+                unique_job_id = workflow.name + "_" + job_name
+                job_definition.update({"id": unique_job_id})
 
-            # Adding job's relevant information
-            crud.get_or_create(
-                session,
-                cls,
-                name=unique_job_id,
-                uses=job_uses,
-                definition=job_definition,
-                depends_on=job_depends_on,
-                workflow=workflow,
-            )
+                # Adding job's relevant information
+                crud.get_or_create(
+                    session,
+                    cls,
+                    name=unique_job_id,
+                    uses=job_uses,
+                    definition=job_definition,
+                    depends_on=job_depends_on,
+                    workflow=workflow,
+                )
 
-            filter_dict = dict(
-                name=unique_job_id,
-            )
-            update_dict = dict(
-                uses=job_uses,
-                definition=job_definition,
-                depends_on=job_depends_on,
-            )
-            should_update = False
-            if workflow.modified_since_last_load:
-                should_update = True
-            if should_update:
-                crud.update(session, cls, filter_dict, update_dict)
+                filter_dict = dict(
+                    name=unique_job_id,
+                )
+                update_dict = dict(
+                    uses=job_uses,
+                    definition=job_definition,
+                    depends_on=job_depends_on,
+                )
+                should_update = False
+                if workflow.modified_since_last_load:
+                    should_update = True
+                if should_update:
+                    crud.update(session, cls, filter_dict, update_dict)
 
     @classmethod
     def trigger_dependencies(cls, job_name, scheduler):
