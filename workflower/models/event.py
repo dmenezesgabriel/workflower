@@ -20,3 +20,7 @@ class Event(BaseModel):
         "exception",
         String,
     )
+    output = Column(
+        "output",
+        String,
+    )

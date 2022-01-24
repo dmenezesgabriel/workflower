@@ -48,7 +48,12 @@ class App:
     def on_job_executed(self, event) -> None:
         logger.info(f"Job: {event.job_id}, successfully executed")
         job = Job.get_one(name=event.job_id)
-        Event.create(name="job_executed", model="job", model_id=job.id)
+        Event.create(
+            name="job_executed",
+            model="job",
+            model_id=job.id,
+            output=event.retval,
+        )
         self.trigger_job_dependency(event)
 
     def trigger_job_dependency(self, event):
