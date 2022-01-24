@@ -33,7 +33,6 @@ class Job(BaseModel):
     definition = Column(
         "definition",
         JSON,
-        index=True,
     )
     depends_on = Column(
         "depends_on",

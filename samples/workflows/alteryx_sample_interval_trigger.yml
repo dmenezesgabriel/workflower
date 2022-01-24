@@ -6,4 +6,4 @@ workflow:
       uses: alteryx
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
       trigger: interval
-      minutes: 3
+      minutes: 1

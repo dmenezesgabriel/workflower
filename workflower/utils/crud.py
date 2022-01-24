@@ -59,7 +59,10 @@ def update(session, model, filter_dict, new_attributes_dict):
 
 
 def get_or_create(session, model, **kwargs):
-    instance = get_one(session, model, **kwargs)
+    """
+    Get or create by name.
+    """
+    instance = get_one(session, model, name=kwargs["name"])
     if instance:
         logger.debug("model already exists")
         return instance
