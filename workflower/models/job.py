@@ -164,11 +164,3 @@ class Job(BaseModel):
             logger.error(f"Value error: {error}")
         except Exception as error:
             logger.error(f"Error: {error}")
-
-    def save_execution(self, dataframe: pd.DataFrame):
-        if self.uses == "alteryx":
-            connection = database.engine.raw_connection()
-            dataframe.to_sql(
-                con=connection, name="alteryx_executions", if_exists="append"
-            )
-        connection.close()

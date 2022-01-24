@@ -31,7 +31,6 @@ class App:
     def on_job_finished(self, event) -> None:
         logger.info(f"Job: {event.job_id}, successfully executed")
         self.trigger_job_dependency(event)
-        self.save_job_returned_value(event)
 
     def trigger_job_dependency(self, event):
         """
@@ -39,16 +38,6 @@ class App:
         """
         logger.debug("Checking if need to trigger a dependency job")
         Job.trigger_dependencies(event.job_id, self.scheduler)
-
-    def save_job_returned_value(self, event):
-        """
-        Save the return value of a job.
-        """
-        # TODO
-        # Check why not saving on a job with dependency trigger
-        logger.debug("Checking if can save job returned value")
-        logger.debug(f"Job id {event.job_id}")
-        Job.save_returned_value(event.job_id, event.retval, self.scheduler)
 
     def setup(self) -> None:
         if not os.path.isdir(Config.ENVIRONMENTS_FOLDER):

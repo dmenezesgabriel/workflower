@@ -121,3 +121,4 @@ class PapermillOperator(BaseOperator):
                     shutil.rmtree(path=kernel_spec_folder)
 
         execute_notebook(input_path, output_path)
+        papermill_logger.removeHandler(file_handler)
