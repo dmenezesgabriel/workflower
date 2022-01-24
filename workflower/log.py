@@ -3,7 +3,6 @@ App logger.
 """
 import logging
 import os
-from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 from config import Config
@@ -13,9 +12,7 @@ def setup_loggers():
     if not os.path.isdir(Config.LOGGING_PATH):
         os.makedirs(Config.LOGGING_PATH)
 
-    log_file_path = os.path.join(
-        Config.LOGGING_PATH, f"{str(datetime.now().date())}-log.log"
-    )
+    log_file_path = os.path.join(Config.LOGGING_PATH, Config.LOGGING_FILE)
     default_log_format = (
         "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
         " %(message)s"
