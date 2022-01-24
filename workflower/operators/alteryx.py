@@ -4,13 +4,15 @@ Alteryx helper module
 from typing import Tuple
 
 import pandas as pd
+from workflower.operators.operator import BaseOperator
 
 
-class AlteryxOperator:
+class AlteryxOperator(BaseOperator):
     @staticmethod
     def run_workflow(path: str) -> pd.DataFrame:
         """
-        Run Alteryx workflow through command line executable AlteryxEngineCmd.exe.
+        Run Alteryx workflow through command line
+        executable AlteryxEngineCmd.exe.
         """
         import re
         import subprocess

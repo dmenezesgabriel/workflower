@@ -93,4 +93,5 @@ class App:
     def stop(self):
         self.is_running = False
         self.scheduler.shutdown()
+        time.sleep(5)
         database.close()

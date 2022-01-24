@@ -5,9 +5,7 @@ Job class.
 import logging
 
 import pandas as pd
-import sqlalchemy
 from apscheduler.jobstores.base import ConflictingIdError
-from config import Config
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
@@ -167,12 +165,8 @@ class Job(BaseModel):
             logger.error(f"Error: {error}")
 
     def save_execution(self, dataframe: pd.DataFrame):
-        connection = database.engine.raw_connection()
-        if self.uses == "papermill":
-            dataframe.to_sql(
-                con=connection, name="papermill_executions", if_exists="append"
-            )
         if self.uses == "alteryx":
+            connection = database.engine.raw_connection()
             dataframe.to_sql(
                 con=connection, name="alteryx_executions", if_exists="append"
             )
