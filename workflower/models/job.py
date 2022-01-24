@@ -23,6 +23,7 @@ class Job(BaseModel):
     name = Column(
         "name",
         String,
+        unique=True,
         index=True,
     )
     uses = Column(
