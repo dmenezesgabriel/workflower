@@ -30,7 +30,7 @@ class Workflow(BaseModel):
     )
     file_exists = Column(
         "file_exists",
-        String,
+        Boolean,
         default=True,
     )
     is_active = Column(
@@ -143,31 +143,35 @@ class Workflow(BaseModel):
         with database.session_scope() as session:
             workflows = crud.get_all(session, cls)
             for workflow in workflows:
-                if workflow.modified_since_last_load:
+                if workflow.modified_since_last_load is True:
                     logger.info(
                         f"{workflow.name} file has been modified, "
-                        "unscheduling  jobs"
+                        "unscheduling jobs"
                     )
                     workflow.unschedule_jobs(scheduler)
-                if not workflow.file_exists:
+                if workflow.file_exists is False:
                     logger.info(
                         f"{workflow.name} file has been removed, "
-                        "unscheduling  jobs"
+                        "unscheduling jobs"
                     )
                     workflow.unschedule_jobs(scheduler)
                 logger.info("Scheduling jobs")
                 workflow.schedule_jobs(scheduler)
 
     def schedule_jobs(self, scheduler):
-        for job in self.jobs:
-            # If job has dependencies wait till the event of
-            # it's job dependency occurs
-            if job.depends_on:
-                logger.info(
-                    f"{job.name} depends on {job.depeds_on}, putting to wait"
-                )
-                continue
-            job.schedule(scheduler)
+        if self.file_exists:
+            for job in self.jobs:
+                # If job has dependencies wait till the event of
+                # it's job dependency occurs
+                if job.depends_on:
+                    logger.info(
+                        f"{job.name} depends on {job.depeds_on}, "
+                        "putting to wait"
+                    )
+                    continue
+                job.schedule(scheduler)
+        else:
+            logger.info(f"{self.name} file removed, skipping")
 
     def unschedule_jobs(self, scheduler):
         for job in self.jobs:
