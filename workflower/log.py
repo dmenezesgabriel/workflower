@@ -3,6 +3,7 @@ App logger.
 """
 import logging
 import os
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 from config import Config
@@ -12,7 +13,9 @@ def setup_loggers():
     if not os.path.isdir(Config.LOGGING_PATH):
         os.makedirs(Config.LOGGING_PATH)
 
-    log_file_path = os.path.join(Config.LOGGING_PATH, Config.LOGGING_FILE)
+    log_file_path = os.path.join(
+        Config.LOGGING_PATH, f"{str(datetime.now().date())}-log.log"
+    )
     default_log_format = (
         "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d]"
         " %(message)s"
@@ -40,3 +43,13 @@ def setup_loggers():
     scheduler_logger.setLevel(log_level)
     scheduler_logger.addHandler(stream_handler)
     scheduler_logger.addHandler(file_handler)
+    # Alteryx Operator
+    alteryx_logger = logging.getLogger("alteryx_operator")
+    alteryx_logger.setLevel(logging.INFO)
+    alteryx_logger.addHandler(stream_handler)
+    alteryx_logger.addHandler(file_handler)
+    # Papermill Operator
+    papermill_logger = logging.getLogger("papermill")
+    papermill_logger.setLevel(logging.INFO)
+    papermill_logger.addHandler(stream_handler)
+    papermill_logger.addHandler(file_handler)

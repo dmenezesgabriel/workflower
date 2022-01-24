@@ -130,8 +130,10 @@ class Workflow(BaseModel):
             for workflow in workflows:
                 file_exists = os.path.isfile(workflow.file_path)
                 if file_exists:
+                    logger.debug(f"{workflow.name} file exists")
                     update_dict = {"file_exists": True}
                 else:
+                    logger.info(f"{workflow.name} file not exists")
                     update_dict = {"file_exists": False}
                 filter_dict = {"name": workflow.name}
                 crud.update(session, cls, filter_dict, update_dict)
@@ -141,11 +143,17 @@ class Workflow(BaseModel):
         with database.session_scope() as session:
             workflows = crud.get_all(session, cls)
             for workflow in workflows:
-                logger.info("Unscheduling modified jobs")
                 if workflow.modified_since_last_load:
+                    logger.info(
+                        f"{workflow.name} file has been modified, "
+                        "unscheduling  jobs"
+                    )
                     workflow.unschedule_jobs(scheduler)
-                logger.info("Unscheduling removed jobs")
                 if not workflow.file_exists:
+                    logger.info(
+                        f"{workflow.name} file has been removed, "
+                        "unscheduling  jobs"
+                    )
                     workflow.unschedule_jobs(scheduler)
                 logger.info("Scheduling jobs")
                 workflow.schedule_jobs(scheduler)
@@ -155,14 +163,20 @@ class Workflow(BaseModel):
             # If job has dependencies wait till the event of
             # it's job dependency occurs
             if job.depends_on:
+                logger.info(
+                    f"{job.name} depends on {job.depeds_on}, putting to wait"
+                )
                 continue
             job.schedule(scheduler)
 
     def unschedule_jobs(self, scheduler):
         for job in self.jobs:
+            logger.info(f"Removing {job.name}")
             try:
                 scheduler.remove_job(job.name)
             except JobLookupError:
                 logger.warning(
                     f"tried to remove {job.name}, " "but it was not scheduled"
                 )
+            except Exception as error:
+                logger.error(f"Try to remove {job.name} failed: {error}")
