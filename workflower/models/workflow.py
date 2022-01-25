@@ -165,7 +165,7 @@ class Workflow(BaseModel):
                 # it's job dependency occurs
                 if job.depends_on:
                     logger.info(
-                        f"{job.name} depends on {job.depeds_on}, "
+                        f"{job.name} depends on {job.depends_on}, "
                         "putting to wait"
                     )
                     continue
