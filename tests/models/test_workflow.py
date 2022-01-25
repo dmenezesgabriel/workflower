@@ -1,10 +1,42 @@
 """
 Workflow class tests.
 """
-
 import pytest
 from workflower.models.base import BaseModel, database
 from workflower.models.workflow import Workflow
+
+
+@pytest.fixture(scope="function")
+def temp_workflow_file(tmpdir_factory):
+    file_content = """
+    version: "1.0"
+    workflow:
+    name: papermill_sample_cron_trigger_with_deps
+    jobs:
+        - name: "papermill_sample"
+        uses: papermill
+        # Papermill paths
+        input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample.ipynb"
+        output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample_output.ipynb"
+        # trigger config
+        trigger: cron
+        minute: "*/1"
+        - name: "papermill_second_sample"
+        uses: papermill
+        # Papermill paths
+        input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_second_sample.ipynb"
+        output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_ssecond_sample_output.ipynb"
+        # TODO
+        # Implement dependency trigger on jobs
+        # This is not implemented yet
+        trigger: dependency
+        depends_on: papermill_sample
+    """
+    p = tmpdir_factory.mktemp("workflow_files").join(
+        "papermill_sample_cron_trigger_with_deps.yaml"
+    )
+    p.write_text(file_content, encoding="utf-8")
+    return str(p)
 
 
 @pytest.fixture(scope="function")
@@ -90,16 +122,14 @@ def test_delete(connection):
     assert Workflow.get_one(name=name) is None
 
 
-def test_from_dict(connection):
+def test_from_dict(connection, temp_workflow_file):
     """
     Should create object from dict and yaml file path.
     """
 
     # Definitions
     name = "papermill_sample_cron_trigger_with_deps"
-    workflow_yaml_config_path = (
-        "tests/resources/papermill_sample_cron_trigger_with_deps.yml"
-    )
+    workflow_yaml_config_path = temp_workflow_file
     configuration_dict = {
         "version": 1.0,
         "workflow": {
