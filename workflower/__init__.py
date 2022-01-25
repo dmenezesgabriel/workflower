@@ -67,9 +67,7 @@ class App:
         if not os.path.isdir(Config.ENVIRONMENTS_FOLDER):
             os.makedirs(Config.ENVIRONMENTS_FOLDER)
 
-        jobstores = {
-            "default": SQLAlchemyJobStore(url=Config.JOB_DATABASE_URL),
-        }
+        jobstores = {"default": SQLAlchemyJobStore(engine=database.engine)}
         executors = {
             "default": {"type": "threadpool", "max_workers": 20},
         }
