@@ -15,8 +15,5 @@ workflow:
       # Papermill paths
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_second_sample.ipynb"
       output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_second_sample_output.ipynb"
-      # TODO
-      # Implement dependency trigger on jobs
-      # This is not implemented yet
       trigger: dependency
       depends_on: papermill_sample
