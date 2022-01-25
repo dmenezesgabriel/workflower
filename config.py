@@ -12,5 +12,5 @@ class Config:
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
     LOGGING_PATH = os.getenv("LOGGING_PATH")
     LOGGING_FILE = os.getenv("LOGGING_FILE", "log.log")
-    ENVIRONMENTS_FOLDER = os.getenv("ENVIRONMENTS_FOLDER")
-    KERNELS_SPECS_PATH = os.getenv("KERNELS_SPECS_PATH")
+    ENVIRONMENTS_DIR = os.getenv("ENVIRONMENTS_DIR")
+    KERNELS_SPECS_DIR = os.getenv("KERNELS_SPECS_DIR")

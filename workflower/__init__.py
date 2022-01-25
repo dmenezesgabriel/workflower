@@ -64,8 +64,8 @@ class App:
         Job.trigger_dependencies(event.job_id, self.scheduler)
 
     def setup(self) -> None:
-        if not os.path.isdir(Config.ENVIRONMENTS_FOLDER):
-            os.makedirs(Config.ENVIRONMENTS_FOLDER)
+        if not os.path.isdir(Config.ENVIRONMENTS_DIR):
+            os.makedirs(Config.ENVIRONMENTS_DIR)
 
         jobstores = {"default": SQLAlchemyJobStore(engine=database.engine)}
         executors = {

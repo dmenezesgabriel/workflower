@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import platform
 import subprocess
@@ -8,19 +9,36 @@ import venv
 from config import Config
 from jupyter_client.kernelspecapp import KernelSpecManager
 
+logger = logging.getLogger("workflower.utils.environment")
 
-def create_and_install_kernel():
-    # Create environment
 
-    kernel_name = str(uuid.uuid4())
-    env_name = f"{Config.ENVIRONMENTS_FOLDER}/{kernel_name}"
-    venv.create(env_name, system_site_packages=True, with_pip=True)
+def create_env(environments_dir, name, with_pip=True):
+    """
+    Create virtual environment.
+    """
+    logger.info("Creating virtual environment")
+    env_path = os.path.join(environments_dir, name)
+    logger.info(f"Virtual environment name: {env_path}")
+
+    venv.create(env_path, system_site_packages=True, with_pip=with_pip)
     if platform.system() == "Windows":
-        env_executable = os.path.join(env_name, "Scripts", "python")
+        env_executable = os.path.join(env_path, "Scripts", "python")
     else:
         # Linux
-        env_executable = os.path.join(env_name, "bin", "python")
+        env_executable = os.path.join(env_path, "bin", "python")
+    return env_path, env_executable
 
+
+def create_and_install_kernel(
+    environments_dir=Config.ENVIRONMENTS_DIR,
+    kernel_specs_dir=Config.KERNELS_SPECS_DIR,
+):
+    # Create environment
+    logger.info("Creating Kernel")
+    kernel_name = str(uuid.uuid4())
+    logger.info(f"Kernel name {kernel_name}")
+
+    env_path, env_executable = create_env(environments_dir, kernel_name)
     # Create kernel spec
     kernel_spec = {
         "argv": [
@@ -33,7 +51,7 @@ def create_and_install_kernel():
         "display_name": "Python 3",
         "language": "python",
     }
-    kernel_spec_folder = os.path.join(Config.KERNELS_SPECS_PATH, kernel_name)
+    kernel_spec_folder = os.path.join(kernel_specs_dir, kernel_name)
     kernel_spec_file = os.path.join(kernel_spec_folder, "kernel.json")
 
     # Create kernel spec folder
@@ -54,6 +72,7 @@ def create_and_install_kernel():
     )
     subprocess.run(
         [env_executable, "-m", "pip", "-q", "install", "ipykernel"],
-        capture_output=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
     )
-    return kernel_name, kernel_spec_folder, env_name
+    return kernel_name, kernel_spec_folder, env_path
