@@ -12,7 +12,7 @@ from jupyter_client.kernelspecapp import KernelSpecManager
 logger = logging.getLogger("workflower.utils.environment")
 
 
-def create_env(environments_dir, name, with_pip=True):
+def create_venv(environments_dir, name, with_pip=True):
     """
     Create virtual environment.
     """
@@ -38,7 +38,7 @@ def create_and_install_kernel(
     kernel_name = str(uuid.uuid4())
     logger.info(f"Kernel name {kernel_name}")
 
-    env_path, env_executable = create_env(environments_dir, kernel_name)
+    env_path, env_executable = create_venv(environments_dir, kernel_name)
     # Create kernel spec
     kernel_spec = {
         "argv": [

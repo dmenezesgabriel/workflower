@@ -20,7 +20,7 @@ class PapermillOperator(BaseOperator):
         env_path=None,
     ):
         """
-        Run notebook.
+        Run notebook with papermill.
         """
         if create_env:
             (
@@ -40,7 +40,7 @@ class PapermillOperator(BaseOperator):
             )
             return str(notebook)
         except Exception as error:
-            logger.error(f"Execution error: {error}")
+            logger.error(f"Papermill execution error: {error}")
         finally:
             if env_path is not None:
                 shutil.rmtree(path=env_path)
