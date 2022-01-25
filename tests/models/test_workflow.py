@@ -21,3 +21,12 @@ def connection():
 def test_create_workflow(connection):
     workflow = Workflow.create(name="test")
     assert workflow.name == "test"
+
+
+def test_update_workflow(connection):
+    new_name = "changed_name"
+    workflow_before_update = Workflow.create(name="test")
+    id = workflow_before_update.id
+    Workflow.update({"id": id}, {"name": new_name})
+    workflow_after_update = Workflow.get_one(id=id)
+    assert workflow_after_update.name == new_name

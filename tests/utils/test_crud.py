@@ -26,7 +26,9 @@ def session():
 
 def test_create_success(session):
     name = str(uuid.uuid4())
-    database_object = crud.create(session=session, model=Workflow, name=name)
+    database_object = crud.create(
+        session=session, model_object=Workflow, name=name
+    )
     assert isinstance(database_object, Workflow)
     assert session.query(Workflow).filter_by(name=name).first().name == name
 
@@ -35,7 +37,7 @@ def test_create_wrong_attribute(session):
     with pytest.raises(TypeError):
         crud.create(
             session=session,
-            model=Workflow,
+            model_object=Workflow,
             wrong_attribute="wrong_attribute",
         )
 

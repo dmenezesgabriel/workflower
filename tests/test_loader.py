@@ -29,12 +29,3 @@ def test_load_one_workflow_from_file(connection):
     assert df.name.to_list()[0] == "papermill_sample_cron_trigger_with_deps"
     df = pd.read_sql("select * from jobs", database.engine)
     assert len(df) == 2
-
-
-def test_load_all_workflows_from_dir(connection):
-    loader = Loader()
-    loader.load_all_workflows_from_dir()
-    df = pd.read_sql("select * from workflows", database.engine)
-    assert df.name.to_list()[0] == "papermill_sample_cron_trigger_with_deps"
-    df = pd.read_sql("select * from jobs", database.engine)
-    assert len(df) == 2
