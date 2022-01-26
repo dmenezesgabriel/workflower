@@ -3,6 +3,7 @@ import time
 import unittest.mock
 
 import pytest
+import yaml
 from workflower.utils.file import (
     get_file_modification_date,
     get_file_name,
@@ -90,18 +91,43 @@ class TestYamlFileToDict:
     Test case for yaml_file_to_dict function.
     """
 
-    def test_yaml_file_to_dict(temp_workflow_file):
-        read_data = """
-                version: "1.0"
-                workflow:
-                name: python_code_sample_interval_trigger
-                jobs:
-                  - name: "hello_python_code"
-                    uses: python
-                    code: "print('Hello, World!')"
-                    trigger: interval
-                    minutes: 2
-            """
-        mock_open = unittest.mock.mock_open(read_data=read_data)
+    read_data = """
+            version: "1.0"
+            workflow:
+            name: python_code_sample_interval_trigger
+            jobs:
+              - name: "hello_python_code"
+                uses: python
+                code: "print('Hello, World!')"
+                trigger: interval
+                minutes: 2
+        """
+
+    def mock_yaml_safe_load(cls, monkeypatch):
+        """
+        Mock yaml.safe_load.
+        """
+        return {
+            "version": "1.0",
+            "workflow": None,
+            "name": "python_code_sample_interval_trigger",
+            "jobs": [
+                {
+                    "name": "hello_python_code",
+                    "uses": "python",
+                    "code": "print('Hello, World!')",
+                    "trigger": "interval",
+                    "minutes": 2,
+                }
+            ],
+        }
+
+    def test_yaml_file_to_dict(cls, temp_workflow_file, monkeypatch):
+        """
+        Valid yaml file from path must return a dict.
+        """
+        yaml_dict = yaml_file_to_dict(temp_workflow_file)
+        monkeypatch.setattr(yaml, "safe_load", cls.test_yaml_file_to_dict)
+        mock_open = unittest.mock.mock_open(read_data=cls.read_data)
         with unittest.mock.patch("builtins.open", mock_open):
-            assert isinstance(yaml_file_to_dict(temp_workflow_file), dict)
+            assert isinstance(yaml_dict, dict)
