@@ -1,3 +1,6 @@
+import os.path
+import time
+
 import pytest
 from workflower.utils.file import (
     get_file_modification_date,
@@ -25,19 +28,66 @@ def temp_workflow_file(tmpdir_factory):
 
 
 class TestGetFileName:
-    def test_get_file_name_return(self, temp_workflow_file):
+    """
+    Test case for get_file_name function.
+    """
+
+    def mock_os_path_basename(self, monkeypatch):
+        """
+        Mock os.path.basename.
+        """
+        return "test_file.yaml"
+
+    def mock_os_path_splittext(self, monkeypatch):
+        """
+        mock os.path.splittext.
+        """
+        return ["test_file", ".yaml"]
+
+    def test_get_file_name_return(self, temp_workflow_file, monkeypatch):
+        """
+        Return value must be a file name without extension.
+        """
+        monkeypatch.setattr(os.path, "basename", self.mock_os_path_basename)
+        monkeypatch.setattr(os.path, "splitext", self.mock_os_path_splittext)
         assert get_file_name(temp_workflow_file) == "test_file"
 
-    def test_get_file_name_return_type(self, temp_workflow_file):
+    def test_get_file_name_return_type(self, temp_workflow_file, monkeypatch):
+        """
+        Return must be string type.
+        """
+        monkeypatch.setattr(os.path, "basename", self.mock_os_path_basename)
+        monkeypatch.setattr(os.path, "splitext", self.mock_os_path_splittext)
         assert isinstance(get_file_name(temp_workflow_file), str)
 
 
 class TestGetFileModificationDate:
-    def test_get_file_modification_date_return_type(self, temp_workflow_file):
+    """
+    Test case for get_file_modification_date function.
+    """
+
+    def mock_os_path_getmtime(self, monkeypatch):
+        """
+        Mock os.path.getmtime.
+        """
+        return time.time()
+
+    def test_get_file_modification_date_return_type(
+        self, temp_workflow_file, monkeypatch
+    ):
+        """
+        Return type must be a floating point representing seconds between
+        epoch and file's modification time.
+        """
+        monkeypatch.setattr(os.path, "getmtime", self.mock_os_path_getmtime)
         file_modification_date = get_file_modification_date(temp_workflow_file)
         assert isinstance(file_modification_date, float)
 
 
 class TestYamlFileToDict:
+    """
+    Test case for yaml_file_to_dict function.
+    """
+
     def test_yaml_file_to_dict(self, temp_workflow_file):
         assert isinstance(yaml_file_to_dict(temp_workflow_file), dict)

@@ -6,12 +6,12 @@ import yaml
 logger = logging.getLogger("workflower.utils.file")
 
 
-def get_file_modification_date(file_path):
-    return os.path.getmtime(file_path)
-
-
 def get_file_name(file_path):
     return os.path.splitext(os.path.basename(file_path))[0]
+
+
+def get_file_modification_date(file_path):
+    return os.path.getmtime(file_path)
 
 
 def yaml_file_to_dict(file_path):
