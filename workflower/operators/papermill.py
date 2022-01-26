@@ -6,12 +6,12 @@ from workflower.utils.environment import create_and_install_kernel
 
 import papermill as pm
 
-logger = logging.getLogger("papermill")
+logger = logging.getLogger("workflower.operators.papermill")
 
 
 class PapermillOperator(BaseOperator):
     @staticmethod
-    def run_notebook(
+    def execute(
         input_path,
         output_path,
         create_env=True,

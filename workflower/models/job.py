@@ -12,6 +12,7 @@ from workflower.models.base import BaseModel, database
 from workflower.models.workflow import Workflow
 from workflower.operators.alteryx import AlteryxOperator
 from workflower.operators.papermill import PapermillOperator
+from workflower.operators.python import PythonOperator
 from workflower.utils import crud
 from workflower.utils.schema import make_job_definition
 
@@ -146,13 +147,13 @@ class Job(BaseModel):
         schedule_args = self.definition.copy()
 
         if self.uses == "alteryx":
-            schedule_args.update(
-                dict(func=getattr(AlteryxOperator, "run_workflow"))
-            )
+            operator = AlteryxOperator
         elif self.uses == "papermill":
-            schedule_args.update(
-                dict(func=getattr(PapermillOperator, "run_notebook"))
-            )
+            operator = PapermillOperator
+        elif self.uses == "python":
+            operator = PythonOperator
+
+        schedule_args.update(dict(func=getattr(operator, "execute")))
 
         try:
             self.job = scheduler.add_job(**schedule_args)

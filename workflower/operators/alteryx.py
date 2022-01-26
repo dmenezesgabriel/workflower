@@ -9,14 +9,14 @@ from workflower.operators.operator import BaseOperator
 
 class AlteryxOperator(BaseOperator):
     @classmethod
-    def run_workflow(cls, workflow_file_path: str) -> str:
+    def execute(cls, workflow_file_path: str) -> str:
         """
         Run Alteryx workflow through command line executable
         AlteryxEngineCmd.exe.
         """
         # Logging configuration
 
-        logger = logging.getLogger("alteryx_operator")
+        logger = logging.getLogger("workflower.operators.alteryx")
 
         process = Popen(
             [

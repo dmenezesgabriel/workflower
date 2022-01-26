@@ -44,7 +44,7 @@ def validate_schema(configuration_dict: dict) -> bool:
         raise InvalidTypeError("Workflow jobs wrong definition")
     job_keys = ["name", "uses", "trigger"]
     job_trigger_options = ["date", "cron", "interval", "dependency"]
-    job_uses_options = ["alteryx", "papermill"]
+    job_uses_options = ["alteryx", "papermill", "python"]
     jobs_names = []
     for job in workflow_jobs:
         # Job keys
@@ -83,6 +83,13 @@ def validate_schema(configuration_dict: dict) -> bool:
             # TODO
             # Validate if path ends with alteryx extension and file exists
         # Job triggers
+        if job["uses"] == "python":
+            python_keys = ["code", "script_path"]
+            if not any(key in job.keys() for key in python_keys):
+                raise InvalidSchemaError(
+                    "Python jobs must contain any of: "
+                    f"{', '.join(python_keys)}"
+                )
         if not isinstance(job["trigger"], str):
             raise InvalidTypeError("Name must be type string")
         if job["trigger"] not in job_trigger_options:
@@ -255,14 +262,14 @@ def parse_job_uses(configuration_dict) -> dict:
         if not os.path.isfile(job_path):
             logger.error("Not a valid job path")
         uses_config.update(dict(args=[job_path]))
-        uses_config.update(dict(func="run_workflow"))
+        uses_config.update(dict(func="AlteryxOperator.execute"))
     # Papermill
     if job_uses == "papermill":
         input_path = configuration_dict.get("input_path")
         if not os.path.isfile(input_path):
             logger.error("Not a valid job path")
         output_path = configuration_dict.get("output_path")
-        uses_config.update(dict(func="run_notebook"))
+        uses_config.update(dict(func="PapermillOperator.execute"))
         uses_config.update(
             dict(
                 kwargs=dict(
@@ -271,7 +278,28 @@ def parse_job_uses(configuration_dict) -> dict:
                 )
             )
         )
-
+    # Python
+    if job_uses == "python":
+        script_path = configuration_dict.get("script_path")
+        code = configuration_dict.get("code")
+        requirements_path = configuration_dict.get("requirements_path")
+        uses_dict = {"kwargs": {}}
+        if script_path:
+            if not os.path.isfile(script_path):
+                logger.error("Not a valid python script path")
+            uses_dict["kwargs"].update(dict(script_path=script_path))
+        elif code:
+            uses_dict["kwargs"].update(dict(code=code))
+        if requirements_path:
+            if not os.path.isfile(requirements_path):
+                logger.error("Not a valid requirements path")
+            uses_config.update(
+                uses_dict["kwargs"].update(
+                    dict(requirements_path=requirements_path)
+                )
+            )
+        uses_dict.update(dict(func="PythonOperator.execute"))
+        uses_config.update(uses_dict)
     return uses_config
 
 
