@@ -14,3 +14,5 @@ class Config:
     LOGGING_FILE = os.getenv("LOGGING_FILE", "log.log")
     ENVIRONMENTS_DIR = os.getenv("ENVIRONMENTS_DIR")
     KERNELS_SPECS_DIR = os.getenv("KERNELS_SPECS_DIR")
+    PIP_INDEX_URL = os.getenv("PIP_INDEX_URL", None)
+    PIP_TRUSTED_HOST = os.getenv("PIP_TRUSTED_HOST", None)

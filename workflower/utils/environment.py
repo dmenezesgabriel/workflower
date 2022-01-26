@@ -32,6 +32,8 @@ def create_venv(environments_dir, name, with_pip=True):
 def create_and_install_kernel(
     environments_dir=Config.ENVIRONMENTS_DIR,
     kernel_specs_dir=Config.KERNELS_SPECS_DIR,
+    pip_index_url=Config.PIP_INDEX_URL,
+    pip_trusted_host=Config.PIP_TRUSTED_HOST,
 ):
     # Create environment
     logger.info("Creating Kernel")
@@ -70,8 +72,22 @@ def create_and_install_kernel(
     kernel_spec_manager.install_kernel_spec(
         source_dir=kernel_spec_folder, kernel_name=kernel_name
     )
+
+    ipykenerl_install_args = [
+        env_executable,
+        "-m",
+        "pip",
+        "-q",
+        "install",
+        "ipykernel",
+    ]
+    if pip_index_url:
+        ipykenerl_install_args.append(f"--index-url={pip_index_url}")
+    if pip_trusted_host:
+        ipykenerl_install_args.append(f"--trusted-host={pip_trusted_host}")
+
     subprocess.run(
-        [env_executable, "-m", "pip", "-q", "install", "ipykernel"],
+        ipykenerl_install_args,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT,
     )
