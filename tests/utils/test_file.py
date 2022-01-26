@@ -1,5 +1,6 @@
 import os.path
 import time
+import unittest.mock
 
 import pytest
 from workflower.utils.file import (
@@ -89,5 +90,18 @@ class TestYamlFileToDict:
     Test case for yaml_file_to_dict function.
     """
 
-    def test_yaml_file_to_dict(self, temp_workflow_file):
-        assert isinstance(yaml_file_to_dict(temp_workflow_file), dict)
+    def test_yaml_file_to_dict(temp_workflow_file):
+        read_data = """
+                version: "1.0"
+                workflow:
+                name: python_code_sample_interval_trigger
+                jobs:
+                  - name: "hello_python_code"
+                    uses: python
+                    code: "print('Hello, World!')"
+                    trigger: interval
+                    minutes: 2
+            """
+        mock_open = unittest.mock.mock_open(read_data=read_data)
+        with unittest.mock.patch("builtins.open", mock_open):
+            assert isinstance(yaml_file_to_dict(temp_workflow_file), dict)
