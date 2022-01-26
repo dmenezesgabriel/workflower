@@ -11,26 +11,13 @@ def temp_workflow_file(tmpdir_factory):
     file_content = """
     version: "1.0"
     workflow:
-    name: papermill_sample_cron_trigger_with_deps
+    name: python_code_sample_interval_trigger
     jobs:
-        - name: "papermill_sample"
-        uses: papermill
-        # Papermill paths
-        input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample.ipynb"
-        output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_sample_output.ipynb"
-        # trigger config
-        trigger: cron
-        minute: "*/1"
-        - name: "papermill_second_sample"
-        uses: papermill
-        # Papermill paths
-        input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_second_sample.ipynb"
-        output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\papermill_ssecond_sample_output.ipynb"
-        # TODO
-        # Implement dependency trigger on jobs
-        # This is not implemented yet
-        trigger: dependency
-        depends_on: papermill_sample
+        - name: "hello_python_code"
+        uses: python
+        code: "print('Hello, World!')"
+        trigger: interval
+        minutes: 2
     """
     p = tmpdir_factory.mktemp("workflow_files").join(
         "papermill_sample_cron_trigger_with_deps.yaml"

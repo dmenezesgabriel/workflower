@@ -1,0 +1,10 @@
+version: "1.0"
+workflow:
+  name: python_script_sample_interval_trigger
+  jobs:
+    - name: "hello_python_script"
+      uses: python
+      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py"
+      requirements_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt"
+      trigger: interval
+      minutes: 2
