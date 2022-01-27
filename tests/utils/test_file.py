@@ -1,6 +1,7 @@
 import os.path
 import time
 import unittest.mock
+from unittest.mock import MagicMock
 
 import pytest
 import yaml
@@ -34,18 +35,6 @@ class TestGetFileName:
     Test case for get_file_name function.
     """
 
-    def mock_os_path_basename(self, monkeypatch):
-        """
-        Mock os.path.basename.
-        """
-        return "test_file.yaml"
-
-    def mock_os_path_splittext(cls, monkeypatch):
-        """
-        mock os.path.splitext.
-        """
-        return ["test_file", ".yaml"]
-
     def test_get_file_name_calls_os_path_basename(cls, temp_workflow_file):
         """
         os.path.basename should be called once.
@@ -62,20 +51,20 @@ class TestGetFileName:
             get_file_name(temp_workflow_file)
             mock_splittext.assert_called_once()
 
-    def test_get_file_name_return(cls, temp_workflow_file, monkeypatch):
+    def test_get_file_name_return(cls, temp_workflow_file):
         """
         Return value must be a file name without extension.
         """
-        monkeypatch.setattr(os.path, "basename", cls.mock_os_path_basename)
-        monkeypatch.setattr(os.path, "splitext", cls.mock_os_path_splittext)
+        os.path.basename = MagicMock(return_value="test_file.yaml")
+        os.path.splitext = MagicMock(return_value=["test_file", ".yaml"])
         assert get_file_name(temp_workflow_file) == "test_file"
 
-    def test_get_file_name_return_type(cls, temp_workflow_file, monkeypatch):
+    def test_get_file_name_return_type(cls, temp_workflow_file):
         """
         Return must be string type.
         """
-        monkeypatch.setattr(os.path, "basename", cls.mock_os_path_basename)
-        monkeypatch.setattr(os.path, "splitext", cls.mock_os_path_splittext)
+        os.path.basename = MagicMock(return_value="test_file.yaml")
+        os.path.splitext = MagicMock(return_value=["test_file", ".yaml"])
         assert isinstance(get_file_name(temp_workflow_file), str)
 
 
@@ -100,14 +89,13 @@ class TestGetFileModificationDate:
             get_file_modification_date(temp_workflow_file)
             mock_getmtime.assert_called_once()
 
-    def test_get_file_modification_date_return_type(
-        cls, temp_workflow_file, monkeypatch
-    ):
+    def test_get_file_modification_date_return_type(cls, temp_workflow_file):
         """
         Return type must be a floating point representing seconds between
         epoch and file's modification time.
         """
-        monkeypatch.setattr(os.path, "getmtime", cls.mock_os_path_getmtime)
+
+        os.path.getmtime = MagicMock(return_value=time.time())
         file_modification_date = get_file_modification_date(temp_workflow_file)
         assert isinstance(file_modification_date, float)
 
@@ -120,22 +108,18 @@ class TestYamlFileToDict:
     read_data = """
             version: "1.0"
             workflow:
-            name: python_code_sample_interval_trigger
-            jobs:
-              - name: "hello_python_code"
-                uses: python
-                code: "print('Hello, World!')"
-                trigger: interval
-                minutes: 2
+              name: python_code_sample_interval_trigger
+              jobs:
+                - name: "hello_python_code"
+                  uses: python
+                  code: "print('Hello, World!')"
+                  trigger: interval
+                  minutes: 2
         """
 
-    def mock_yaml_safe_load(cls, monkeypatch):
-        """
-        Mock yaml.safe_load.
-        """
-        return {
-            "version": "1.0",
-            "workflow": None,
+    mock_dict = {
+        "version": "1.0",
+        "workflow": {
             "name": "python_code_sample_interval_trigger",
             "jobs": [
                 {
@@ -146,7 +130,8 @@ class TestYamlFileToDict:
                     "minutes": 2,
                 }
             ],
-        }
+        },
+    }
 
     def test_yaml_file_to_dict_calls_yaml_safe_load(cls, temp_workflow_file):
         """
@@ -156,12 +141,12 @@ class TestYamlFileToDict:
             yaml_file_to_dict(temp_workflow_file)
             mock_safe_load.assert_called_once()
 
-    def test_yaml_file_to_dict(cls, temp_workflow_file, monkeypatch):
+    def test_yaml_file_to_dict(cls, temp_workflow_file):
         """
         Valid yaml file from path must return a dict.
         """
         yaml_dict = yaml_file_to_dict(temp_workflow_file)
-        monkeypatch.setattr(yaml, "safe_load", cls.test_yaml_file_to_dict)
+        yaml.safe_load = MagicMock(return_value=cls.mock_dict)
         mock_open = unittest.mock.mock_open(read_data=cls.read_data)
         with unittest.mock.patch("builtins.open", mock_open):
             assert isinstance(yaml_dict, dict)
