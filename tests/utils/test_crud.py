@@ -60,7 +60,28 @@ class TestCreate:
             crud.create(session=session, model_object=Workflow, name=name)
         assert mock.call_count == 1
 
+    def test_create_calls_rollback_on_exception(cls, session):
+        """
+        crud.create should call sqlalchemy.orm.session.Session.rollback.
+        """
+        # Mock commit exception
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.commit"
+        ) as mock_commit:
+            mock_commit.side_effect = Exception("Mock Exception")
+            #  Check if rollback is called
+            with unittest.mock.patch(
+                "sqlalchemy.orm.session.Session.rollback"
+            ) as mock_rollback:
+                name = str(uuid.uuid4())
+                crud.create(session=session, model_object=Workflow, name=name)
+            assert mock_rollback.call_count == 1
+
+    # Integration tests
     def test_create_success(cls, session):
+        """
+        Should create an Object with args passed matching with attributes.
+        """
         name = str(uuid.uuid4())
         database_object = crud.create(
             session=session, model_object=Workflow, name=name
@@ -69,14 +90,6 @@ class TestCreate:
         assert (
             session.query(Workflow).filter_by(name=name).first().name == name
         )
-
-    def test_create_wrong_attribute(cls, session):
-        with pytest.raises(TypeError):
-            crud.create(
-                session=session,
-                model_object=Workflow,
-                wrong_attribute="wrong_attribute",
-            )
 
 
 class TestGetOne:
