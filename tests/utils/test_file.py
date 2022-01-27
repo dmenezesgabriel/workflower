@@ -40,26 +40,42 @@ class TestGetFileName:
         """
         return "test_file.yaml"
 
-    def mock_os_path_splittext(self, monkeypatch):
+    def mock_os_path_splittext(cls, monkeypatch):
         """
-        mock os.path.splittext.
+        mock os.path.splitext.
         """
         return ["test_file", ".yaml"]
 
-    def test_get_file_name_return(self, temp_workflow_file, monkeypatch):
+    def test_get_file_name_calls_os_path_basename(cls, temp_workflow_file):
+        """
+        os.path.basename should be called once.
+        """
+        with unittest.mock.patch("os.path.basename") as mock_basename:
+            get_file_name(temp_workflow_file)
+            mock_basename.assert_called_once()
+
+    def test_get_file_name_calls_os_path_splittext(cls, temp_workflow_file):
+        """
+        os.path.splitext should be called once.
+        """
+        with unittest.mock.patch("os.path.splitext") as mock_splittext:
+            get_file_name(temp_workflow_file)
+            mock_splittext.assert_called_once()
+
+    def test_get_file_name_return(cls, temp_workflow_file, monkeypatch):
         """
         Return value must be a file name without extension.
         """
-        monkeypatch.setattr(os.path, "basename", self.mock_os_path_basename)
-        monkeypatch.setattr(os.path, "splitext", self.mock_os_path_splittext)
+        monkeypatch.setattr(os.path, "basename", cls.mock_os_path_basename)
+        monkeypatch.setattr(os.path, "splitext", cls.mock_os_path_splittext)
         assert get_file_name(temp_workflow_file) == "test_file"
 
-    def test_get_file_name_return_type(self, temp_workflow_file, monkeypatch):
+    def test_get_file_name_return_type(cls, temp_workflow_file, monkeypatch):
         """
         Return must be string type.
         """
-        monkeypatch.setattr(os.path, "basename", self.mock_os_path_basename)
-        monkeypatch.setattr(os.path, "splitext", self.mock_os_path_splittext)
+        monkeypatch.setattr(os.path, "basename", cls.mock_os_path_basename)
+        monkeypatch.setattr(os.path, "splitext", cls.mock_os_path_splittext)
         assert isinstance(get_file_name(temp_workflow_file), str)
 
 
@@ -68,20 +84,30 @@ class TestGetFileModificationDate:
     Test case for get_file_modification_date function.
     """
 
-    def mock_os_path_getmtime(self, monkeypatch):
+    def mock_os_path_getmtime(cls, monkeypatch):
         """
         Mock os.path.getmtime.
         """
         return time.time()
 
+    def test_get_file_modification_date_calls_os_path_basename(
+        cls, temp_workflow_file
+    ):
+        """
+        os.path.getmtime should be called once.
+        """
+        with unittest.mock.patch("os.path.getmtime") as mock_getmtime:
+            get_file_modification_date(temp_workflow_file)
+            mock_getmtime.assert_called_once()
+
     def test_get_file_modification_date_return_type(
-        self, temp_workflow_file, monkeypatch
+        cls, temp_workflow_file, monkeypatch
     ):
         """
         Return type must be a floating point representing seconds between
         epoch and file's modification time.
         """
-        monkeypatch.setattr(os.path, "getmtime", self.mock_os_path_getmtime)
+        monkeypatch.setattr(os.path, "getmtime", cls.mock_os_path_getmtime)
         file_modification_date = get_file_modification_date(temp_workflow_file)
         assert isinstance(file_modification_date, float)
 
@@ -121,6 +147,14 @@ class TestYamlFileToDict:
                 }
             ],
         }
+
+    def test_yaml_file_to_dict_calls_yaml_safe_load(cls, temp_workflow_file):
+        """
+        os.path.basename should be called once.
+        """
+        with unittest.mock.patch("yaml.safe_load") as mock_safe_load:
+            yaml_file_to_dict(temp_workflow_file)
+            mock_safe_load.assert_called_once()
 
     def test_yaml_file_to_dict(cls, temp_workflow_file, monkeypatch):
         """
