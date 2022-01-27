@@ -6,27 +6,29 @@ from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 logger = logging.getLogger("workflower.utils.schema")
 
 
-def validate_schema(configuration_dict: dict) -> bool:
+def validate_pipeline_keys(configuration_dict: dict) -> None:
     """
-    Validate pipeline file schema
+    Dict must have version and workflow keys.
     """
-    # TODO
-    #  Break in smaller functions
-    logger.debug("Validating yml schema")
-    #  Pipeline
     pipeline_keys = ["version", "workflow"]
     if not all(key in configuration_dict.keys() for key in pipeline_keys):
         raise InvalidSchemaError(
             "The pipeline must have all of it's keys: "
             f"{', '.join(pipeline_keys)}"
         )
-    # TODO
-    # Pytest this step
+
+
+def validate_has_only_one_workflow(configuration_dict: dict) -> None:
+    """
+    Dict must have only one workflow definition.
+    """
     if len([key for key in configuration_dict if key == "workflow"]) > 1:
         raise InvalidSchemaError("Pipeline file must only one workflow")
     if not isinstance(configuration_dict["version"], str):
         raise InvalidTypeError("Version must be type string")
-    #  Workflow
+
+
+def validate_workflow_definition(configuration_dict: dict) -> None:
     if not isinstance(configuration_dict["workflow"], dict):
         raise InvalidTypeError("Workflow wrong definition")
     workflow_keys = ["name", "jobs"]
@@ -38,7 +40,10 @@ def validate_schema(configuration_dict: dict) -> bool:
         )
     if not isinstance(workflow["name"], str):
         raise InvalidTypeError("Name must be type string")
-    # Jobs
+
+
+def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
+    workflow = configuration_dict["workflow"]
     workflow_jobs = workflow["jobs"]
     if not isinstance(workflow_jobs, list):
         raise InvalidTypeError("Workflow jobs wrong definition")
@@ -116,6 +121,19 @@ def validate_schema(configuration_dict: dict) -> bool:
                     "from the same workflow"
                 )
 
+
+def validate_schema(configuration_dict: dict) -> bool:
+    """
+    Validate pipeline file schema
+    """
+    logger.debug("Validating yml schema")
+    #  Pipeline
+    validate_pipeline_keys(configuration_dict)
+    validate_has_only_one_workflow(configuration_dict)
+    #  Workflow
+    validate_workflow_definition(configuration_dict)
+    # Jobs
+    validate_workflow_jobs_definition(configuration_dict)
     return True
 
 
