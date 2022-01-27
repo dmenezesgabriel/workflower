@@ -29,6 +29,9 @@ def validate_has_only_one_workflow(configuration_dict: dict) -> None:
 
 
 def validate_workflow_definition(configuration_dict: dict) -> None:
+    """
+    Validate workflow definition.
+    """
     if not isinstance(configuration_dict["workflow"], dict):
         raise InvalidTypeError("Workflow wrong definition")
     workflow_keys = ["name", "jobs"]
@@ -42,84 +45,104 @@ def validate_workflow_definition(configuration_dict: dict) -> None:
         raise InvalidTypeError("Name must be type string")
 
 
+def validate_job_keys(job_dict: dict) -> None:
+    """
+    Validate job attributes.
+    """
+    job_keys = ["name", "uses", "trigger"]
+    if not all(key in job_dict.keys() for key in job_keys):
+        raise InvalidSchemaError(
+            "The job must have all of it's keys: " f"{', '.join(job_keys)}"
+        )
+
+
+def validate_job_name(job_dict: dict) -> None:
+    """
+    Validate job name data type.
+    """
+    if not isinstance(job_dict["name"], str):
+        raise InvalidTypeError("Name must be type string")
+
+
+def validate_job_uses(job_dict: dict) -> None:
+    """
+    Validate job uses.
+    """
+    if not isinstance(job_dict["uses"], str):
+        raise InvalidTypeError("Name must be type string")
+    job_uses_options = ["alteryx", "papermill", "python"]
+    if job_dict["uses"] not in job_uses_options:
+        raise InvalidSchemaError(
+            f"Job trigger must be: {', '.join(job_uses_options)}"
+        )
+    # Papermill
+    if job_dict["uses"] == "papermill":
+        papermill_keys = ["input_path", "output_path"]
+        if not all(key in job_dict.keys() for key in papermill_keys):
+            raise InvalidSchemaError(
+                "Papermill jobs must contain: " f"{', '.join(papermill_keys)}"
+            )
+        # TODO
+        # Validate if input_path ends with ipynb and file exists
+        # and output_path ends with ipynb and dir exists
+    # Alteryx
+    if job_dict["uses"] == "alteryx":
+        alteryx_keys = ["path"]
+        if not all(key in job_dict.keys() for key in alteryx_keys):
+            raise InvalidSchemaError(
+                "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
+            )
+        # TODO
+        # Validate if path ends with alteryx extension and file exists
+    # Job triggers
+    if job_dict["uses"] == "python":
+        python_keys = ["code", "script_path"]
+        if not any(key in job_dict.keys() for key in python_keys):
+            raise InvalidSchemaError(
+                "Python jobs must contain any of: " f"{', '.join(python_keys)}"
+            )
+
+
+def validate_job_triggers(job_dict: dict, jobs_names: list) -> None:
+    """
+    Validate job triggers.
+    """
+    job_trigger_options = ["date", "cron", "interval", "dependency"]
+    if not isinstance(job_dict["trigger"], str):
+        raise InvalidTypeError("Name must be type string")
+    if job_dict["trigger"] not in job_trigger_options:
+        raise InvalidSchemaError(
+            f"Job trigger must be: {', '.join(job_trigger_options)}"
+        )
+    if job_dict["trigger"] == "dependency":
+        dependency_options = ["depends_on"]
+        if not all(key in job_dict.keys() for key in dependency_options):
+            raise InvalidSchemaError(
+                "Dependency triggered job must have keys: "
+                f"{', '.join(dependency_options)}"
+            )
+        if not job_dict["depends_on"] in jobs_names:
+            raise InvalidSchemaError(
+                "Job depends_on must have a valid job name reference "
+                "from the same workflow"
+            )
+
+
 def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
+    """
+    Validate workflow jobs definition.
+    """
     workflow = configuration_dict["workflow"]
     workflow_jobs = workflow["jobs"]
     if not isinstance(workflow_jobs, list):
         raise InvalidTypeError("Workflow jobs wrong definition")
-    job_keys = ["name", "uses", "trigger"]
-    job_trigger_options = ["date", "cron", "interval", "dependency"]
-    job_uses_options = ["alteryx", "papermill", "python"]
     jobs_names = []
     for job in workflow_jobs:
-        # Job keys
-        if not all(key in job.keys() for key in job_keys):
-            raise InvalidSchemaError(
-                "The job must have all of it's keys: " f"{', '.join(job_keys)}"
-            )
-        if not isinstance(job["name"], str):
-            raise InvalidTypeError("Name must be type string")
-        #  Job uses
         jobs_names.append(job["name"])
-        if not isinstance(job["uses"], str):
-            raise InvalidTypeError("Name must be type string")
-        if job["uses"] not in job_uses_options:
-            raise InvalidSchemaError(
-                f"Job trigger must be: {', '.join(job_uses_options)}"
-            )
-        # Papermill
-        if job["uses"] == "papermill":
-            papermill_keys = ["input_path", "output_path"]
-            if not all(key in job.keys() for key in papermill_keys):
-                raise InvalidSchemaError(
-                    "Papermill jobs must contain: "
-                    f"{', '.join(papermill_keys)}"
-                )
-            # TODO
-            # Validate if input_path ends with ipynb and file exists
-            # and output_path ends with ipynb and dir exists
-        # Alteryx
-        if job["uses"] == "alteryx":
-            alteryx_keys = ["path"]
-            if not all(key in job.keys() for key in alteryx_keys):
-                raise InvalidSchemaError(
-                    "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
-                )
-            # TODO
-            # Validate if path ends with alteryx extension and file exists
-        # Job triggers
-        if job["uses"] == "python":
-            python_keys = ["code", "script_path"]
-            if not any(key in job.keys() for key in python_keys):
-                raise InvalidSchemaError(
-                    "Python jobs must contain any of: "
-                    f"{', '.join(python_keys)}"
-                )
-        if not isinstance(job["trigger"], str):
-            raise InvalidTypeError("Name must be type string")
-        if job["trigger"] not in job_trigger_options:
-            raise InvalidSchemaError(
-                f"Job trigger must be: {', '.join(job_trigger_options)}"
-            )
-        # TODO
-        if job["trigger"] == "date":
-            pass
-        if job["trigger"] == "cron":
-            pass
-        if job["trigger"] == "interval":
-            pass
-        if job["trigger"] == "dependency":
-            dependency_options = ["depends_on"]
-            if not all(key in job.keys() for key in dependency_options):
-                raise InvalidSchemaError(
-                    "Dependency triggered job must have keys: "
-                    f"{', '.join(dependency_options)}"
-                )
-            if not job["depends_on"] in jobs_names:
-                raise InvalidSchemaError(
-                    "Job depends_on must have a valid job name reference "
-                    "from the same workflow"
-                )
+        validate_job_name(job)
+        validate_job_keys(job)
+        #  Job uses
+        validate_job_uses(job)
 
 
 def validate_schema(configuration_dict: dict) -> bool:
