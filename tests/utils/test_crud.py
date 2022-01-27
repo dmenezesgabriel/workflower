@@ -203,7 +203,39 @@ class TestUpdate:
 
 
 class TestDelete:
+    def test_delete_calls_session_delete(cls, session):
+        """
+        crud.delete should call sqlalchemy.orm.session.Session.delete.
+        """
+        name = str(uuid.uuid4())
+        object = DummyModel(name=name)
+        session.add(object)
+        session.commit()
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.delete"
+        ) as mock:
+            crud.delete(session, DummyModel, name=name)
+        assert mock.call_count == 1
+
+    def test_delete_calls_session_commit(cls, session):
+        """
+        crud.delete should call sqlalchemy.orm.session.Session.commit.
+        """
+        name = str(uuid.uuid4())
+        object = DummyModel(name=name)
+        session.add(object)
+        session.commit()
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.commit"
+        ) as mock:
+            crud.delete(session, DummyModel, name=name)
+        assert mock.call_count == 1
+
+    # Integration tests
     def test_delete(cls, session):
+        """
+        crud.delete should delete passed object from database.
+        """
         name = str(uuid.uuid4())
         object = DummyModel(name=name)
         session.add(object)

@@ -71,5 +71,3 @@ def delete(session, model_object, **kwargs):
     if instance:
         session.delete(instance)
         session.commit()
-
-        session.rollback()
