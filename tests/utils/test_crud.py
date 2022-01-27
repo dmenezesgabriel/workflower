@@ -26,6 +26,29 @@ def session():
 
 
 class TestCreate:
+    def test_create_calls_add(cls, session):
+        print(type(session))
+        with unittest.mock.patch("sqlalchemy.orm.session.Session.add") as mock:
+            name = str(uuid.uuid4())
+            crud.create(session=session, model_object=Workflow, name=name)
+        assert mock.call_count == 1
+
+    def test_create_calls_commit(cls, session):
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.commit"
+        ) as mock:
+            name = str(uuid.uuid4())
+            crud.create(session=session, model_object=Workflow, name=name)
+        assert mock.call_count == 1
+
+    def test_create_calls_refresh(cls, session):
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.refresh"
+        ) as mock:
+            name = str(uuid.uuid4())
+            crud.create(session=session, model_object=Workflow, name=name)
+        assert mock.call_count == 1
+
     def test_create_success(cls, session):
         name = str(uuid.uuid4())
         database_object = crud.create(
