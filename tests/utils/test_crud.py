@@ -3,10 +3,9 @@ import uuid
 
 import pytest
 from config import Config
-from sqlalchemy import create_engine
+from sqlalchemy import Column, String, create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from workflower.models.base import BaseModel
-from workflower.models.workflow import Workflow
 from workflower.utils import crud
 
 
@@ -28,6 +27,19 @@ def session():
         BaseModel.metadata.drop_all(bind=engine)
 
 
+class DummyModel(BaseModel):
+    __tablename__ = "test"
+    name = Column(
+        "name",
+        String,
+        unique=True,
+        index=True,
+    )
+
+    def __init__(self, name):
+        self.name = name
+
+
 class TestCreate:
     def test_create_calls_add(cls, session):
         """
@@ -35,7 +47,7 @@ class TestCreate:
         """
         with unittest.mock.patch("sqlalchemy.orm.session.Session.add") as mock:
             name = str(uuid.uuid4())
-            crud.create(session=session, model_object=Workflow, name=name)
+            crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
     def test_create_calls_commit(cls, session):
@@ -46,7 +58,7 @@ class TestCreate:
             "sqlalchemy.orm.session.Session.commit"
         ) as mock:
             name = str(uuid.uuid4())
-            crud.create(session=session, model_object=Workflow, name=name)
+            crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
     def test_create_calls_refresh(cls, session):
@@ -57,7 +69,7 @@ class TestCreate:
             "sqlalchemy.orm.session.Session.refresh"
         ) as mock:
             name = str(uuid.uuid4())
-            crud.create(session=session, model_object=Workflow, name=name)
+            crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
     def test_create_calls_rollback_on_exception(cls, session):
@@ -74,7 +86,9 @@ class TestCreate:
                 "sqlalchemy.orm.session.Session.rollback"
             ) as mock_rollback:
                 name = str(uuid.uuid4())
-                crud.create(session=session, model_object=Workflow, name=name)
+                crud.create(
+                    session=session, model_object=DummyModel, name=name
+                )
             assert mock_rollback.call_count == 1
 
     # Integration tests
@@ -84,32 +98,32 @@ class TestCreate:
         """
         name = str(uuid.uuid4())
         database_object = crud.create(
-            session=session, model_object=Workflow, name=name
+            session=session, model_object=DummyModel, name=name
         )
-        assert isinstance(database_object, Workflow)
+        assert isinstance(database_object, DummyModel)
         assert (
-            session.query(Workflow).filter_by(name=name).first().name == name
+            session.query(DummyModel).filter_by(name=name).first().name == name
         )
 
 
 class TestGetOne:
     def test_get_one(cls, session):
         name = str(uuid.uuid4())
-        object = Workflow(name=name)
+        object = DummyModel(name=name)
         session.add(object)
         session.commit()
-        returned_object = crud.get_one(session, Workflow, name=name)
-        assert isinstance(returned_object, Workflow)
+        returned_object = crud.get_one(session, DummyModel, name=name)
+        assert isinstance(returned_object, DummyModel)
         assert (
-            session.query(Workflow).filter_by(name=name).first().name == name
+            session.query(DummyModel).filter_by(name=name).first().name == name
         )
 
     def test_get_one_not_exists(cls, session):
         name = str(uuid.uuid4())
-        object = Workflow(name=name)
+        object = DummyModel(name=name)
         session.add(object)
         session.commit()
-        returned_object = crud.get_one(session, Workflow, name="not_exists")
+        returned_object = crud.get_one(session, DummyModel, name="not_exists")
         assert returned_object is None
 
 
@@ -117,24 +131,24 @@ class TestGetAll:
     def test_get_all(cls, session):
         for i in range(4, 10):
             name = str(uuid.uuid4())
-            object = Workflow(name=name)
+            object = DummyModel(name=name)
             session.add(object)
             session.commit()
-        result = crud.get_all(session, Workflow)
+        result = crud.get_all(session, DummyModel)
         assert len(result) == 6
 
 
 class TestUpdate:
     def test_update(cls, session):
         name = str(uuid.uuid4())
-        object = Workflow(name=name)
+        object = DummyModel(name=name)
         session.add(object)
         session.commit()
         filter_dict = {"name": name}
         update_dict = {"name": "new_name"}
-        crud.update(session, Workflow, filter_dict, update_dict)
+        crud.update(session, DummyModel, filter_dict, update_dict)
         assert (
-            session.query(Workflow).filter_by(name="new_name").first().name
+            session.query(DummyModel).filter_by(name="new_name").first().name
             == "new_name"
         )
 
@@ -142,8 +156,8 @@ class TestUpdate:
 class TestDelete:
     def test_delete(cls, session):
         name = str(uuid.uuid4())
-        object = Workflow(name=name)
+        object = DummyModel(name=name)
         session.add(object)
         session.commit()
-        crud.delete(session, Workflow, name=name)
-        assert session.query(Workflow).filter_by(name=name).first() is None
+        crud.delete(session, DummyModel, name=name)
+        assert session.query(DummyModel).filter_by(name=name).first() is None
