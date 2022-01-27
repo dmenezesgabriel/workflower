@@ -23,10 +23,6 @@ def create(session, model_object, **kwargs):
         return None
 
 
-def get_all(session, model_object, **kwargs):
-    return session.query(model_object).filter_by(**kwargs).all()
-
-
 def get_one(session, model_object, **kwargs):
     logger.debug(f"Getting one {model_object} , {dict(**kwargs)}")
     instance = session.query(model_object).filter_by(**kwargs).first()
@@ -36,6 +32,10 @@ def get_one(session, model_object, **kwargs):
     else:
         logger.debug(f"Model {model_object} , {dict(**kwargs)} not found ")
     return None
+
+
+def get_all(session, model_object, **kwargs):
+    return session.query(model_object).filter_by(**kwargs).all()
 
 
 def get_or_create(session, model_object, **kwargs):

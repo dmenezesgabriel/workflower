@@ -41,7 +41,7 @@ class DummyModel(BaseModel):
 
 
 class TestCreate:
-    def test_create_calls_add(cls, session):
+    def test_create_calls_session_add(cls, session):
         """
         crud.create should call sqlalchemy.orm.session.Session.add.
         """
@@ -50,7 +50,7 @@ class TestCreate:
             crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
-    def test_create_calls_commit(cls, session):
+    def test_create_calls_session_commit(cls, session):
         """
         crud.create should call sqlalchemy.orm.session.Session.commit.
         """
@@ -61,7 +61,7 @@ class TestCreate:
             crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
-    def test_create_calls_refresh(cls, session):
+    def test_create_calls_session_refresh(cls, session):
         """
         crud.create should call sqlalchemy.orm.session.Session.refresh.
         """
@@ -72,7 +72,7 @@ class TestCreate:
             crud.create(session=session, model_object=DummyModel, name=name)
         assert mock.call_count == 1
 
-    def test_create_calls_rollback_on_exception(cls, session):
+    def test_create_calls_session_rollback_on_exception(cls, session):
         """
         crud.create should call sqlalchemy.orm.session.Session.rollback.
         """
@@ -92,7 +92,7 @@ class TestCreate:
             assert mock_rollback.call_count == 1
 
     # Integration tests
-    def test_create_success(cls, session):
+    def test_create_model_instance(cls, session):
         """
         Should create an Object with args passed matching with attributes.
         """
@@ -101,24 +101,59 @@ class TestCreate:
             session=session, model_object=DummyModel, name=name
         )
         assert isinstance(database_object, DummyModel)
+
+    def test_create_model_attributes_match(cls, session):
+        """
+        Should create an Object which args passed matching with attributes.
+        """
+        name = str(uuid.uuid4())
+        crud.create(session=session, model_object=DummyModel, name=name)
         assert (
             session.query(DummyModel).filter_by(name=name).first().name == name
         )
 
 
 class TestGetOne:
-    def test_get_one(cls, session):
+    def test_get_one_calls_session_query(cls, session):
+        """
+        crud.create should call sqlalchemy.orm.session.Session.add.
+        """
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.query"
+        ) as mock:
+            name = str(uuid.uuid4())
+            crud.get_one(session, DummyModel, name=name)
+        assert mock.call_count == 1
+
+    # Integration tests
+    def test_get_one_model_instance(cls, session):
+        """
+        Should get an Object with correct class.
+        """
         name = str(uuid.uuid4())
         object = DummyModel(name=name)
         session.add(object)
         session.commit()
         returned_object = crud.get_one(session, DummyModel, name=name)
         assert isinstance(returned_object, DummyModel)
+
+    def test_get_one_attribute_match(cls, session):
+        """
+        Should get an Object which args passed matching with attributes.
+        """
+        name = str(uuid.uuid4())
+        object = DummyModel(name=name)
+        session.add(object)
+        session.commit()
+        crud.get_one(session, DummyModel, name=name)
         assert (
             session.query(DummyModel).filter_by(name=name).first().name == name
         )
 
     def test_get_one_not_exists(cls, session):
+        """
+        Should return none if searched object does not exists.
+        """
         name = str(uuid.uuid4())
         object = DummyModel(name=name)
         session.add(object)
