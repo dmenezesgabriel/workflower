@@ -16,7 +16,8 @@ def create(session, model_object, **kwargs):
         return instance
     except Exception as error:
         logger.error(
-            f"Writing model_object{model_object} , {dict(**kwargs)} failed. Error: {error}"
+            f"Writing model_object{model_object} , {dict(**kwargs)} failed."
+            f" Error: {error}"
         )
         session.rollback()
         return None
