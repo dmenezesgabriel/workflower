@@ -23,14 +23,6 @@ def create(session, model_object, **kwargs):
         return None
 
 
-def delete(session, model_object, **kwargs):
-    logger.debug(f"Deleting {model_object} , {dict(**kwargs)}")
-    instance = get_one(session, model_object, **kwargs)
-    if instance:
-        session.delete(instance)
-        session.commit()
-
-
 def get_all(session, model_object, **kwargs):
     return session.query(model_object).filter_by(**kwargs).all()
 
@@ -46,6 +38,19 @@ def get_one(session, model_object, **kwargs):
     return None
 
 
+def get_or_create(session, model_object, **kwargs):
+    """
+    Get or create by name.
+    """
+    instance = get_one(session, model_object, name=kwargs["name"])
+    if instance:
+        logger.debug("model_object already exists")
+        return instance
+    else:
+        logger.debug("Creating model_object")
+        return create(session, model_object, **kwargs)
+
+
 def update(session, model_object, filter_dict, new_attributes_dict):
     try:
         session.query(model_object).filter_by(**filter_dict).update(
@@ -58,17 +63,13 @@ def update(session, model_object, filter_dict, new_attributes_dict):
             f"Updating model_object{model_object} , {dict(**filter_dict)} "
             f"failed. Error: {error}"
         )
-        session.rollback()
 
 
-def get_or_create(session, model_object, **kwargs):
-    """
-    Get or create by name.
-    """
-    instance = get_one(session, model_object, name=kwargs["name"])
+def delete(session, model_object, **kwargs):
+    logger.debug(f"Deleting {model_object} , {dict(**kwargs)}")
+    instance = get_one(session, model_object, **kwargs)
     if instance:
-        logger.debug("model_object already exists")
-        return instance
-    else:
-        logger.debug("Creating model_object")
-        return create(session, model_object, **kwargs)
+        session.delete(instance)
+        session.commit()
+
+        session.rollback()

@@ -12,6 +12,9 @@ from workflower.utils import crud
 
 @pytest.fixture(scope="function")
 def session():
+    """
+    sqlalchemy.orm.session.Session.
+    """
     engine = create_engine(Config.APP_DATABASE_URL)
     BaseModel.metadata.create_all(bind=engine)
     Session = scoped_session(
