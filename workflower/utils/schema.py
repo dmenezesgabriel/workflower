@@ -25,15 +25,14 @@ def dict_has_only_one_workflow(configuration_dict: dict) -> bool:
     """
     if len([key for key in configuration_dict if key == "workflow"]) > 1:
         raise InvalidSchemaError("Pipeline file must only one workflow")
-    if not isinstance(configuration_dict["version"], str):
-        raise InvalidTypeError("Version must be type string")
-    return True
 
 
 def validate_workflow_definition(configuration_dict: dict) -> None:
     """
     Validate workflow definition.
     """
+    if not isinstance(configuration_dict["version"], str):
+        raise InvalidTypeError("Version must be type string")
     if not isinstance(configuration_dict["workflow"], dict):
         raise InvalidTypeError("Workflow wrong definition")
     workflow_keys = ["name", "jobs"]
