@@ -6,6 +6,7 @@ from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 logger = logging.getLogger("workflower.utils.schema")
 
 
+# Pipeline
 def pipeline_keys_valid(configuration_dict: dict) -> bool:
     """
     Dict must have version and workflow keys.
@@ -19,14 +20,7 @@ def pipeline_keys_valid(configuration_dict: dict) -> bool:
     return True
 
 
-def dict_has_only_one_workflow(configuration_dict: dict) -> bool:
-    """
-    Dict must have only one workflow definition.
-    """
-    if len([key for key in configuration_dict if key == "workflow"]) > 1:
-        raise InvalidSchemaError("Pipeline file must only one workflow")
-
-
+#  Workflow
 def validate_workflow_definition(configuration_dict: dict) -> None:
     """
     Validate workflow definition.
@@ -46,6 +40,7 @@ def validate_workflow_definition(configuration_dict: dict) -> None:
         raise InvalidTypeError("Name must be type string")
 
 
+# Jobs
 def validate_job_keys(job_dict: dict) -> None:
     """
     Validate job attributes.
@@ -153,7 +148,6 @@ def validate_schema(configuration_dict: dict) -> bool:
     logger.debug("Validating yml schema")
     #  Pipeline
     pipeline_keys_valid(configuration_dict)
-    dict_has_only_one_workflow(configuration_dict)
     #  Workflow
     validate_workflow_definition(configuration_dict)
     # Jobs
@@ -161,6 +155,7 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
+# Parse jobs
 def parse_job_date_trigger_options(configuration_dict) -> dict:
     """
     parse_job a dict with date trigger options.
