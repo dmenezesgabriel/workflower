@@ -188,7 +188,27 @@ class TestGetAll:
 
 
 class TestUpdate:
+    def test_get_all_calls_session_query(cls, session):
+        """
+        crud.update should call sqlalchemy.orm.session.Session.query.
+        """
+        name = str(uuid.uuid4())
+        object = DummyModel(name=name)
+        session.add(object)
+        session.commit()
+        filter_dict = {"name": name}
+        update_dict = {"name": "new_name"}
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.query"
+        ) as mock:
+            crud.update(session, DummyModel, filter_dict, update_dict)
+        assert mock.call_count == 1
+
+    # Integration tests
     def test_update(cls, session):
+        """
+        crud.update should update attributes of an object in database.
+        """
         name = str(uuid.uuid4())
         object = DummyModel(name=name)
         session.add(object)
