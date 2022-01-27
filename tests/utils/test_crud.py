@@ -116,7 +116,7 @@ class TestCreate:
 class TestGetOne:
     def test_get_one_calls_session_query(cls, session):
         """
-        crud.create should call sqlalchemy.orm.session.Session.add.
+        crud.get_one should call sqlalchemy.orm.session.Session.query.
         """
         with unittest.mock.patch(
             "sqlalchemy.orm.session.Session.query"
@@ -163,7 +163,21 @@ class TestGetOne:
 
 
 class TestGetAll:
+    def test_get_all_calls_session_query(cls, session):
+        """
+        crud.get_one should call sqlalchemy.orm.session.Session.query.
+        """
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.query"
+        ) as mock:
+            crud.get_all(session, DummyModel)
+        assert mock.call_count == 1
+
+    # Integration tests
     def test_get_all(cls, session):
+        """
+        crud.get_all should get all objects from a given model.
+        """
         for i in range(4, 10):
             name = str(uuid.uuid4())
             object = DummyModel(name=name)
