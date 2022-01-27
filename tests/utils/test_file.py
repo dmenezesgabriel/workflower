@@ -1,7 +1,7 @@
 import os.path
 import time
 import unittest.mock
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, create_autospec
 
 import pytest
 import yaml
@@ -39,17 +39,17 @@ class TestGetFileName:
         """
         os.path.basename should be called once.
         """
-        with unittest.mock.patch("os.path.basename") as mock_basename:
+        with unittest.mock.patch("os.path.basename") as mock:
             get_file_name(temp_workflow_file)
-            mock_basename.assert_called_once()
+            assert mock.call_count == 1
 
-    def test_get_file_name_calls_os_path_splittext(cls, temp_workflow_file):
+    def test_get_file_name_calls_os_path_splitext(cls, temp_workflow_file):
         """
         os.path.splitext should be called once.
         """
-        with unittest.mock.patch("os.path.splitext") as mock_splittext:
+        with unittest.mock.patch("os.path.splitext") as mock:
             get_file_name(temp_workflow_file)
-            mock_splittext.assert_called_once()
+            assert mock.call_count == 1
 
     def test_get_file_name_return(cls, temp_workflow_file):
         """
@@ -73,21 +73,15 @@ class TestGetFileModificationDate:
     Test case for get_file_modification_date function.
     """
 
-    def mock_os_path_getmtime(cls, monkeypatch):
-        """
-        Mock os.path.getmtime.
-        """
-        return time.time()
-
     def test_get_file_modification_date_calls_os_path_basename(
         cls, temp_workflow_file
     ):
         """
         os.path.getmtime should be called once.
         """
-        with unittest.mock.patch("os.path.getmtime") as mock_getmtime:
+        with unittest.mock.patch("os.path.getmtime") as mock:
             get_file_modification_date(temp_workflow_file)
-            mock_getmtime.assert_called_once()
+            assert mock.call_count == 1
 
     def test_get_file_modification_date_return_type(cls, temp_workflow_file):
         """
@@ -117,6 +111,8 @@ class TestYamlFileToDict:
                   minutes: 2
         """
 
+    mock_open = unittest.mock.mock_open(read_data=read_data)
+
     mock_dict = {
         "version": "1.0",
         "workflow": {
@@ -137,16 +133,16 @@ class TestYamlFileToDict:
         """
         os.path.basename should be called once.
         """
-        with unittest.mock.patch("yaml.safe_load") as mock_safe_load:
-            yaml_file_to_dict(temp_workflow_file)
-            mock_safe_load.assert_called_once()
+        with unittest.mock.patch("builtins.open", cls.mock_open):
+            with unittest.mock.patch("yaml.safe_load") as mock:
+                yaml_file_to_dict(temp_workflow_file)
+                assert mock.call_count == 1
 
     def test_yaml_file_to_dict(cls, temp_workflow_file):
         """
         Valid yaml file from path must return a dict.
         """
-        yaml_dict = yaml_file_to_dict(temp_workflow_file)
         yaml.safe_load = MagicMock(return_value=cls.mock_dict)
-        mock_open = unittest.mock.mock_open(read_data=cls.read_data)
-        with unittest.mock.patch("builtins.open", mock_open):
+        with unittest.mock.patch("builtins.open", cls.mock_open):
+            yaml_dict = yaml_file_to_dict(temp_workflow_file)
             assert isinstance(yaml_dict, dict)
