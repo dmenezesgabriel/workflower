@@ -27,13 +27,18 @@ def session():
 
 class TestCreate:
     def test_create_calls_add(cls, session):
-        print(type(session))
+        """
+        crud.create should call sqlalchemy.orm.session.Session.add.
+        """
         with unittest.mock.patch("sqlalchemy.orm.session.Session.add") as mock:
             name = str(uuid.uuid4())
             crud.create(session=session, model_object=Workflow, name=name)
         assert mock.call_count == 1
 
     def test_create_calls_commit(cls, session):
+        """
+        crud.create should call sqlalchemy.orm.session.Session.commit.
+        """
         with unittest.mock.patch(
             "sqlalchemy.orm.session.Session.commit"
         ) as mock:
@@ -42,6 +47,9 @@ class TestCreate:
         assert mock.call_count == 1
 
     def test_create_calls_refresh(cls, session):
+        """
+        crud.create should call sqlalchemy.orm.session.Session.refresh.
+        """
         with unittest.mock.patch(
             "sqlalchemy.orm.session.Session.refresh"
         ) as mock:
