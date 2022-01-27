@@ -3,21 +3,6 @@ import logging
 logger = logging.getLogger("workflower.utils.crud")
 
 
-def get_all(session, model_object, **kwargs):
-    return session.query(model_object).filter_by(**kwargs).all()
-
-
-def get_one(session, model_object, **kwargs):
-    logger.debug(f"Getting one {model_object} , {dict(**kwargs)}")
-    instance = session.query(model_object).filter_by(**kwargs).first()
-    if instance:
-        logger.debug(f"Model {model_object} , {dict(**kwargs)} found")
-        return instance
-    else:
-        logger.debug(f"Model {model_object} , {dict(**kwargs)} not found ")
-    return None
-
-
 def create(session, model_object, **kwargs):
     logger.debug(f"Creating {model_object} , {dict(**kwargs)}")
     instance = model_object(**kwargs)
@@ -43,6 +28,21 @@ def delete(session, model_object, **kwargs):
     if instance:
         session.delete(instance)
         session.commit()
+
+
+def get_all(session, model_object, **kwargs):
+    return session.query(model_object).filter_by(**kwargs).all()
+
+
+def get_one(session, model_object, **kwargs):
+    logger.debug(f"Getting one {model_object} , {dict(**kwargs)}")
+    instance = session.query(model_object).filter_by(**kwargs).first()
+    if instance:
+        logger.debug(f"Model {model_object} , {dict(**kwargs)} found")
+        return instance
+    else:
+        logger.debug(f"Model {model_object} , {dict(**kwargs)} not found ")
+    return None
 
 
 def update(session, model_object, filter_dict, new_attributes_dict):
