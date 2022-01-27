@@ -6,7 +6,7 @@ from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 logger = logging.getLogger("workflower.utils.schema")
 
 
-def validate_pipeline_keys(configuration_dict: dict) -> None:
+def pipeline_keys_valid(configuration_dict: dict) -> bool:
     """
     Dict must have version and workflow keys.
     """
@@ -16,9 +16,10 @@ def validate_pipeline_keys(configuration_dict: dict) -> None:
             "The pipeline must have all of it's keys: "
             f"{', '.join(pipeline_keys)}"
         )
+    return True
 
 
-def validate_has_only_one_workflow(configuration_dict: dict) -> None:
+def dict_has_only_one_workflow(configuration_dict: dict) -> bool:
     """
     Dict must have only one workflow definition.
     """
@@ -26,6 +27,7 @@ def validate_has_only_one_workflow(configuration_dict: dict) -> None:
         raise InvalidSchemaError("Pipeline file must only one workflow")
     if not isinstance(configuration_dict["version"], str):
         raise InvalidTypeError("Version must be type string")
+    return True
 
 
 def validate_workflow_definition(configuration_dict: dict) -> None:
@@ -151,8 +153,8 @@ def validate_schema(configuration_dict: dict) -> bool:
     """
     logger.debug("Validating yml schema")
     #  Pipeline
-    validate_pipeline_keys(configuration_dict)
-    validate_has_only_one_workflow(configuration_dict)
+    pipeline_keys_valid(configuration_dict)
+    dict_has_only_one_workflow(configuration_dict)
     #  Workflow
     validate_workflow_definition(configuration_dict)
     # Jobs
