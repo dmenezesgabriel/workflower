@@ -9,7 +9,7 @@ workflow:
       output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb"
       # trigger config
       trigger: cron
-      minute: "*/5"
+      minute: "*/3"
     - name: "hello_notebook"
       uses: papermill
       # Papermill paths
