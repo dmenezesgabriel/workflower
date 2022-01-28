@@ -94,17 +94,33 @@ def job_name_is_string_type(job_dict: dict) -> bool:
     return True
 
 
+def job_uses_is_string_type(job_dict: dict) -> bool:
+    """
+    Validate job uses data type.
+    """
+    if not isinstance(job_dict["uses"], str):
+        raise InvalidTypeError("Name must be type string")
+    return True
+
+
+def job_uses_options_in_expected(job_dict) -> bool:
+    """
+    Job uses must have expected options.
+    """
+    job_uses_options = ["alteryx", "papermill", "python"]
+    if job_dict["uses"] not in job_uses_options:
+        raise InvalidSchemaError(
+            f"Job uses options must be in: {', '.join(job_uses_options)}"
+        )
+    return True
+
+
 def validate_job_uses(job_dict: dict) -> None:
     """
     Validate job uses.
     """
-    if not isinstance(job_dict["uses"], str):
-        raise InvalidTypeError("Name must be type string")
-    job_uses_options = ["alteryx", "papermill", "python"]
-    if job_dict["uses"] not in job_uses_options:
-        raise InvalidSchemaError(
-            f"Job trigger must be: {', '.join(job_uses_options)}"
-        )
+    job_uses_is_string_type(job_dict)
+    job_uses_options_in_expected(job_dict)
     # Papermill
     if job_dict["uses"] == "papermill":
         papermill_keys = ["input_path", "output_path"]

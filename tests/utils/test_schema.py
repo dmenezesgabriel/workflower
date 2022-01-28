@@ -160,7 +160,7 @@ class TestJobSchemaValidation:
 
     def test_job_has_expected_keys(cls, job_dict):
         """
-        Workflow must have expected keys.
+        Job must have expected keys.
         """
         assert schema.job_has_expected_keys(job_dict) is True
 
@@ -174,14 +174,14 @@ class TestJobSchemaValidation:
     )
     def test_job_has_expected_keys_missing_keys(cls, test_input):
         """
-        If Workflow not contain expected keys should raise Exception.
+        If Job not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
             schema.job_has_expected_keys(test_input)
 
     def test_job_name_is_string_type_true(cls, job_dict):
         """
-        Workflow must be dict type.
+        Job name must be string type.
         """
         assert schema.job_name_is_string_type(job_dict) is True
 
@@ -199,3 +199,53 @@ class TestJobSchemaValidation:
     def test_job_name_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
             schema.job_name_is_string_type(test_input)
+
+    def test_job_uses_is_string_type_true(cls, job_dict):
+        """
+        Job uses must be dict type.
+        """
+        assert schema.job_uses_is_string_type(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"uses": 1}),
+            ({"uses": 1.1}),
+            ({"uses": True}),
+            ({"uses": {}}),
+            ({"uses": []}),
+            ({"uses": ()}),
+        ],
+    )
+    def test_job_uses_is_string_type_not_string(cls, test_input):
+        with pytest.raises(InvalidTypeError):
+            schema.job_uses_is_string_type(test_input)
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"uses": "alteryx"}),
+            ({"uses": "papermill"}),
+            ({"uses": "python"}),
+        ],
+    )
+    def test_job_uses_options_in_expected(cls, test_input):
+        """
+        Job uses must have expected options.
+        """
+        assert schema.job_uses_options_in_expected(test_input) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"uses": "altery"}),
+            ({"uses": "papermil"}),
+            ({"uses": "pyton"}),
+        ],
+    )
+    def test_job_uses_options_in_expected_not_in_expected(cls, test_input):
+        """
+        Job uses must have expected options.
+        """
+        with pytest.raises(InvalidSchemaError):
+            schema.job_uses_options_in_expected(test_input)
