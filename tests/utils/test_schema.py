@@ -1,6 +1,6 @@
 import pytest
 import workflower.utils.schema as schema
-from workflower.exceptions import InvalidSchemaError
+from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 
 
 class TestPipeline:
@@ -20,6 +20,28 @@ class TestPipeline:
         """
         with pytest.raises(InvalidSchemaError):
             schema.pipeline_keys_valid(test_input)
+
+    def test_version_is_string_true(cls):
+        """
+        Version must be string data type.
+        """
+        dict_obj = {"version": "1.0", "workflow": {}}
+        assert schema.version_is_string(dict_obj)
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"version": 1}),
+            ({"version": 1.1}),
+            ({"version": True}),
+            ({"version": []}),
+            ({"version": {}}),
+            ({"version": ()}),
+        ],
+    )
+    def test_version_is_string_not_string(cls, test_input):
+        with pytest.raises(InvalidTypeError):
+            schema.version_is_string(test_input)
 
 
 class TestWorkflow:
