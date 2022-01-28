@@ -1,7 +1,11 @@
 import logging
 import os
 
-from workflower.exceptions import InvalidSchemaError, InvalidTypeError
+from workflower.exceptions import (
+    InvalidFilePathError,
+    InvalidSchemaError,
+    InvalidTypeError,
+)
 
 logger = logging.getLogger("workflower.utils.schema")
 
@@ -116,6 +120,9 @@ def job_uses_options_in_expected(job_dict) -> bool:
 
 
 def papermill_job_use_has_expected_keys(job_dict: dict) -> bool:
+    """
+    papermill job must have expected keys.
+    """
     papermill_keys = ["input_path", "output_path"]
     if not all(key in job_dict.keys() for key in papermill_keys):
         raise InvalidSchemaError(
@@ -124,11 +131,33 @@ def papermill_job_use_has_expected_keys(job_dict: dict) -> bool:
     return True
 
 
+def papermill_job_input_path_is_file(job_dict: dict) -> bool:
+    """
+    Papermill job input_path must point to an existing file.
+    """
+    if not os.path.isfile(job_dict["input_path"]):
+        raise InvalidFilePathError("Papermill input_path file not exists")
+    return True
+
+
+def papermill_job_paths_ends_with_ipynb(job_dict: dict) -> bool:
+    """
+    Papermill job paths must point to .ipynb type files.
+    """
+    if not job_dict["input_path"].endswith(".ipynb") or not job_dict[
+        "output_path"
+    ].endswith(".ipynb"):
+        raise InvalidTypeError("input and output paths must be .ipynb files")
+    return True
+
+
 def validate_papermill_job(job_dict: dict) -> None:
+    """
+    Validate papermill job use.
+    """
     papermill_job_use_has_expected_keys(job_dict)
-    # TODO
-    # Validate if input_path ends with ipynb and file exists
-    # and output_path ends with ipynb and dir exists
+    papermill_job_input_path_is_file(job_dict)
+    papermill_job_paths_ends_with_ipynb(job_dict)
 
 
 def validate_alteryx_job(job_dict: dict) -> None:

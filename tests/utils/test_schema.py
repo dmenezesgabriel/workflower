@@ -3,7 +3,11 @@ import unittest.mock
 
 import pytest
 import workflower.utils.schema as schema
-from workflower.exceptions import InvalidSchemaError, InvalidTypeError
+from workflower.exceptions import (
+    InvalidFilePathError,
+    InvalidSchemaError,
+    InvalidTypeError,
+)
 
 
 class TestPipelineSchemaValidation:
@@ -297,7 +301,7 @@ class TestPapermillJobSchemaValidation:
             """
             p = tmpdir_factory.mktemp("file").join(name)
             p.write_text(file_content, encoding="utf-8")
-            return str(p)
+            return p
 
         return _return_notebook_path
 
@@ -308,15 +312,16 @@ class TestPapermillJobSchemaValidation:
             "uses": "papermill",
             "trigger": "interval",
             "minutes": 1,
-            "input_path": jupyter_notebook_file(name="notebook.ipynb"),
-            "output_path": jupyter_notebook_file(name="notebook_output.ipynb"),
+            "input_path": str(jupyter_notebook_file(name="notebook.ipynb")),
+            "output_path": str(
+                jupyter_notebook_file(name="notebook_output.ipynb")
+            ),
         }
 
     def test_papermill_job_use_has_expected_keys(cls, job_dict):
         """
         Job must have expected keys.
         """
-        print(job_dict)
         assert schema.papermill_job_use_has_expected_keys(job_dict) is True
 
     @pytest.mark.parametrize(
@@ -353,3 +358,82 @@ class TestPapermillJobSchemaValidation:
         """
         with pytest.raises(InvalidSchemaError):
             schema.papermill_job_use_has_expected_keys(test_input)
+
+    def test_papermill_job_input_path_is_file(cls, job_dict):
+        """
+        Papermill input_path must be an existing file.
+        """
+        assert schema.papermill_job_input_path_is_file(job_dict) is True
+
+    def test_papermill_job_input_path_is_file_not_exists(cls):
+        """
+        Papermill input_path must be an existing file.
+        """
+        job_dict = {"input_path": "./test.ipynb"}
+        with pytest.raises(InvalidFilePathError):
+            schema.papermill_job_input_path_is_file(job_dict)
+
+    def test_papermill_job_paths_ends_with_ipynb_true(cls, job_dict):
+        """
+        Papermill job paths must point to .ipynb type files.
+        """
+        assert schema.papermill_job_paths_ends_with_ipynb(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            (
+                {
+                    "name": "job_name",
+                    "uses": "papermill",
+                    "trigger": "interval",
+                    "minutes": 1,
+                    "input_path": "./test.txt",
+                    "output_path": "./test.ipynb",
+                }
+            ),
+            (
+                {
+                    "name": "job_name",
+                    "uses": "papermill",
+                    "trigger": "interval",
+                    "minutes": 1,
+                    "input_path": "./test.ipynb",
+                    "output_path": "./test.txt",
+                }
+            ),
+        ],
+    )
+    def test_papermill_job_paths_ends_with_ipynb_false(cls, test_input):
+        """
+        Papermill job paths must point to .ipynb type files.
+        """
+        with pytest.raises(InvalidTypeError):
+            schema.papermill_job_paths_ends_with_ipynb(test_input)
+
+    def test_validate_papermill_job_calls_papermill_job_use_has_expected_keys(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.papermill_job_use_has_expected_keys"
+        ) as mock:
+            schema.validate_papermill_job(job_dict)
+        assert mock.call_count == 1
+
+    def test_validate_papermill_job_calls_papermill_job_input_path_is_file(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.papermill_job_input_path_is_file"
+        ) as mock:
+            schema.validate_papermill_job(job_dict)
+        assert mock.call_count == 1
+
+    def test_validate_papermill_job_calls_papermill_job_paths_ends_with_ipynb(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.papermill_job_paths_ends_with_ipynb"
+        ) as mock:
+            schema.validate_papermill_job(job_dict)
+        assert mock.call_count == 1
