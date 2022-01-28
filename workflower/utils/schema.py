@@ -176,6 +176,8 @@ def validate_python_job(job_dict: dict) -> None:
         raise InvalidSchemaError(
             "Python jobs must contain any of: " f"{', '.join(python_keys)}"
         )
+    # TODO
+    # Validate if path ends with python extension and file exists
 
 
 def validate_job_uses(job_dict: dict) -> None:
