@@ -1,6 +1,7 @@
 import logging
 import os
 
+from config import Config
 from workflower.exceptions import (
     InvalidFilePathError,
     InvalidSchemaError,
@@ -411,6 +412,10 @@ def parse_job_uses(configuration_dict) -> dict:
                 kwargs=dict(
                     input_path=input_path,
                     output_path=output_path,
+                    environments_dir=Config.ENVIRONMENTS_DIR,
+                    kernel_specs_dir=Config.KERNELS_SPECS_DIR,
+                    pip_index_url=Config.PIP_INDEX_URL,
+                    pip_trusted_host=Config.PIP_TRUSTED_HOST,
                 )
             )
         )
@@ -419,23 +424,26 @@ def parse_job_uses(configuration_dict) -> dict:
         script_path = configuration_dict.get("script_path")
         code = configuration_dict.get("code")
         requirements_path = configuration_dict.get("requirements_path")
-        uses_dict = {"kwargs": {}}
-        if script_path:
+        if code:
+            uses_config.update(dict(kwargs=dict(code=code)))
+        elif script_path:
             if not os.path.isfile(script_path):
                 logger.error("Not a valid python script path")
-            uses_dict["kwargs"].update(dict(script_path=script_path))
-        elif code:
-            uses_dict["kwargs"].update(dict(code=code))
+            uses_config.update(dict(kwargs=dict(script_path=script_path)))
         if requirements_path:
             if not os.path.isfile(requirements_path):
                 logger.error("Not a valid requirements path")
-            uses_config.update(
-                uses_dict["kwargs"].update(
-                    dict(requirements_path=requirements_path)
-                )
+            uses_config["kwargs"].update(
+                dict(requirements_path=requirements_path)
             )
-        uses_dict.update(dict(func="PythonOperator.execute"))
-        uses_config.update(uses_dict)
+        uses_config["kwargs"].update(
+            dict(
+                pip_index_url=Config.PIP_INDEX_URL,
+                pip_trusted_host=Config.PIP_TRUSTED_HOST,
+                environments_dir=Config.ENVIRONMENTS_DIR,
+            )
+        )
+        uses_config.update(dict(func="PythonOperator.execute"))
     return uses_config
 
 

@@ -152,7 +152,6 @@ class Job(BaseModel):
             operator = PapermillOperator
         elif self.uses == "python":
             operator = PythonOperator
-
         schedule_args.update(dict(func=getattr(operator, "execute")))
 
         try:

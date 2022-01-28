@@ -18,6 +18,10 @@ class PapermillOperator(BaseOperator):
         kernel_name=None,
         kernel_spec_folder=None,
         env_path=None,
+        environments_dir=None,
+        kernel_specs_dir=None,
+        pip_index_url=None,
+        pip_trusted_host=None,
     ):
         """
         Run notebook with papermill.
@@ -27,7 +31,12 @@ class PapermillOperator(BaseOperator):
                 kernel_name,
                 kernel_spec_folder,
                 env_path,
-            ) = create_and_install_kernel()
+            ) = create_and_install_kernel(
+                environments_dir,
+                kernel_specs_dir,
+                pip_index_url,
+                pip_trusted_host,
+            )
 
         try:
             notebook = pm.execute_notebook(

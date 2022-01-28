@@ -1,5 +1,6 @@
 import logging
 import os
+import traceback
 from typing import List
 
 from config import Config
@@ -47,10 +48,10 @@ class Loader:
                         self.load_one_workflow_from_file(
                             workflow_yaml_config_path
                         )
-                    except Exception as error:
+                    except Exception:
                         logger.error(
                             f"Error loading {workflow_yaml_config_path}:"
-                            f" {error}"
+                            f" {traceback.format_exc()}"
                         )
         Workflow.set_files_still_exists()
 

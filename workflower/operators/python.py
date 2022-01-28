@@ -6,7 +6,6 @@ import sys
 import traceback
 import uuid
 
-from config import Config
 from workflower.operators.operator import BaseOperator
 from workflower.utils.environment import create_venv
 
@@ -21,8 +20,9 @@ class PythonOperator(BaseOperator):
         requirements_path=None,
         create_env=True,
         env_path=None,
-        pip_index_url=Config.PIP_INDEX_URL,
-        pip_trusted_host=Config.PIP_TRUSTED_HOST,
+        pip_index_url=None,
+        pip_trusted_host=None,
+        environments_dir=None,
     ):
         """
         Run python with papermill.
@@ -30,7 +30,9 @@ class PythonOperator(BaseOperator):
         output = {"logs": []}
         if create_env:
             venv_name = str(uuid.uuid4())
-            env_path, env_executable = create_venv(venv_name)
+            env_path, env_executable = create_venv(
+                venv_name, environments_dir=environments_dir
+            )
         else:
             env_executable = sys.executable
         output.update(dict(env_executable=env_executable))

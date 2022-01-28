@@ -6,13 +6,12 @@ import subprocess
 import uuid
 import venv
 
-from config import Config
 from jupyter_client.kernelspecapp import KernelSpecManager
 
 logger = logging.getLogger("workflower.utils.environment")
 
 
-def create_venv(name, environments_dir=Config.ENVIRONMENTS_DIR, with_pip=True):
+def create_venv(name, environments_dir, with_pip=True):
     """
     Create virtual environment.
     """
@@ -30,16 +29,14 @@ def create_venv(name, environments_dir=Config.ENVIRONMENTS_DIR, with_pip=True):
 
 
 def create_and_install_kernel(
-    kernel_specs_dir=Config.KERNELS_SPECS_DIR,
-    pip_index_url=Config.PIP_INDEX_URL,
-    pip_trusted_host=Config.PIP_TRUSTED_HOST,
+    environments_dir, kernel_specs_dir, pip_index_url, pip_trusted_host
 ):
     # Create environment
     logger.info("Creating Kernel")
     kernel_name = str(uuid.uuid4())
     logger.info(f"Kernel name {kernel_name}")
 
-    env_path, env_executable = create_venv(kernel_name)
+    env_path, env_executable = create_venv(kernel_name, environments_dir)
     # Create kernel spec
     kernel_spec = {
         "argv": [
