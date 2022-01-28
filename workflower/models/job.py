@@ -4,7 +4,6 @@ Job class.
 
 import logging
 
-import pandas as pd
 from apscheduler.jobstores.base import ConflictingIdError
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -14,7 +13,7 @@ from workflower.operators.alteryx import AlteryxOperator
 from workflower.operators.papermill import PapermillOperator
 from workflower.operators.python import PythonOperator
 from workflower.utils import crud
-from workflower.utils.schema import make_job_definition
+from workflower.utils.schema import JobSchemaParser
 
 logger = logging.getLogger("workflower.job")
 
@@ -77,7 +76,8 @@ class Job(BaseModel):
                     job_depends_on = workflow.name + "_" + job_depends_on
                 logger.debug(f"Job depends on: {job_depends_on}")
                 # Make apscheduler job definition
-                job_definition = make_job_definition(job_dict)
+                parser = JobSchemaParser()
+                job_definition = parser.parse_schema(job_dict)
                 # Job name must be unique
                 unique_job_id = workflow.name + "_" + job_name
                 job_definition.update({"id": unique_job_id})
@@ -117,25 +117,6 @@ class Job(BaseModel):
                         f"Dependency job {dependency_job.name} triggered"
                     )
                     dependency_job.schedule(scheduler)
-
-    @classmethod
-    def save_returned_value(cls, job_name, return_value, scheduler):
-        logger.debug(f"Job to save returned value 1 {job_name}")
-        with database.session_scope() as session:
-            scheduled_job = crud.get_one(session, cls, name=job_name)
-            if scheduled_job:
-                logger.debug(
-                    f"Job to save returned value 2 {scheduled_job.name}"
-                )
-                logger.debug(f"Return type {type(return_value)}")
-                if isinstance(return_value, pd.DataFrame):
-                    logger.debug(f"Saving {scheduled_job.name}, return value")
-                    scheduler.add_job(
-                        func=scheduled_job.save_execution,
-                        kwargs=dict(dataframe=return_value),
-                    )
-                else:
-                    logger.debug("Return value not a DataFrame")
 
     def schedule(self, scheduler) -> None:
         """

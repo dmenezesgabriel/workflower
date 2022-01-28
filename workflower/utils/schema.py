@@ -255,161 +255,162 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
-# Parse jobs
-def parse_job_date_trigger_options(configuration_dict) -> dict:
-    """
-    parse_job a dict with date trigger options.
-    """
-    date_string_options = [
-        "run_date",
-        "timezone",
-    ]
+class JobSchemaParser:
+    # Parse jobs
+    def __init__(self):
+        self.schema_args = []
+        self.schema_kwargs = {}
+        self.trigger_config = {}
+        self.uses_config = {}
 
-    date_string_options_dict = {
-        date_option: str(configuration_dict.get(date_option))
-        for date_option in date_string_options
-        if configuration_dict.get(date_option)
-    }
-    return date_string_options_dict
+    def parse_job_date_trigger_options(self, configuration_dict) -> dict:
+        """
+        parse_job a dict with date trigger options.
+        """
+        date_string_options = [
+            "run_date",
+            "timezone",
+        ]
 
+        date_string_options_dict = {
+            date_option: str(configuration_dict.get(date_option))
+            for date_option in date_string_options
+            if configuration_dict.get(date_option)
+        }
+        return date_string_options_dict
 
-def parse_job_interval_trigger_options(configuration_dict) -> dict:
-    """
-    parse_job a dict with interval trigger options.
-    """
-    interval_int_options = [
-        "weeks",
-        "days",
-        "hours",
-        "minutes",
-        "seconds",
-        "jitter",
-    ]
+    def parse_job_interval_trigger_options(self, configuration_dict) -> dict:
+        """
+        parse_job a dict with interval trigger options.
+        """
+        interval_int_options = [
+            "weeks",
+            "days",
+            "hours",
+            "minutes",
+            "seconds",
+            "jitter",
+        ]
 
-    interval_string_options = [
-        "start_date",
-        "end_date",
-        "timezone",
-    ]
-    interval_int_options_dict = {
-        interval_option: int(configuration_dict.get(interval_option))
-        for interval_option in interval_int_options
-        if configuration_dict.get(interval_option)
-    }
-    interval_string_options_dict = {
-        interval_option: str(configuration_dict.get(interval_option))
-        for interval_option in interval_string_options
-        if configuration_dict.get(interval_option)
-    }
-    return {**interval_int_options_dict, **interval_string_options_dict}
+        interval_string_options = [
+            "start_date",
+            "end_date",
+            "timezone",
+        ]
+        interval_int_options_dict = {
+            interval_option: int(configuration_dict.get(interval_option))
+            for interval_option in interval_int_options
+            if configuration_dict.get(interval_option)
+        }
+        interval_string_options_dict = {
+            interval_option: str(configuration_dict.get(interval_option))
+            for interval_option in interval_string_options
+            if configuration_dict.get(interval_option)
+        }
+        return {**interval_int_options_dict, **interval_string_options_dict}
 
+    def parse_job_cron_trigger_options(self, configuration_dict) -> dict:
+        """
+        parse_job a dict with cron trigger options.
+        """
+        interval_int_or_string_options = [
+            "year",
+            "month",
+            "day",
+            "week",
+            "day_of_week",
+            "hour",
+            "minute",
+            "second",
+        ]
+        interval_string_options = [
+            "start_date",
+            "end_date",
+            "timezone",
+        ]
+        interval_int_options = [
+            "jitter",
+        ]
+        interval_int_or_string_options_dict = {
+            interval_option: configuration_dict.get(interval_option)
+            for interval_option in interval_int_or_string_options
+            if configuration_dict.get(interval_option)
+            and (
+                isinstance(configuration_dict.get(interval_option), int)
+                or isinstance(configuration_dict.get(interval_option), str)
+            )
+        }
+        interval_int_options_dict = {
+            interval_option: int(configuration_dict.get(interval_option))
+            for interval_option in interval_int_options
+            if configuration_dict.get(interval_option)
+        }
+        interval_string_options_dict = {
+            interval_option: str(configuration_dict.get(interval_option))
+            for interval_option in interval_string_options
+            if configuration_dict.get(interval_option)
+        }
+        return {
+            **interval_int_or_string_options_dict,
+            **interval_int_options_dict,
+            **interval_string_options_dict,
+        }
 
-def parse_job_cron_trigger_options(configuration_dict) -> dict:
-    """
-    parse_job a dict with cron trigger options.
-    """
-    interval_int_or_string_options = [
-        "year",
-        "month",
-        "day",
-        "week",
-        "day_of_week",
-        "hour",
-        "minute",
-        "second",
-    ]
-    interval_string_options = [
-        "start_date",
-        "end_date",
-        "timezone",
-    ]
-    interval_int_options = [
-        "jitter",
-    ]
-    interval_int_or_string_options_dict = {
-        interval_option: configuration_dict.get(interval_option)
-        for interval_option in interval_int_or_string_options
-        if configuration_dict.get(interval_option)
-        and (
-            isinstance(configuration_dict.get(interval_option), int)
-            or isinstance(configuration_dict.get(interval_option), str)
-        )
-    }
-    interval_int_options_dict = {
-        interval_option: int(configuration_dict.get(interval_option))
-        for interval_option in interval_int_options
-        if configuration_dict.get(interval_option)
-    }
-    interval_string_options_dict = {
-        interval_option: str(configuration_dict.get(interval_option))
-        for interval_option in interval_string_options
-        if configuration_dict.get(interval_option)
-    }
-    return {
-        **interval_int_or_string_options_dict,
-        **interval_int_options_dict,
-        **interval_string_options_dict,
-    }
+    def parse_job_trigger_options(self, configuration_dict) -> None:
+        """
+        Define trigger options from dict.
+        """
+        job_trigger = configuration_dict.get("trigger")
+        logger.debug(f"Job trigger {job_trigger}")
+        #  interval trigger
+        if job_trigger == "interval":
+            self.trigger_config.update(dict(trigger="interval"))
+            interval_trigger_options = self.parse_job_interval_trigger_options(
+                configuration_dict
+            )
+            self.trigger_config.update(interval_trigger_options)
+        #  Cron trigger
+        elif job_trigger == "cron":
+            self.trigger_config.update(dict(trigger="cron"))
+            cron_trigger_options = self.parse_job_cron_trigger_options(
+                configuration_dict
+            )
+            self.trigger_config.update(cron_trigger_options)
+        #  Date trigger
+        elif job_trigger == "date":
+            self.trigger_config.update(dict(trigger="date"))
+            date_trigger_options = self.parse_job_date_trigger_options(
+                configuration_dict
+            )
+            self.trigger_config.update(date_trigger_options)
+        elif job_trigger == "dependency":
+            # Trigger "dependency" is not recognized by apscheduler, so it
+            # must be removed from job definition
+            configuration_dict.pop("trigger", None)
 
-
-def parse_job_trigger_options(configuration_dict) -> dict:
-    """
-    Define trigger options from dict.
-    """
-    trigger_config = {}
-    job_trigger = configuration_dict.get("trigger")
-    logger.debug(f"Job trigger {job_trigger}")
-    #  interval trigger
-    if job_trigger == "interval":
-        trigger_config.update(dict(trigger="interval"))
-        interval_trigger_options = parse_job_interval_trigger_options(
-            configuration_dict
-        )
-        trigger_config.update(interval_trigger_options)
-    #  Cron trigger
-    elif job_trigger == "cron":
-        trigger_config.update(dict(trigger="cron"))
-        cron_trigger_options = parse_job_cron_trigger_options(
-            configuration_dict
-        )
-        trigger_config.update(cron_trigger_options)
-    #  Date trigger
-    elif job_trigger == "date":
-        trigger_config.update(dict(trigger="date"))
-        date_trigger_options = parse_job_date_trigger_options(
-            configuration_dict
-        )
-        trigger_config.update(date_trigger_options)
-    elif job_trigger == "dependency":
-        # Trigger "dependency" is not recognized by apscheduler, so it must be
-        # removed from job definition
-        configuration_dict.pop("trigger", None)
-    return trigger_config
-
-
-def parse_job_uses(configuration_dict) -> dict:
-    """
-    Define job uses from dict.
-    """
-    uses_config = {}
-    job_uses = configuration_dict.get("uses")
-    # Alteryx
-    if job_uses == "alteryx":
-        job_path = configuration_dict.get("path")
-        if not os.path.isfile(job_path):
-            logger.error("Not a valid job path")
-        uses_config.update(dict(args=[job_path]))
-        uses_config.update(dict(func="AlteryxOperator.execute"))
-    # Papermill
-    if job_uses == "papermill":
-        input_path = configuration_dict.get("input_path")
-        if not os.path.isfile(input_path):
-            logger.error("Not a valid job path")
-        output_path = configuration_dict.get("output_path")
-        uses_config.update(dict(func="PapermillOperator.execute"))
-        uses_config.update(
-            dict(
-                kwargs=dict(
+    def parse_job_uses(self, configuration_dict) -> dict:
+        """
+        Define job uses from dict.
+        """
+        job_uses = configuration_dict.get("uses")
+        # Alteryx
+        if job_uses == "alteryx":
+            workflow_file_path = configuration_dict.get("path")
+            if not os.path.isfile(workflow_file_path):
+                logger.error("Not a valid job path")
+            self.schema_kwargs.update(
+                dict(workflow_file_path=workflow_file_path)
+            )
+            self.uses_config.update(dict(func="AlteryxOperator.execute"))
+        # Papermill
+        elif job_uses == "papermill":
+            input_path = configuration_dict.get("input_path")
+            if not os.path.isfile(input_path):
+                logger.error("Not a valid job path")
+            output_path = configuration_dict.get("output_path")
+            self.uses_config.update(dict(func="PapermillOperator.execute"))
+            self.schema_kwargs.update(
+                dict(
                     input_path=input_path,
                     output_path=output_path,
                     environments_dir=Config.ENVIRONMENTS_DIR,
@@ -418,48 +419,50 @@ def parse_job_uses(configuration_dict) -> dict:
                     pip_trusted_host=Config.PIP_TRUSTED_HOST,
                 )
             )
-        )
-    # Python
-    if job_uses == "python":
-        script_path = configuration_dict.get("script_path")
-        code = configuration_dict.get("code")
-        requirements_path = configuration_dict.get("requirements_path")
-        if code:
-            uses_config.update(dict(kwargs=dict(code=code)))
-        elif script_path:
-            if not os.path.isfile(script_path):
-                logger.error("Not a valid python script path")
-            uses_config.update(dict(kwargs=dict(script_path=script_path)))
-        if requirements_path:
-            if not os.path.isfile(requirements_path):
-                logger.error("Not a valid requirements path")
-            uses_config["kwargs"].update(
-                dict(requirements_path=requirements_path)
+        # Python
+        elif job_uses == "python":
+            script_path = configuration_dict.get("script_path")
+            code = configuration_dict.get("code")
+            requirements_path = configuration_dict.get("requirements_path")
+            if code:
+                self.schema_kwargs.update(dict(code=code))
+            elif script_path:
+                if not os.path.isfile(script_path):
+                    logger.error("Not a valid python script path")
+                self.schema_kwargs.update(dict(script_path=script_path))
+            if requirements_path:
+                if not os.path.isfile(requirements_path):
+                    logger.error("Not a valid requirements path")
+                self.schema_kwargs.update(
+                    dict(requirements_path=requirements_path)
+                )
+            self.schema_kwargs.update(
+                dict(
+                    pip_index_url=Config.PIP_INDEX_URL,
+                    pip_trusted_host=Config.PIP_TRUSTED_HOST,
+                    environments_dir=Config.ENVIRONMENTS_DIR,
+                )
             )
-        uses_config["kwargs"].update(
-            dict(
-                pip_index_url=Config.PIP_INDEX_URL,
-                pip_trusted_host=Config.PIP_TRUSTED_HOST,
-                environments_dir=Config.ENVIRONMENTS_DIR,
-            )
-        )
-        uses_config.update(dict(func="PythonOperator.execute"))
-    return uses_config
+            self.uses_config.update(dict(func="PythonOperator.execute"))
 
-
-def make_job_definition(configuration_dict) -> dict:
-    # TODO
-    # Verify and build job config
-    # Maybe build a config file verifier on a web page with
-    # file uploading and parsing.
-    job_name = configuration_dict.get("name")
-    job_executor = "default"
-    job_config = {"id": job_name, "executor": job_executor}
-    # Set job uses
-    uses_options = parse_job_uses(configuration_dict)
-    job_config.update(uses_options)
-    # Set job triggers
-    trigger_options = parse_job_trigger_options(configuration_dict)
-    job_config.update(trigger_options)
-
-    return job_config
+    def parse_schema(self, configuration_dict):
+        job_name = configuration_dict.get("name")
+        job_executor = "default"
+        job_config = {"id": job_name, "executor": job_executor}
+        self.parse_job_trigger_options(configuration_dict)
+        self.parse_job_uses(configuration_dict)
+        #  Update job config
+        logger.debug(f"Job schema args: {self.schema_args}")
+        if self.schema_args:
+            job_config.update(dict(args=self.schema_args))
+        logger.debug(f"Job schema kwargs: {self.schema_kwargs}")
+        if self.schema_kwargs:
+            job_config.update(dict(kwargs=self.schema_kwargs))
+        logger.debug(f"Job schema trigger: {self.trigger_config}")
+        if self.trigger_config:
+            job_config.update(self.trigger_config)
+        logger.debug(f"Job schema uses: {self.uses_config}")
+        if self.uses_config:
+            job_config.update(self.uses_config)
+        logger.debug(f"job parsed configuration: {job_config}")
+        return job_config
