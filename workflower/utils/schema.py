@@ -115,6 +115,35 @@ def job_uses_options_in_expected(job_dict) -> bool:
     return True
 
 
+def validate_papermill_job(job_dict: dict) -> None:
+    papermill_keys = ["input_path", "output_path"]
+    if not all(key in job_dict.keys() for key in papermill_keys):
+        raise InvalidSchemaError(
+            "Papermill jobs must contain: " f"{', '.join(papermill_keys)}"
+        )
+    # TODO
+    # Validate if input_path ends with ipynb and file exists
+    # and output_path ends with ipynb and dir exists
+
+
+def validate_alteryx_job(job_dict: dict) -> None:
+    alteryx_keys = ["path"]
+    if not all(key in job_dict.keys() for key in alteryx_keys):
+        raise InvalidSchemaError(
+            "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
+        )
+    # TODO
+    # Validate if path ends with alteryx extension and file exists
+
+
+def validate_python_job(job_dict: dict) -> None:
+    python_keys = ["code", "script_path"]
+    if not any(key in job_dict.keys() for key in python_keys):
+        raise InvalidSchemaError(
+            "Python jobs must contain any of: " f"{', '.join(python_keys)}"
+        )
+
+
 def validate_job_uses(job_dict: dict) -> None:
     """
     Validate job uses.
@@ -123,30 +152,13 @@ def validate_job_uses(job_dict: dict) -> None:
     job_uses_options_in_expected(job_dict)
     # Papermill
     if job_dict["uses"] == "papermill":
-        papermill_keys = ["input_path", "output_path"]
-        if not all(key in job_dict.keys() for key in papermill_keys):
-            raise InvalidSchemaError(
-                "Papermill jobs must contain: " f"{', '.join(papermill_keys)}"
-            )
-        # TODO
-        # Validate if input_path ends with ipynb and file exists
-        # and output_path ends with ipynb and dir exists
+        validate_papermill_job(job_dict)
     # Alteryx
     if job_dict["uses"] == "alteryx":
-        alteryx_keys = ["path"]
-        if not all(key in job_dict.keys() for key in alteryx_keys):
-            raise InvalidSchemaError(
-                "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
-            )
-        # TODO
-        # Validate if path ends with alteryx extension and file exists
+        validate_alteryx_job(job_dict)
     # Job triggers
     if job_dict["uses"] == "python":
-        python_keys = ["code", "script_path"]
-        if not any(key in job_dict.keys() for key in python_keys):
-            raise InvalidSchemaError(
-                "Python jobs must contain any of: " f"{', '.join(python_keys)}"
-            )
+        validate_python_job(job_dict)
 
 
 def validate_job_triggers(job_dict: dict, jobs_names: list) -> None:
