@@ -73,7 +73,7 @@ def validate_workflow_definition(configuration_dict: dict) -> None:
 
 
 # Jobs
-def validate_job_keys(job_dict: dict) -> None:
+def job_has_expected_keys(job_dict: dict) -> bool:
     """
     Validate job attributes.
     """
@@ -82,14 +82,16 @@ def validate_job_keys(job_dict: dict) -> None:
         raise InvalidSchemaError(
             "The job must have all of it's keys: " f"{', '.join(job_keys)}"
         )
+    return True
 
 
-def validate_job_name(job_dict: dict) -> None:
+def job_name_is_string_type(job_dict: dict) -> bool:
     """
     Validate job name data type.
     """
     if not isinstance(job_dict["name"], str):
         raise InvalidTypeError("Name must be type string")
+    return True
 
 
 def validate_job_uses(job_dict: dict) -> None:
@@ -167,8 +169,8 @@ def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
     jobs_names = []
     for job in workflow_jobs:
         jobs_names.append(job["name"])
-        validate_job_name(job)
-        validate_job_keys(job)
+        job_name_is_string_type(job)
+        job_has_expected_keys(job)
         #  Job uses
         validate_job_uses(job)
 

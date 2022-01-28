@@ -6,7 +6,7 @@ import workflower.utils.schema as schema
 from workflower.exceptions import InvalidSchemaError, InvalidTypeError
 
 
-class TestPipeline:
+class TestPipelineSchemaValidation:
     """
     Pipeline schema tests.
     """
@@ -51,7 +51,7 @@ class TestPipeline:
             schema.version_is_string_type(test_input)
 
 
-class TestWorkflow:
+class TestWorkflowSchemaValidation:
     """
     Workflow schema tests.
     """
@@ -151,3 +151,51 @@ class TestWorkflow:
         ) as mock:
             schema.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
+
+
+class TestJobSchemaValidation:
+    @pytest.fixture(scope="function")
+    def job_dict(cls):
+        return {"name": "job_name", "uses": "python", "trigger": "date"}
+
+    def test_job_has_expected_keys(cls, job_dict):
+        """
+        Workflow must have expected keys.
+        """
+        assert schema.job_has_expected_keys(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"uses": "python", "trigger": "date"}),
+            ({"name": "job_name", "trigger": "date"}),
+            ({"name": "job_name", "uses": "python"}),
+        ],
+    )
+    def test_job_has_expected_keys_missing_keys(cls, test_input):
+        """
+        If Workflow not contain expected keys should raise Exception.
+        """
+        with pytest.raises(InvalidSchemaError):
+            schema.job_has_expected_keys(test_input)
+
+    def test_job_name_is_string_type_true(cls, job_dict):
+        """
+        Workflow must be dict type.
+        """
+        assert schema.job_name_is_string_type(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"name": 1}),
+            ({"name": 1.1}),
+            ({"name": True}),
+            ({"name": {}}),
+            ({"name": []}),
+            ({"name": ()}),
+        ],
+    )
+    def test_job_name_is_string_type_not_string(cls, test_input):
+        with pytest.raises(InvalidTypeError):
+            schema.job_name_is_string_type(test_input)
