@@ -21,23 +21,28 @@ def pipeline_keys_valid(configuration_dict: dict) -> bool:
 
 
 def version_is_string_type(configuration_dict: dict) -> bool:
+    """
+    Version key value must be string type.
+    """
     if not isinstance(configuration_dict["version"], str):
         raise InvalidTypeError("Version must be type string")
     return True
 
 
+#  Workflow
 def workflow_value_is_dict_type(configuration_dict: dict) -> bool:
+    """
+    Workflow key value must be dict type.
+    """
     if not isinstance(configuration_dict["workflow"], dict):
         raise InvalidTypeError("Workflow wrong definition")
     return True
 
 
-#  Workflow
-def validate_workflow_definition(configuration_dict: dict) -> None:
+def workflow_has_expected_keys(configuration_dict: dict) -> bool:
     """
-    Validate workflow definition.
+    Workflow must have expected keys.
     """
-    workflow_value_is_dict_type(configuration_dict)
     workflow_keys = ["name", "jobs"]
     workflow = configuration_dict["workflow"]
     if not all(key in workflow.keys() for key in workflow_keys):
@@ -45,8 +50,26 @@ def validate_workflow_definition(configuration_dict: dict) -> None:
             "The workflow must have all of it's keys: "
             f"{', '.join(workflow_keys)}"
         )
+    return True
+
+
+def workflow_name_is_string_type(configuration_dict: dict) -> bool:
+    """
+    Workflow name value must be string data type.
+    """
+    workflow = configuration_dict["workflow"]
     if not isinstance(workflow["name"], str):
         raise InvalidTypeError("Name must be type string")
+    return True
+
+
+def validate_workflow_definition(configuration_dict: dict) -> None:
+    """
+    Validate workflow definition.
+    """
+    workflow_value_is_dict_type(configuration_dict)
+    workflow_has_expected_keys(configuration_dict)
+    workflow_name_is_string_type(configuration_dict)
 
 
 # Jobs

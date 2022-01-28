@@ -63,6 +63,13 @@ class TestWorkflow:
             ({"workflow": ()}),
         ],
     )
-    def test_workflow_value_is_dict_type_not_string(cls, test_input):
+    def test_workflow_value_is_dict_type_not_dict(cls, test_input):
         with pytest.raises(InvalidTypeError):
             schema.workflow_value_is_dict_type(test_input)
+
+    def test_workflow_has_expected_keys(cls):
+        """
+        Workflow must have expected keys.
+        """
+        dict_obj = {"workflow": {"name": "workflow_name", "jobs": []}}
+        assert schema.workflow_has_expected_keys(dict_obj) is True
