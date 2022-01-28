@@ -108,7 +108,7 @@ class Job(BaseModel):
                     crud.update(session, cls, filter_dict, update_dict)
 
     @classmethod
-    def trigger_dependencies(cls, job_name, scheduler):
+    def trigger_dependencies(cls, job_name, scheduler, **kwargs):
         with database.session_scope() as session:
             dependency_jobs = crud.get_all(session, cls, depends_on=job_name)
             if dependency_jobs:
@@ -116,16 +116,19 @@ class Job(BaseModel):
                     logger.debug(
                         f"Dependency job {dependency_job.name} triggered"
                     )
-                    dependency_job.schedule(scheduler)
+                    dependency_job.schedule(scheduler, **kwargs)
 
-    def schedule(self, scheduler) -> None:
+    def schedule(self, scheduler, **kwargs) -> None:
         """
         Schedule a job in apscheduler
         """
         job_id = self.definition["id"]
         logger.debug(f"scheduling {job_id}")
         logger.debug(self.definition)
-        schedule_args = self.definition.copy()
+        schedule_params = self.definition.copy()
+        schedule_kwargs = schedule_params.get("kwargs")
+        if schedule_kwargs:
+            schedule_kwargs.update(kwargs)
 
         if self.uses == "alteryx":
             operator = AlteryxOperator
@@ -133,10 +136,10 @@ class Job(BaseModel):
             operator = PapermillOperator
         elif self.uses == "python":
             operator = PythonOperator
-        schedule_args.update(dict(func=getattr(operator, "execute")))
+        schedule_params.update(dict(func=getattr(operator, "execute")))
 
         try:
-            self.job = scheduler.add_job(**schedule_args)
+            self.job = scheduler.add_job(**schedule_params)
         except ConflictingIdError:
             logger.warning(f"{job_id}, already scheduled, skipping.")
         except ValueError as error:

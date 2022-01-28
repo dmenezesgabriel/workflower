@@ -7,7 +7,7 @@ class BaseOperator(ABC):
     """
 
     @abstractclassmethod
-    def execute():
+    def execute(*args, **kwargs):
         pass
 
     pass

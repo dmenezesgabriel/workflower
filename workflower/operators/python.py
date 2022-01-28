@@ -23,6 +23,8 @@ class PythonOperator(BaseOperator):
         pip_index_url=None,
         pip_trusted_host=None,
         environments_dir=None,
+        *args,
+        **kwargs,
     ):
         """
         Run python with papermill.
@@ -69,6 +71,10 @@ class PythonOperator(BaseOperator):
             logger.debug(f"Python script path: {script_path}")
             run_python_args.append(script_path)
             output.update(dict(script_path=script_path))
+
+            # Get output from previous job
+            if "job_return_value" in kwargs:
+                run_python_args.append(kwargs["job_return_value"])
 
         elif code:
             logger.debug(f"Python shell command: {code}")

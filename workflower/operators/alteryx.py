@@ -9,7 +9,7 @@ from workflower.operators.operator import BaseOperator
 
 class AlteryxOperator(BaseOperator):
     @classmethod
-    def execute(cls, workflow_file_path: str) -> str:
+    def execute(cls, workflow_file_path: str, *args, **kwargs) -> str:
         """
         Run Alteryx workflow through command line executable
         AlteryxEngineCmd.exe.

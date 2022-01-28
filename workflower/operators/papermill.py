@@ -22,6 +22,8 @@ class PapermillOperator(BaseOperator):
         kernel_specs_dir=None,
         pip_index_url=None,
         pip_trusted_host=None,
+        *args,
+        **kwargs,
     ):
         """
         Run notebook with papermill.

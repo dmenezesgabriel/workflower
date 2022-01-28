@@ -10,10 +10,10 @@ workflow:
       # trigger config
       trigger: cron
       minute: "*/3"
-    - name: "hello_notebook"
-      uses: papermill
+      # Second job, triggered after first
+    - name: "python_get_argv"
+      uses: python
       # Papermill paths
-      input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\hello_notebook.ipynb"
-      output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\hello_notebook_output.ipynb"
+      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\get_argv.py"
       trigger: dependency
       depends_on: notebook_install_packages

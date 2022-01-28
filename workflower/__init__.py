@@ -61,7 +61,9 @@ class App:
         Trigger a job that depends on another.
         """
         logger.debug("Checking if need to trigger a dependency job")
-        Job.trigger_dependencies(event.job_id, self.scheduler)
+        Job.trigger_dependencies(
+            event.job_id, self.scheduler, job_return_value=event.retval
+        )
 
     def setup(self) -> None:
         if not os.path.isdir(Config.ENVIRONMENTS_DIR):

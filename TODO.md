@@ -42,3 +42,4 @@ Basic Coverage
 
 - Alembic migrations
 - Reusable connections uris(login and password to) from environment variables
+- Turn app into async
