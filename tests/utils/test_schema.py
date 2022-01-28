@@ -16,7 +16,7 @@ class TestPipeline:
     )
     def test_pipeline_keys_valid_missing_keys(cls, test_input):
         """
-        If pipeline keys not contain expected keys should raise Exception.
+        If pipeline not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
             schema.pipeline_keys_valid(test_input)
@@ -73,3 +73,17 @@ class TestWorkflow:
         """
         dict_obj = {"workflow": {"name": "workflow_name", "jobs": []}}
         assert schema.workflow_has_expected_keys(dict_obj) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            ({"workflow": {"name": "workflow_name"}}),
+            ({"workflow": {"jobs": []}}),
+        ],
+    )
+    def test_workflow_has_expected_keys_missing_keys(cls, test_input):
+        """
+        If Workflow not contain expected keys should raise Exception.
+        """
+        with pytest.raises(InvalidSchemaError):
+            schema.workflow_has_expected_keys(test_input)
