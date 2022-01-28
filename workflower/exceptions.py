@@ -8,3 +8,9 @@ class InvalidTypeError(Exception):
     """Base class for invalid type error"""
 
     pass
+
+
+class InvalidFilePathError(Exception):
+    """Base class for invalid type error"""
+
+    pass

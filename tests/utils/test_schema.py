@@ -249,3 +249,72 @@ class TestJobSchemaValidation:
         """
         with pytest.raises(InvalidSchemaError):
             schema.job_uses_options_in_expected(test_input)
+
+    def test_validate_job_uses(cls):
+        pass
+
+
+class TestPapermillJobSchemaValidation:
+    @pytest.fixture(scope="function")
+    def jupyter_notebook_file(cls, tmpdir_factory):
+        """
+        Return a function that creates a temporary jupyter notebook
+        with given name.
+        """
+
+        def _return_notebook_path(name):
+            file_content = """
+            {
+            "cells": [
+            {
+            "cell_type": "code",
+            "execution_count": null,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "print(\"Hello, World!\")"
+            ]
+            }
+            ],
+            "metadata": {
+            "interpreter": {
+            "hash": "123"
+            },
+            "kernelspec": {
+            "display_name": "Python 3.10.0 64-bit ('venv': venv)",
+            "language": "python",
+            "name": "python3"
+            },
+            "language_info": {
+            "name": "python",
+            "version": "3.10.0"
+            },
+            "orig_nbformat": 4
+            },
+            "nbformat": 4,
+            "nbformat_minor": 2
+            }
+            """
+            p = tmpdir_factory.mktemp("file").join(name)
+            p.write_text(file_content, encoding="utf-8")
+            return str(p)
+
+        return _return_notebook_path
+
+    @pytest.fixture(scope="function")
+    def job_dict(cls, jupyter_notebook_file):
+        return {
+            "name": "job_name",
+            "uses": "papermill",
+            "trigger": "interval",
+            "minutes": 1,
+            "input_path": jupyter_notebook_file(name="notebook.ipynb"),
+            "output_path": jupyter_notebook_file(name="notebook_output.ipynb"),
+        }
+
+    def test_job_has_expected_keys(cls, job_dict):
+        """
+        Job must have expected keys.
+        """
+        print(job_dict)
+        assert schema.job_has_expected_keys(job_dict) is True

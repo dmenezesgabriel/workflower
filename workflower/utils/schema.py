@@ -115,12 +115,17 @@ def job_uses_options_in_expected(job_dict) -> bool:
     return True
 
 
-def validate_papermill_job(job_dict: dict) -> None:
+def papermill_job_use_has_expected_keys(job_dict: dict) -> bool:
     papermill_keys = ["input_path", "output_path"]
     if not all(key in job_dict.keys() for key in papermill_keys):
         raise InvalidSchemaError(
             "Papermill jobs must contain: " f"{', '.join(papermill_keys)}"
         )
+    return True
+
+
+def validate_papermill_job(job_dict: dict) -> None:
+    papermill_job_use_has_expected_keys(job_dict)
     # TODO
     # Validate if input_path ends with ipynb and file exists
     # and output_path ends with ipynb and dir exists
