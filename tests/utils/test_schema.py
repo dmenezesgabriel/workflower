@@ -312,9 +312,44 @@ class TestPapermillJobSchemaValidation:
             "output_path": jupyter_notebook_file(name="notebook_output.ipynb"),
         }
 
-    def test_job_has_expected_keys(cls, job_dict):
+    def test_papermill_job_use_has_expected_keys(cls, job_dict):
         """
         Job must have expected keys.
         """
         print(job_dict)
-        assert schema.job_has_expected_keys(job_dict) is True
+        assert schema.papermill_job_use_has_expected_keys(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            (
+                {
+                    "name": "job_name",
+                    "uses": "papermill",
+                    "trigger": "date",
+                    "input_path": "",
+                }
+            ),
+            (
+                {
+                    "name": "job_name",
+                    "uses": "papermill",
+                    "trigger": "date",
+                    "output_path": "",
+                }
+            ),
+            (
+                {
+                    "name": "job_name",
+                    "uses": "papermill",
+                    "trigger": "date",
+                }
+            ),
+        ],
+    )
+    def test_papermill_job_use_has_expected_keys_missing_keys(cls, test_input):
+        """
+        If Job not contain expected keys should raise Exception.
+        """
+        with pytest.raises(InvalidSchemaError):
+            schema.papermill_job_use_has_expected_keys(test_input)
