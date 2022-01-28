@@ -20,9 +20,15 @@ def pipeline_keys_valid(configuration_dict: dict) -> bool:
     return True
 
 
-def version_is_string(configuration_dict: dict) -> bool:
+def version_is_string_type(configuration_dict: dict) -> bool:
     if not isinstance(configuration_dict["version"], str):
         raise InvalidTypeError("Version must be type string")
+    return True
+
+
+def workflow_value_is_dict_type(configuration_dict: dict) -> bool:
+    if not isinstance(configuration_dict["workflow"], dict):
+        raise InvalidTypeError("Workflow wrong definition")
     return True
 
 
@@ -31,8 +37,7 @@ def validate_workflow_definition(configuration_dict: dict) -> None:
     """
     Validate workflow definition.
     """
-    if not isinstance(configuration_dict["workflow"], dict):
-        raise InvalidTypeError("Workflow wrong definition")
+    workflow_value_is_dict_type(configuration_dict)
     workflow_keys = ["name", "jobs"]
     workflow = configuration_dict["workflow"]
     if not all(key in workflow.keys() for key in workflow_keys):
@@ -152,7 +157,7 @@ def validate_schema(configuration_dict: dict) -> bool:
     logger.debug("Validating yml schema")
     #  Pipeline
     pipeline_keys_valid(configuration_dict)
-    version_is_string(configuration_dict)
+    version_is_string_type(configuration_dict)
     #  Workflow
     validate_workflow_definition(configuration_dict)
     # Jobs
