@@ -43,15 +43,28 @@ class Job(BaseModel):
         Integer,
         ForeignKey("workflows.id"),
     )
+    next_run_time = Column(
+        "next_run_time",
+        String,
+    )
 
     workflow = relationship("Workflow", back_populates="jobs")
 
-    def __init__(self, name, uses, definition, depends_on, workflow):
+    def __init__(
+        self,
+        name,
+        uses,
+        definition,
+        depends_on,
+        workflow,
+        next_run_time=None,
+    ):
         self.name = name
         self.uses = uses
         self.definition = definition
         self.depends_on = depends_on
         self.workflow = workflow
+        self.next_run_time = next_run_time
         self.job = None
 
     @classmethod
@@ -118,6 +131,17 @@ class Job(BaseModel):
                     )
                     dependency_job.schedule(scheduler, **kwargs)
 
+    @classmethod
+    def update_next_run_time(cls, name, scheduler):
+        logger.debug(f"updating next run time for {name}")
+        job = scheduler.get_job(name)
+        if job:
+            logger.debug(f"found job id: {job}")
+            cls.update(
+                {"name": name},
+                {"next_run_time": str(job.next_run_time)},
+            )
+
     def schedule(self, scheduler, **kwargs) -> None:
         """
         Schedule a job in apscheduler
@@ -140,6 +164,7 @@ class Job(BaseModel):
 
         try:
             self.job = scheduler.add_job(**schedule_params)
+            self.update_next_run_time(self.name, scheduler)
         except ConflictingIdError:
             logger.warning(f"{job_id}, already scheduled, skipping.")
         except ValueError as error:

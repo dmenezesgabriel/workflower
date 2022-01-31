@@ -2,7 +2,7 @@
 if [ $1 == "clean" ];
 then
     echo "Removing development sqlite databases"
-    find . -name "*dev.sqlite" -type f -delete
+    find . -name "*dev.sqlite*" -type f -delete
     echo "Removing notebooks outputs"
     find . -name "*output.ipynb" -type f -delete
     echo "Removing logs"

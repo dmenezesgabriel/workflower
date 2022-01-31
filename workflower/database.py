@@ -29,7 +29,7 @@ class DatabaseManager:
         self,
         database_uri=Config.APP_DATABASE_URL,
     ) -> None:
-        self.engine = create_engine(database_uri)
+        self.engine = create_engine(database_uri, connect_args={"timeout": 10})
         self.connection = None
 
     def connect(self):

@@ -54,6 +54,7 @@ class App:
             model_id=job.id,
             output=event.retval,
         )
+        Job.update_next_run_time(event.job_id, self.scheduler)
         self.trigger_job_dependency(event)
 
     def trigger_job_dependency(self, event):
