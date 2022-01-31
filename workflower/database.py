@@ -28,8 +28,14 @@ class DatabaseManager:
     def __init__(
         self,
         database_uri=Config.APP_DATABASE_URL,
+        timeout=10,
     ) -> None:
-        self.engine = create_engine(database_uri, connect_args={"timeout": 10})
+        self.engine = create_engine(
+            database_uri,
+            connect_args={
+                "timeout": timeout,
+            },
+        )
         self.connection = None
 
     def connect(self):

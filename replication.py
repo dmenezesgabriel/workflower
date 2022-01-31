@@ -1,8 +1,6 @@
-from sqlalchemy import create_engine
+from workflower.models.base import BaseModel, DatabaseManager, database
 
-from workflower.models.base import BaseModel, database
-
-replica_db = create_engine("sqlite:///replica-dev.sqlite")
+replica_db = DatabaseManager(database_uri="sqlite:///replica-dev.sqlite")
 replica_db.connect()
 
 try:
@@ -12,7 +10,6 @@ except Exception as error:
 
 database.connect()
 database.engine.execute("ATTACH DATABASE 'replica-dev.sqlite' as replica")
-
 
 # import sqlite3
 
