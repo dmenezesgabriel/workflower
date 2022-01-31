@@ -87,8 +87,7 @@ trigger: cron
 
 ```yaml
 trigger: dependency
-depends_on:
-  name: other_job_name
+depends_on: other_job_name
 ```
 
 ## Note
