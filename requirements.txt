@@ -11,3 +11,4 @@ jupyterlab==3.2.5
 # fastapi==0.71.0
 # Microsoft Visual C++ 14.0 or greater is required
 # pyodbc==4.0.32
+jinja2==3.0.3

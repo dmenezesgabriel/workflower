@@ -15,5 +15,6 @@ workflow:
       uses: python
       # Papermill paths
       script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\get_argv.py"
+      requirements_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\requirements.txt"
       trigger: dependency
       depends_on: notebook_install_packages
