@@ -11,3 +11,4 @@ environments/
 kernel_specs/
 __pycache__
 .coverage
+data/
