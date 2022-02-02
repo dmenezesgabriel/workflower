@@ -4,10 +4,11 @@ Database class
 import logging
 from contextlib import contextmanager
 
-from config import Config
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+
+from workflower.config import Config
 
 logger = logging.getLogger("workflower.database")
 

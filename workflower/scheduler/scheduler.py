@@ -11,7 +11,7 @@ from apscheduler.events import (
 )
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-from config import Config
+from workflower.config import Config
 from workflower.loader import Loader
 from workflower.models.base import database
 from workflower.models.event import Event
