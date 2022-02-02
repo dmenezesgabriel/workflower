@@ -67,6 +67,14 @@ class Workflow(BaseModel):
         self.is_active = is_active
         self.jobs = jobs
 
+    def __repr__(self) -> str:
+        return (
+            f"Workflow(name={self.name}, file_path={self.file_path}, "
+            f"file_last_modified_at={self.file_last_modified_at}, "
+            f"modified_since_last_load={self.modified_since_last_load}, "
+            f"is_active={self.is_active}"
+        )
+
     @classmethod
     def from_dict(cls, workflow_yaml_config_path, configuration_dict):
         """

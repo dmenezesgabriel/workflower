@@ -67,6 +67,15 @@ class Job(BaseModel):
         self.next_run_time = next_run_time
         self.job = None
 
+    def __repr__(self) -> str:
+        return (
+            f"Job(name={self.name}, uses={self.uses}, "
+            f"definition={self.definition}, "
+            f"depends_on={self.depends_on}, "
+            f"workflow={self.workflow}, "
+            f"next_run_time={self.next_run_time}, "
+        )
+
     @classmethod
     def from_dict(cls, job_dict: dict, workflow_name: str) -> None:
         """
