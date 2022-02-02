@@ -1,7 +1,7 @@
 import logging
 import os
 
-from config import Config
+from workflower.config import Config
 from workflower.models.base import BaseModel, database
 
 # Models must be imported even if unused so the tables can be declared.
@@ -16,8 +16,7 @@ logger = logging.getLogger("Init_db")
 logger.setLevel(logging.INFO)
 
 
-if __name__ == "__main__":
-
+def init_db():
     if not os.path.isdir(Config.DATA_DIR):
         os.makedirs(Config.DATA_DIR)
     database.connect()

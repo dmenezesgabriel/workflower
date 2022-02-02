@@ -1,7 +1,7 @@
 import logging
 import os
 
-from config import Config
+from workflower.config import Config
 from workflower.exceptions import (
     InvalidFilePathError,
     InvalidSchemaError,

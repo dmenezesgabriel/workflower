@@ -2,9 +2,9 @@ import unittest.mock
 import uuid
 
 import pytest
-from config import Config
 from sqlalchemy import Column, String, create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from workflower.config import Config
 from workflower.models.base import BaseModel
 from workflower.utils import crud
 

@@ -3,8 +3,7 @@ import os
 import traceback
 from typing import List
 
-from config import Config
-
+from workflower.config import Config
 from workflower.models.job import Job
 from workflower.models.workflow import Workflow
 from workflower.utils.file import yaml_file_to_dict

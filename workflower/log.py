@@ -5,7 +5,7 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from config import Config
+from workflower.config import Config
 
 
 def setup_loggers():
