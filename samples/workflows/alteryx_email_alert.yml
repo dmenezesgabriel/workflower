@@ -1,0 +1,16 @@
+version: "1.0"
+workflow:
+  name: alteryx_email_alert
+  jobs:
+    - name: "combine_two_sheets"
+      uses: alteryx
+      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
+      trigger: interval
+      minutes: 1
+    - name: "send_email_alert"
+      uses: python
+      # Papermill paths
+      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\parse_alteryx_logs_send_email\\send_email_alert.py"
+      requirements_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\parse_alteryx_logs_send_email\\requirements.txt"
+      trigger: dependency
+      depends_on: combine_two_sheets

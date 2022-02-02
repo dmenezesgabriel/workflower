@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: papermill_sample_cron_trigger
+  name: papermill_cron_trigger
   jobs:
     - name: "notebook_install_packages"
       uses: papermill

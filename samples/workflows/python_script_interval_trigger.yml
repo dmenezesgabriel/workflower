@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: python_script_sample_interval_trigger
+  name: python_script_interval_trigger
   jobs:
     - name: "hello_python_script"
       uses: python
