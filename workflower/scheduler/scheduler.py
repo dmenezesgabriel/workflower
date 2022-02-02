@@ -12,7 +12,6 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from config import Config
-
 from workflower.loader import Loader
 from workflower.models.base import database
 from workflower.models.event import Event
@@ -22,7 +21,7 @@ from workflower.models.workflow import Workflow
 logger = logging.getLogger("workflower.app")
 
 
-class App:
+class Scheduler:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.is_running = False
