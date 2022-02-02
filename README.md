@@ -15,6 +15,5 @@ A minimal workflow orchestrator for data pipelines, made to work on a windows ma
 Configure a .env file following the _.env.\*.template_ examples then:
 
 ```
-source .env
-python .
+./run.sh [options (dev, prod, test)]
 ```

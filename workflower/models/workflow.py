@@ -163,6 +163,12 @@ class Workflow(BaseModel):
                         "unscheduling jobs"
                     )
                     workflow.unschedule_jobs(scheduler)
+                    cls.update({"id": workflow.id}, {"is_active": False})
+                if workflow.file_exists is False:
+                    logger.debug(
+                        f"{workflow.name} inactive is inactive, skipping"
+                    )
+                    continue
                 logger.info("Scheduling jobs")
                 workflow.schedule_jobs(scheduler)
 
