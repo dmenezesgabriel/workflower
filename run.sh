@@ -11,8 +11,8 @@ elif [ $1 == "dev" ];
 then
     echo "Run dev"
     eval "$(cat .env.dev.template)"  && \
-    python init_db.py && \
-    python .
+    python . init-db && \
+    python . run
 elif [ $1 == "test" ];
 then
     echo "Run test"
@@ -22,7 +22,7 @@ elif [ $1 == "prod" ];
 then
     echo "Run prod"
     eval "$(cat .env.prod.template)"  && \
-    python .
+    python . run
 else
     echo "No arg received ending"
 fi
