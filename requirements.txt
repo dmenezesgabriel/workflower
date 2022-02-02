@@ -8,7 +8,8 @@ papermill==2.3.3
 pyyaml==6.0
 # python-json-logger==2.0.2
 jupyterlab==3.2.5
-# fastapi==0.71.0
+fastapi==0.71.0
 # Microsoft Visual C++ 14.0 or greater is required
 # pyodbc==4.0.32
 jinja2==3.0.3
+uvicorn==0.17.1
