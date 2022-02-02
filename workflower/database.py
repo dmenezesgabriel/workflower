@@ -31,7 +31,7 @@ class DatabaseManager:
         database_uri=Config.APP_DATABASE_URL,
     ) -> None:
         self.engine = create_engine(
-            database_uri, connect_args={"timeout": 10}, echo=True
+            database_uri, connect_args={"timeout": 15}, echo=True
         )
         self.connection = None
 

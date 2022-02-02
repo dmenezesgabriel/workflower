@@ -3,7 +3,7 @@
 *.env*
 *.env*
 !*.template
-*venv
+*venv*
 *_output.ipynb
 *.log*
 .pytest_cache
