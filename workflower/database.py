@@ -15,6 +15,13 @@ logger = logging.getLogger("workflower.database")
 
 @event.listens_for(Engine, "connect")
 def connect(dbapi_con, connection_record):
+    """
+    Listener to make connection set WAL mode on SQLite.
+    """
+
+    # TODO
+    # Verify if engine is SQlite type.
+
     logger.debug("Setting Wall Mode")
     cursor = dbapi_con.cursor()
     cursor.execute("pragma journal_mode=WAL")
@@ -31,15 +38,25 @@ class DatabaseManager:
         database_uri=Config.APP_DATABASE_URL,
     ) -> None:
         self.engine = create_engine(
-            database_uri, connect_args={"timeout": 15}, echo=True
+            database_uri,
+            connect_args={
+                "timeout": 15,
+            },
+            echo=True,
         )
         self.connection = None
 
     def connect(self):
+        """
+        Establish database connection.
+        """
         self.connection = self.engine.connect()
 
     @contextmanager
     def session_scope(self):
+        """
+        Session scope context.
+        """
         Session = scoped_session(
             sessionmaker(
                 autocommit=False,
@@ -54,4 +71,7 @@ class DatabaseManager:
             session.close()
 
     def close(self):
+        """
+        Close database connection.
+        """
         self.connection.close()
