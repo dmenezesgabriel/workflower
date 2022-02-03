@@ -27,6 +27,7 @@ class Event(BaseModel):
 
     def __repr__(self) -> str:
         return (
-            f"Event(name={self.name}, model={self.model}, "
+            f"Event(name={self.name}, "
+            f"model={self.model}, "
             f"model_id={self.model_id})"
         )
