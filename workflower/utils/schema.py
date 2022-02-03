@@ -233,29 +233,64 @@ def validate_job_uses(job_dict: dict) -> None:
         validate_python_job(job_dict)
 
 
-def validate_job_triggers(job_dict: dict, jobs_names: list) -> None:
+def trigger_is_string_type(job_dict: dict) -> bool:
     """
-    Validate job triggers.
+    Trigger key value must be string type.
     """
-    job_trigger_options = ["date", "cron", "interval", "dependency"]
     if not isinstance(job_dict["trigger"], str):
         raise InvalidTypeError("Name must be type string")
+    return True
+
+
+def job_trigger_has_expected_options(job_dict: dict) -> bool:
+    """
+    Job trigger must have expected options.
+    """
+    job_trigger_options = ["date", "cron", "interval", "dependency"]
     if job_dict["trigger"] not in job_trigger_options:
         raise InvalidSchemaError(
             f"Job trigger must be: {', '.join(job_trigger_options)}"
         )
+    return True
+
+
+def dependency_trigger_has_expected_keys(job_dict: dict) -> bool:
+    """
+    Dependency trigger must have expected keys.
+    """
+    dependency_options = ["depends_on"]
+    if not all(key in job_dict.keys() for key in dependency_options):
+        raise InvalidSchemaError(
+            "Dependency triggered job must have keys: "
+            f"{', '.join(dependency_options)}"
+        )
+    return True
+
+
+def dependency_trigger_depends_on_existing_job(
+    job_dict: dict,
+    jobs_names: list,
+) -> bool:
+    """
+    Dependency trigger depends_on must be an existing job.
+    """
+    if not job_dict["depends_on"] in jobs_names:
+        raise InvalidSchemaError(
+            "Job depends_on must have a valid job name reference "
+            "from the same workflow"
+        )
+    return True
+
+
+def validate_job_triggers(job_dict: dict, jobs_names: list) -> None:
+    """
+    Validate job triggers.
+    """
+    trigger_is_string_type(job_dict)
+    job_trigger_has_expected_options(job_dict)
     if job_dict["trigger"] == "dependency":
-        dependency_options = ["depends_on"]
-        if not all(key in job_dict.keys() for key in dependency_options):
-            raise InvalidSchemaError(
-                "Dependency triggered job must have keys: "
-                f"{', '.join(dependency_options)}"
-            )
-        if not job_dict["depends_on"] in jobs_names:
-            raise InvalidSchemaError(
-                "Job depends_on must have a valid job name reference "
-                "from the same workflow"
-            )
+        dependency_trigger_has_expected_keys(job_dict)
+        dependency_trigger_depends_on_existing_job(job_dict, jobs_names)
 
 
 def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
