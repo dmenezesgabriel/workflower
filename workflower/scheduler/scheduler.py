@@ -21,7 +21,7 @@ from workflower.models.workflow import Workflow
 logger = logging.getLogger("workflower.app")
 
 
-class Scheduler:
+class SchedulerService:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.is_running = False
@@ -64,24 +64,38 @@ class Scheduler:
             event.job_id, self.scheduler, job_return_value=event.retval
         )
 
-    def setup(self) -> None:
+    def create_default_directories(self) -> None:
         if not os.path.isdir(Config.ENVIRONMENTS_DIR):
             os.makedirs(Config.ENVIRONMENTS_DIR)
 
         if not os.path.isdir(Config.DATA_DIR):
             os.makedirs(Config.DATA_DIR)
 
+    def setup_event_actions(self, scheduler):
+        """"""
+        event_actions = [
+            {"func": self.on_job_added, "event": EVENT_JOB_ADDED},
+            {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
+            {"func": self.on_job_error, "event": EVENT_JOB_ERROR},
+            {"func": self.on_job_removed, "event": EVENT_JOB_REMOVED},
+        ]
+        for event_action in event_actions:
+            scheduler.add_listener(
+                event_action["func"],
+                event_action["event"],
+            )
+
+    def setup(self) -> None:
+        """
+        Setup general app configuration.
+        """
+        self.create_default_directories()
         jobstores = {"default": SQLAlchemyJobStore(engine=database.engine)}
         executors = {
             "default": {"type": "threadpool", "max_workers": 20},
         }
-
         self.scheduler = BackgroundScheduler()
-        self.scheduler.add_listener(self.on_job_added, EVENT_JOB_ADDED)
-        self.scheduler.add_listener(self.on_job_executed, EVENT_JOB_EXECUTED)
-        self.scheduler.add_listener(self.on_job_error, EVENT_JOB_ERROR)
-        self.scheduler.add_listener(self.on_job_removed, EVENT_JOB_REMOVED)
-
+        self.setup_event_actions(self.scheduler)
         self.scheduler.configure(
             jobstores=jobstores,
             executors=executors,
@@ -89,6 +103,9 @@ class Scheduler:
         )
 
     def init(self):
+        """
+        Initialize app.
+        """
         database.connect()
 
     async def run(self) -> None:
@@ -111,6 +128,9 @@ class Scheduler:
             await asyncio.sleep(Config.CYCLE)
 
     def stop(self):
+        """
+        Stop app.
+        """
         logger.info("Stopping App")
         self.is_running = False
         database.close()

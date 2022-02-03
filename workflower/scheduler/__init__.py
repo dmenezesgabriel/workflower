@@ -1,9 +1,9 @@
 """
 Scheduler Factory.
 """
-from workflower.scheduler.scheduler import Scheduler
+from workflower.scheduler.scheduler import SchedulerService
 
 
 def create_scheduler():
-    scheduler = Scheduler()
+    scheduler = SchedulerService()
     return scheduler
