@@ -8,12 +8,19 @@ logger = logging.getLogger("workflower.cli.client")
 
 
 class CLI:
+    """
+    Workflower Command Line Interface.
+    """
+
     CLI_VERSION = "Workflower 0.0.1"
 
     def __init__(self):
         self.__run()
 
     def __run(self):
+        """
+        Setup and parse command line arguments and options.
+        """
         self.parser = argparse.ArgumentParser(
             prog="workflower",
             description="Workflow automation tool.",
