@@ -567,3 +567,7 @@ class TestAlteryxJobSchemaValidation:
         ) as mock:
             schema.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
+
+
+class TestPythonJobSchemaValidation:
+    pass

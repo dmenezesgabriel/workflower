@@ -200,14 +200,20 @@ def validate_alteryx_job(job_dict: dict) -> None:
     alteryx_job_paths_ends_with_yxmd(job_dict)
 
 
-def validate_python_job(job_dict: dict) -> None:
+def python_job_use_has_expected_keys(job_dict: dict) -> bool:
+    """
+    Python job must have expected keys.
+    """
     python_keys = ["code", "script_path"]
     if not any(key in job_dict.keys() for key in python_keys):
         raise InvalidSchemaError(
             "Python jobs must contain any of: " f"{', '.join(python_keys)}"
         )
-    # TODO
-    # Validate if path ends with python extension and file exists
+    return True
+
+
+def validate_python_job(job_dict: dict) -> None:
+    python_job_use_has_expected_keys(job_dict)
 
 
 def validate_job_uses(job_dict: dict) -> None:
@@ -284,8 +290,27 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
+class PipelineSchemaParser:
+    """
+    Pipeline Schema parser.
+    """
+
+    pass
+
+
+class WorkflowSchemaParser:
+    """
+    Workflow Schema parser.
+    """
+
+    pass
+
+
 class JobSchemaParser:
-    # Parse jobs
+    """
+    Job Schema parser.
+    """
+
     def __init__(self):
         self.schema_args = []
         self.schema_kwargs = {}
