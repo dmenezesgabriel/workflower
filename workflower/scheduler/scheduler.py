@@ -104,6 +104,7 @@ class Scheduler:
             workflows_loader = Loader()
             workflows_loader.load_all()
             workflows = Workflow.get_all()
+            Job.unschedule_deactivated_jobs(self.scheduler)
             logger.info(f"Workflows Loaded {len(workflows)}")
             Workflow.schedule_all_jobs(self.scheduler)
             logger.info(f"Sleeping {Config.CYCLE} seconds")

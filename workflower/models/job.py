@@ -4,7 +4,7 @@ Job class.
 
 import logging
 
-from apscheduler.jobstores.base import ConflictingIdError
+from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
@@ -143,20 +143,27 @@ class Job(BaseModel):
         with database.session_scope() as session:
             workflow = crud.get_one(session, Workflow, name=workflow_name)
             if workflow:
-                workflow_jobs = [job.name for job in workflow.jobs]
                 jobs_names = [
                     workflow_name + "_" + job["name"]
                     for job in configuration_dict["workflow"]["jobs"]
                 ]
-                for job_name in workflow_jobs:
-                    if job_name not in jobs_names:
-                        logger.debug(f"Deactivate {job_name}")
+                for job in workflow.jobs:
+                    if job.name not in jobs_names:
+                        logger.debug(f"Deactivate {job.name}")
                         crud.update(
                             session,
                             cls,
-                            {"name": job_name},
+                            {"name": job.name},
                             {"is_active": False},
                         )
+
+    @classmethod
+    def unschedule_deactivated_jobs(cls, scheduler) -> None:
+        with database.session_scope() as session:
+            jobs = crud.get_all(session, cls)
+            for job in jobs:
+                if not job.is_active:
+                    job.unschedule(scheduler)
 
     @classmethod
     def trigger_dependencies(cls, job_name, scheduler, **kwargs):
@@ -214,3 +221,12 @@ class Job(BaseModel):
                 logger.error(f"Error: {error}")
         else:
             logger.info(f"Job {self.name} is inactive, skipping schedule")
+
+    def unschedule(self, scheduler) -> None:
+        logger.debug(f"Unscheduling job: {self.name}")
+        try:
+            scheduler.remove_job(self.name)
+        except JobLookupError:
+            logger.warning(
+                f"tried to remove {self.name}, " "but it was not scheduled"
+            )

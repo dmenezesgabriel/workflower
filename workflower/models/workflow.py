@@ -5,7 +5,6 @@ import os
 import logging
 import os
 
-from apscheduler.jobstores.base import JobLookupError
 from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
@@ -191,10 +190,6 @@ class Workflow(BaseModel):
         for job in self.jobs:
             logger.info(f"Removing {job.name}")
             try:
-                scheduler.remove_job(job.name)
-            except JobLookupError:
-                logger.warning(
-                    f"tried to remove {job.name}, " "but it was not scheduled"
-                )
+                job.unschedule(scheduler)
             except Exception as error:
                 logger.error(f"Try to remove {job.name} failed: {error}")
