@@ -42,7 +42,7 @@ def get_or_create(session, model_object, **kwargs):
     """
     Get or create by name.
     """
-    instance = get_one(session, model_object, name=kwargs["name"])
+    instance = get_one(session, model_object, **kwargs)
     if instance:
         logger.debug("model_object already exists")
         return instance

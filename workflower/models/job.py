@@ -5,15 +5,21 @@ Job class.
 import logging
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
-from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
-from workflower.models.workflow import Workflow
 from workflower.operators.alteryx import AlteryxOperator
 from workflower.operators.papermill import PapermillOperator
 from workflower.operators.python import PythonOperator
 from workflower.utils import crud
-from workflower.utils.schema import JobSchemaParser
 
 logger = logging.getLogger("workflower.job")
 
@@ -23,8 +29,6 @@ class Job(BaseModel):
     name = Column(
         "name",
         String,
-        unique=True,
-        index=True,
     )
     uses = Column(
         "uses",
@@ -52,8 +56,13 @@ class Job(BaseModel):
         "next_run_time",
         String,
     )
-
-    workflow = relationship("Workflow", back_populates="jobs")
+    workflow = relationship(
+        "Workflow",
+        back_populates="jobs",
+    )
+    __table_args__ = (
+        UniqueConstraint("name", "workflow_id", name="_name_workflow_id_uc"),
+    )
 
     def __init__(
         self,
@@ -84,91 +93,12 @@ class Job(BaseModel):
         )
 
     @classmethod
-    def from_dict(cls, job_dict: dict, workflow_name: str) -> None:
+    def trigger_dependencies(cls, job_id, scheduler, **kwargs):
         """
-        Job from dict.
+        Trigger job's dependencies.
         """
         with database.session_scope() as session:
-            # Get parent workflow
-            workflow = crud.get_one(session, Workflow, name=workflow_name)
-            if workflow:
-                # Get job attributes from dict
-                job_name = job_dict["name"]
-                logger.debug(f"Job name: {job_name}")
-                # ---
-                job_uses = job_dict["uses"]
-                logger.debug(f"Job uses: {job_uses}")
-                # job_depends_on must point to another job of same workflow
-                # Then the event listener will trigger the job by it's id
-                job_depends_on = job_dict.get("depends_on", None)
-                if job_depends_on:
-                    job_depends_on = workflow.name + "_" + job_depends_on
-                logger.debug(f"Job depends on: {job_depends_on}")
-                # Make apscheduler job definition
-                parser = JobSchemaParser()
-                job_definition = parser.parse_schema(job_dict)
-                # Job name must be unique
-                unique_job_id = workflow.name + "_" + job_name
-                job_definition.update({"id": unique_job_id})
-
-                # Adding job's relevant information
-                crud.get_or_create(
-                    session,
-                    cls,
-                    name=unique_job_id,
-                    uses=job_uses,
-                    definition=job_definition,
-                    depends_on=job_depends_on,
-                    workflow=workflow,
-                )
-
-                filter_dict = dict(
-                    name=unique_job_id,
-                )
-                update_dict = dict(
-                    uses=job_uses,
-                    definition=job_definition,
-                    depends_on=job_depends_on,
-                )
-                should_update = False
-                if workflow.modified_since_last_load:
-                    should_update = True
-                if should_update:
-                    crud.update(session, cls, filter_dict, update_dict)
-
-    @classmethod
-    def deactivate_removed_jobs(cls, configuration_dict: dict) -> None:
-        logger.debug("Searching for workflow removed jobs")
-        workflow_name = configuration_dict["workflow"]["name"]
-        with database.session_scope() as session:
-            workflow = crud.get_one(session, Workflow, name=workflow_name)
-            if workflow:
-                jobs_names = [
-                    workflow_name + "_" + job["name"]
-                    for job in configuration_dict["workflow"]["jobs"]
-                ]
-                for job in workflow.jobs:
-                    if job.name not in jobs_names:
-                        logger.debug(f"Deactivate {job.name}")
-                        crud.update(
-                            session,
-                            cls,
-                            {"name": job.name},
-                            {"is_active": False},
-                        )
-
-    @classmethod
-    def unschedule_deactivated_jobs(cls, scheduler) -> None:
-        with database.session_scope() as session:
-            jobs = crud.get_all(session, cls)
-            for job in jobs:
-                if not job.is_active:
-                    job.unschedule(scheduler)
-
-    @classmethod
-    def trigger_dependencies(cls, job_name, scheduler, **kwargs):
-        with database.session_scope() as session:
-            dependency_jobs = crud.get_all(session, cls, depends_on=job_name)
+            dependency_jobs = crud.get_all(session, cls, depends_on=job_id)
             if dependency_jobs:
                 for dependency_job in dependency_jobs:
                     logger.debug(
@@ -177,13 +107,16 @@ class Job(BaseModel):
                     dependency_job.schedule(scheduler, **kwargs)
 
     @classmethod
-    def update_next_run_time(cls, name, scheduler):
-        logger.debug(f"updating next run time for {name}")
-        job = scheduler.get_job(name)
+    def update_next_run_time(cls, id, scheduler):
+        """
+        Update next_run_time in database's object row.
+        """
+        logger.debug(f"updating next run time for {id}")
+        job = scheduler.get_job(id)
         if job:
             logger.debug(f"found job id: {job}")
             cls.update(
-                {"name": name},
+                {"id": id},
                 {"next_run_time": str(job.next_run_time)},
             )
 
@@ -192,8 +125,7 @@ class Job(BaseModel):
         Schedule a job in apscheduler
         """
         if self.is_active:
-            job_id = self.definition["id"]
-            logger.debug(f"scheduling {job_id}")
+            logger.debug(f"scheduling {self.id}")
             logger.debug(self.definition)
             schedule_params = self.definition.copy()
             schedule_kwargs = schedule_params.get("kwargs")
@@ -209,10 +141,12 @@ class Job(BaseModel):
             schedule_params.update(dict(func=getattr(operator, "execute")))
 
             try:
-                self.job = scheduler.add_job(**schedule_params)
-                self.update_next_run_time(self.name, scheduler)
+                self.job = scheduler.add_job(
+                    id=str(self.id), **schedule_params
+                )
+                self.update_next_run_time(self.id, scheduler)
             except ConflictingIdError:
-                logger.warning(f"{job_id}, already scheduled, skipping.")
+                logger.warning(f"{self.id}, already scheduled, skipping.")
             except ValueError as error:
                 # If someone set an invalid date value it will lead
                 # to this exception
@@ -220,10 +154,10 @@ class Job(BaseModel):
             except Exception as error:
                 logger.error(f"Error: {error}")
         else:
-            logger.info(f"Job {self.name} is inactive, skipping schedule")
+            logger.info(f"Job {self.id} is inactive, skipping schedule")
 
     def unschedule(self, scheduler) -> None:
-        logger.debug(f"Unscheduling job: {self.name}")
+        logger.debug(f"Unscheduling job: {self.id}")
         try:
             scheduler.remove_job(self.name)
         except JobLookupError:

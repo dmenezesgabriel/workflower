@@ -339,7 +339,18 @@ class PipelineSchemaParser:
     Pipeline Schema parser.
     """
 
-    pass
+    def parse_version(self, configuration_dict: dict) -> None:
+        """
+        Parse pipeline version.
+        """
+        return configuration_dict["version"]
+
+    def parse_schema(self, configuration_dict: dict):
+        """
+        Parse Pipeline schema.
+        """
+        version = self.parse_version(configuration_dict)
+        return version
 
 
 class WorkflowSchemaParser:
@@ -347,7 +358,25 @@ class WorkflowSchemaParser:
     Workflow Schema parser.
     """
 
-    pass
+    def _get_workflow_name(self, configuration_dict: dict) -> str:
+        """
+        Parse workflow name.
+        """
+        return configuration_dict["workflow"]["name"]
+
+    def _get_workflow_jobs_dict(self, configuration_dict: dict):
+        """
+        Parse jobs dict.
+        """
+        return configuration_dict["workflow"]["jobs"]
+
+    def parse_schema(self, configuration_dict: dict):
+        """
+        Parse Workflow schema.
+        """
+        workflow_name = self._get_workflow_name(configuration_dict)
+        jobs_dict = self._get_workflow_jobs_dict(configuration_dict)
+        return workflow_name, jobs_dict
 
 
 class JobSchemaParser:
@@ -361,7 +390,7 @@ class JobSchemaParser:
         self.trigger_config = {}
         self.uses_config = {}
 
-    def parse_job_date_trigger_options(self, configuration_dict) -> dict:
+    def _parse_job_date_trigger_options(self, configuration_dict) -> dict:
         """
         parse_job a dict with date trigger options.
         """
@@ -377,7 +406,7 @@ class JobSchemaParser:
         }
         return date_string_options_dict
 
-    def parse_job_interval_trigger_options(self, configuration_dict) -> dict:
+    def _parse_job_interval_trigger_options(self, configuration_dict) -> dict:
         """
         parse_job a dict with interval trigger options.
         """
@@ -407,7 +436,7 @@ class JobSchemaParser:
         }
         return {**interval_int_options_dict, **interval_string_options_dict}
 
-    def parse_job_cron_trigger_options(self, configuration_dict) -> dict:
+    def _parse_job_cron_trigger_options(self, configuration_dict) -> dict:
         """
         parse_job a dict with cron trigger options.
         """
@@ -454,7 +483,7 @@ class JobSchemaParser:
             **interval_string_options_dict,
         }
 
-    def parse_job_trigger_options(self, configuration_dict) -> None:
+    def _parse_job_trigger_options(self, configuration_dict) -> None:
         """
         Define trigger options from dict.
         """
@@ -463,21 +492,21 @@ class JobSchemaParser:
         #  interval trigger
         if job_trigger == "interval":
             self.trigger_config.update(dict(trigger="interval"))
-            interval_trigger_options = self.parse_job_interval_trigger_options(
-                configuration_dict
+            interval_trigger_options = (
+                self._parse_job_interval_trigger_options(configuration_dict)
             )
             self.trigger_config.update(interval_trigger_options)
         #  Cron trigger
         elif job_trigger == "cron":
             self.trigger_config.update(dict(trigger="cron"))
-            cron_trigger_options = self.parse_job_cron_trigger_options(
+            cron_trigger_options = self._parse_job_cron_trigger_options(
                 configuration_dict
             )
             self.trigger_config.update(cron_trigger_options)
         #  Date trigger
         elif job_trigger == "date":
             self.trigger_config.update(dict(trigger="date"))
-            date_trigger_options = self.parse_job_date_trigger_options(
+            date_trigger_options = self._parse_job_date_trigger_options(
                 configuration_dict
             )
             self.trigger_config.update(date_trigger_options)
@@ -486,7 +515,7 @@ class JobSchemaParser:
             # must be removed from job definition
             configuration_dict.pop("trigger", None)
 
-    def parse_job_uses(self, configuration_dict) -> dict:
+    def _parse_job_uses(self, configuration_dict) -> dict:
         """
         Define job uses from dict.
         """
@@ -543,12 +572,17 @@ class JobSchemaParser:
             )
             self.uses_config.update(dict(func="PythonOperator.execute"))
 
-    def parse_schema(self, configuration_dict):
+    def parse_schema(self, configuration_dict: dict):
+        """
+        Parse Job schema.
+        """
         job_name = configuration_dict.get("name")
+        job_uses = configuration_dict.get("uses")
+        job_depends_on = configuration_dict.get("depends_on", None)
         job_executor = "default"
-        job_config = {"id": job_name, "executor": job_executor}
-        self.parse_job_trigger_options(configuration_dict)
-        self.parse_job_uses(configuration_dict)
+        job_config = {"executor": job_executor}
+        self._parse_job_trigger_options(configuration_dict)
+        self._parse_job_uses(configuration_dict)
         #  Update job config
         logger.debug(f"Job schema args: {self.schema_args}")
         if self.schema_args:
@@ -563,4 +597,4 @@ class JobSchemaParser:
         if self.uses_config:
             job_config.update(self.uses_config)
         logger.debug(f"job parsed configuration: {job_config}")
-        return job_config
+        return job_name, job_uses, job_depends_on, job_config
