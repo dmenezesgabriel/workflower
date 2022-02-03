@@ -1,3 +1,8 @@
+"""
+Database initialization script.
+
+Technical debit, must be replaced with alembic migrations.
+"""
 import logging
 import os
 
@@ -17,6 +22,10 @@ logger.setLevel(logging.INFO)
 
 
 def init_db():
+    """
+    Create database tables.
+    """
+
     if not os.path.isdir(Config.DATA_DIR):
         os.makedirs(Config.DATA_DIR)
     database.connect()
