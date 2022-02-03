@@ -161,14 +161,43 @@ def validate_papermill_job(job_dict: dict) -> None:
     papermill_job_paths_ends_with_ipynb(job_dict)
 
 
-def validate_alteryx_job(job_dict: dict) -> None:
+def alteryx_job_use_has_expected_keys(job_dict: dict) -> bool:
+    """
+    Alteryx job must have expected keys.
+    """
     alteryx_keys = ["path"]
     if not all(key in job_dict.keys() for key in alteryx_keys):
         raise InvalidSchemaError(
             "Alteryx jobs must contain: " f"{', '.join(alteryx_keys)}"
         )
-    # TODO
-    # Validate if path ends with alteryx extension and file exists
+    return True
+
+
+def alteryx_job_path_is_file(job_dict: dict) -> bool:
+    """
+    Alteryx job path must point to an existing file.
+    """
+    if not os.path.isfile(job_dict["path"]):
+        raise InvalidFilePathError("Alteryx path file not exists")
+    return True
+
+
+def alteryx_job_paths_ends_with_yxmd(job_dict: dict) -> bool:
+    """
+    Alteryx job paths must point to .yxmd type files.
+    """
+    if not job_dict["path"].endswith(".yxmd"):
+        raise InvalidTypeError("path paths must be .yxmd file")
+    return True
+
+
+def validate_alteryx_job(job_dict: dict) -> None:
+    """
+    Validate Alteryx job uses.
+    """
+    alteryx_job_use_has_expected_keys(job_dict)
+    alteryx_job_path_is_file(job_dict)
+    alteryx_job_paths_ends_with_yxmd(job_dict)
 
 
 def validate_python_job(job_dict: dict) -> None:

@@ -261,6 +261,10 @@ class TestJobSchemaValidation:
 
 
 class TestPapermillJobSchemaValidation:
+    """
+    Papermill operator schema validation.
+    """
+
     @pytest.fixture(scope="function")
     def jupyter_notebook_file(cls, tmpdir_factory):
         """
@@ -269,6 +273,9 @@ class TestPapermillJobSchemaValidation:
         """
 
         def _return_notebook_path(name):
+            """
+            Return a Jupyter notebook mock file.
+            """
             file_content = """
             {
             "cells": [
@@ -439,3 +446,37 @@ class TestPapermillJobSchemaValidation:
         ) as mock:
             schema.validate_papermill_job(job_dict)
         assert mock.call_count == 1
+
+
+class TestAlteryxJobSchemaValidation:
+    """
+    Alteryx operator schema validation.
+    """
+
+    @pytest.fixture(scope="function")
+    def alteryx_workflow_file(cls, tmpdir_factory) -> str:
+        """
+        Return Alteryx workflow mocked file.
+        """
+        file_content = """
+        xml stuff
+        """
+        p = tmpdir_factory.mktemp("file").join("workflow.yxmd")
+        p.write_text(file_content, encoding="utf-8")
+        return str(p)
+
+    @pytest.fixture(scope="function")
+    def job_dict(cls, alteryx_workflow_file):
+        return {
+            "name": "job_name",
+            "uses": "alteryx",
+            "path": alteryx_workflow_file,
+            "trigger": "interval",
+            "minutes": 1,
+        }
+
+    def test_alteryx_job_use_has_expected_keys(cls, job_dict):
+        """
+        Job must have expected keys.
+        """
+        assert schema.alteryx_job_use_has_expected_keys(job_dict) is True
