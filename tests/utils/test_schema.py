@@ -480,3 +480,90 @@ class TestAlteryxJobSchemaValidation:
         Job must have expected keys.
         """
         assert schema.alteryx_job_use_has_expected_keys(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            (
+                {
+                    "name": "job_name",
+                    "uses": "alteryx",
+                    "trigger": "date",
+                }
+            ),
+        ],
+    )
+    def test_alteryx_job_use_has_expected_keys_missing_keys(cls, test_input):
+        """
+        If Job not contain expected keys should raise Exception.
+        """
+        with pytest.raises(InvalidSchemaError):
+            schema.alteryx_job_use_has_expected_keys(test_input)
+
+    def test_alteryx_job_path_is_file(cls, job_dict):
+        """
+        Alteryx path must be an existing file.
+        """
+        assert schema.alteryx_job_path_is_file(job_dict) is True
+
+    def test_alteryx_job_path_is_file_not_exists(cls):
+        """
+        Alteryx path must be an existing file.
+        """
+        job_dict = {"path": "./test.yxmd"}
+        with pytest.raises(InvalidFilePathError):
+            schema.alteryx_job_path_is_file(job_dict)
+
+    def test_alteryx_job_paths_ends_with_yxmd_true(cls, job_dict):
+        """
+        Alteryx job paths must point to .yxmd type files.
+        """
+        assert schema.alteryx_job_paths_ends_with_yxmd(job_dict) is True
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            (
+                {
+                    "name": "job_name",
+                    "uses": "alteryx",
+                    "trigger": "interval",
+                    "minutes": 1,
+                    "path": "./test.txt",
+                }
+            ),
+        ],
+    )
+    def test_alteryx_job_paths_ends_with_yxmd_false(cls, test_input):
+        """
+        Alteryx job paths must point to .yxmd type files.
+        """
+        with pytest.raises(InvalidTypeError):
+            schema.alteryx_job_paths_ends_with_yxmd(test_input)
+
+    def test_validate_alteryx_job_calls_alteryx_job_use_has_expected_keys(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.alteryx_job_use_has_expected_keys"
+        ) as mock:
+            schema.validate_alteryx_job(job_dict)
+        assert mock.call_count == 1
+
+    def test_validate_alteryx_job_calls_alteryx_job_path_is_file(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.alteryx_job_path_is_file"
+        ) as mock:
+            schema.validate_alteryx_job(job_dict)
+        assert mock.call_count == 1
+
+    def test_validate_alteryx_job_calls_alteryx_job_paths_ends_with_yxmd(
+        cls, job_dict
+    ):
+        with unittest.mock.patch(
+            "workflower.utils.schema.alteryx_job_paths_ends_with_yxmd"
+        ) as mock:
+            schema.validate_alteryx_job(job_dict)
+        assert mock.call_count == 1
