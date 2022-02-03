@@ -26,43 +26,8 @@ class SchedulerService:
         self.scheduler = BackgroundScheduler()
         self.is_running = False
 
-    def on_job_added(self, event):
-        job = Job.get_one(name=event.job_id)
-        Event.create(name="job_added", model="job", model_id=job.id)
-
-    def on_job_removed(self, event):
-        job = Job.get_one(name=event.job_id)
-        Event.create(name="job_removed", model="job", model_id=job.id)
-
-    def on_job_error(self, event) -> None:
-        job = Job.get_one(name=event.job_id)
-        Event.create(
-            name="job_error",
-            model="job",
-            model_id=job.id,
-            exception=event.exception,
-        )
-
     def on_job_executed(self, event) -> None:
-        logger.info(f"Job: {event.job_id}, successfully executed")
-        job = Job.get_one(name=event.job_id)
-        Event.create(
-            name="job_executed",
-            model="job",
-            model_id=job.id,
-            output=event.retval,
-        )
-        Job.update_next_run_time(event.job_id, self.scheduler)
-        self.trigger_job_dependency(event)
-
-    def trigger_job_dependency(self, event):
-        """
-        Trigger a job that depends on another.
-        """
-        logger.debug("Checking if need to trigger a dependency job")
-        Job.trigger_dependencies(
-            event.job_id, self.scheduler, job_return_value=event.retval
-        )
+        Event.job_executed(event, self.scheduler)
 
     def create_default_directories(self) -> None:
         if not os.path.isdir(Config.ENVIRONMENTS_DIR):
@@ -74,10 +39,10 @@ class SchedulerService:
     def setup_event_actions(self, scheduler):
         """"""
         event_actions = [
-            {"func": self.on_job_added, "event": EVENT_JOB_ADDED},
+            {"func": Event.job_added, "event": EVENT_JOB_ADDED},
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
-            {"func": self.on_job_error, "event": EVENT_JOB_ERROR},
-            {"func": self.on_job_removed, "event": EVENT_JOB_REMOVED},
+            {"func": Event.job_error, "event": EVENT_JOB_ERROR},
+            {"func": Event.job_removed, "event": EVENT_JOB_REMOVED},
         ]
         for event_action in event_actions:
             scheduler.add_listener(
