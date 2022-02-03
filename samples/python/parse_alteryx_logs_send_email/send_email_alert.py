@@ -29,12 +29,12 @@ mail.Subject = "Alteryx Combine Two Sheets Alert"
 mail.HTMLBody = f"""
 <h1>Alteryx Workflow Alert</h1>
 
-Workflow path: {workflow_path}
+Workflow path: {workflow_path[0]}
 
 </br>
 
 <h2>Logs</h2>
-{"</br> ".join(messages)}
+{"<br>".join(messages)}
 
 """
 # attachment = "Path to the attachment"
