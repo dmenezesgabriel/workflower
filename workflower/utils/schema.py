@@ -293,14 +293,23 @@ def validate_job_triggers(job_dict: dict, jobs_names: list) -> None:
         dependency_trigger_depends_on_existing_job(job_dict, jobs_names)
 
 
+def workflow_jobs_is_list_type(configuration_dict: dict) -> bool:
+    """
+    Workflow jobs must be string type.
+    """
+    workflow_jobs = configuration_dict["workflow"]["jobs"]
+    if not isinstance(workflow_jobs, list):
+        raise InvalidTypeError("Workflow jobs wrong definition")
+    return True
+
+
 def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
     """
     Validate workflow jobs definition.
     """
+    workflow_jobs_is_list_type(configuration_dict)
     workflow = configuration_dict["workflow"]
     workflow_jobs = workflow["jobs"]
-    if not isinstance(workflow_jobs, list):
-        raise InvalidTypeError("Workflow jobs wrong definition")
     jobs_names = []
     for job in workflow_jobs:
         jobs_names.append(job["name"])
