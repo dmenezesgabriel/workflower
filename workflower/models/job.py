@@ -5,7 +5,7 @@ Job class.
 import logging
 
 from apscheduler.jobstores.base import ConflictingIdError
-from sqlalchemy import JSON, Column, ForeignKey, Integer, String
+from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
 from workflower.models.workflow import Workflow
@@ -43,6 +43,11 @@ class Job(BaseModel):
         Integer,
         ForeignKey("workflows.id"),
     )
+    is_active = Column(
+        "is_active",
+        Boolean,
+        default=True,
+    )
     next_run_time = Column(
         "next_run_time",
         String,
@@ -57,6 +62,7 @@ class Job(BaseModel):
         definition,
         depends_on,
         workflow,
+        is_active=True,
         next_run_time=None,
     ):
         self.name = name
@@ -64,6 +70,7 @@ class Job(BaseModel):
         self.definition = definition
         self.depends_on = depends_on
         self.workflow = workflow
+        self.is_active = is_active
         self.next_run_time = next_run_time
         self.job = None
 
@@ -130,6 +137,28 @@ class Job(BaseModel):
                     crud.update(session, cls, filter_dict, update_dict)
 
     @classmethod
+    def deactivate_removed_jobs(cls, configuration_dict: dict) -> None:
+        logger.debug("Searching for workflow removed jobs")
+        workflow_name = configuration_dict["workflow"]["name"]
+        with database.session_scope() as session:
+            workflow = crud.get_one(session, Workflow, name=workflow_name)
+            if workflow:
+                workflow_jobs = [job.name for job in workflow.jobs]
+                jobs_names = [
+                    workflow_name + "_" + job["name"]
+                    for job in configuration_dict["workflow"]["jobs"]
+                ]
+                for job_name in workflow_jobs:
+                    if job_name not in jobs_names:
+                        logger.debug(f"Deactivate {job_name}")
+                        crud.update(
+                            session,
+                            cls,
+                            {"name": job_name},
+                            {"is_active": False},
+                        )
+
+    @classmethod
     def trigger_dependencies(cls, job_name, scheduler, **kwargs):
         with database.session_scope() as session:
             dependency_jobs = crud.get_all(session, cls, depends_on=job_name)
@@ -155,30 +184,33 @@ class Job(BaseModel):
         """
         Schedule a job in apscheduler
         """
-        job_id = self.definition["id"]
-        logger.debug(f"scheduling {job_id}")
-        logger.debug(self.definition)
-        schedule_params = self.definition.copy()
-        schedule_kwargs = schedule_params.get("kwargs")
-        if schedule_kwargs:
-            schedule_kwargs.update(kwargs)
+        if self.is_active:
+            job_id = self.definition["id"]
+            logger.debug(f"scheduling {job_id}")
+            logger.debug(self.definition)
+            schedule_params = self.definition.copy()
+            schedule_kwargs = schedule_params.get("kwargs")
+            if schedule_kwargs:
+                schedule_kwargs.update(kwargs)
 
-        if self.uses == "alteryx":
-            operator = AlteryxOperator
-        elif self.uses == "papermill":
-            operator = PapermillOperator
-        elif self.uses == "python":
-            operator = PythonOperator
-        schedule_params.update(dict(func=getattr(operator, "execute")))
+            if self.uses == "alteryx":
+                operator = AlteryxOperator
+            elif self.uses == "papermill":
+                operator = PapermillOperator
+            elif self.uses == "python":
+                operator = PythonOperator
+            schedule_params.update(dict(func=getattr(operator, "execute")))
 
-        try:
-            self.job = scheduler.add_job(**schedule_params)
-            self.update_next_run_time(self.name, scheduler)
-        except ConflictingIdError:
-            logger.warning(f"{job_id}, already scheduled, skipping.")
-        except ValueError as error:
-            # If someone set an invalid date value it will lead
-            # to this exception
-            logger.error(f"Value error: {error}")
-        except Exception as error:
-            logger.error(f"Error: {error}")
+            try:
+                self.job = scheduler.add_job(**schedule_params)
+                self.update_next_run_time(self.name, scheduler)
+            except ConflictingIdError:
+                logger.warning(f"{job_id}, already scheduled, skipping.")
+            except ValueError as error:
+                # If someone set an invalid date value it will lead
+                # to this exception
+                logger.error(f"Value error: {error}")
+            except Exception as error:
+                logger.error(f"Error: {error}")
+        else:
+            logger.info(f"Job {self.name} is inactive, skipping schedule")

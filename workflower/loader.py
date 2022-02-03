@@ -29,6 +29,7 @@ class Loader:
         logger.debug("Loading jobs")
         workflow_name = configuration_dict["workflow"]["name"]
         workflow_job_dicts = configuration_dict["workflow"]["jobs"]
+        Job.deactivate_removed_jobs(configuration_dict)
         for workflow_job_dict in workflow_job_dicts:
             Job.from_dict(workflow_job_dict, workflow_name)
 
