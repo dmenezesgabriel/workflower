@@ -1,3 +1,8 @@
+"""
+Base exceptions module.
+"""
+
+
 class InvalidSchemaError(Exception):
     """Base class for invalid Schema exception"""
 
