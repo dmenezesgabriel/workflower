@@ -10,6 +10,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     ForeignKey,
+    Index,
     Integer,
     String,
     UniqueConstraint,
@@ -20,6 +21,7 @@ from workflower.operators.alteryx import AlteryxOperator
 from workflower.operators.papermill import PapermillOperator
 from workflower.operators.python import PythonOperator
 from workflower.utils import crud
+from workflower.utils.schema import JobSchemaParser
 
 logger = logging.getLogger("workflower.job")
 
@@ -62,6 +64,7 @@ class Job(BaseModel):
     )
     __table_args__ = (
         UniqueConstraint("name", "workflow_id", name="_name_workflow_id_uc"),
+        Index("name_workflow_id_idx", "name", "workflow_id"),
     )
 
     def __init__(
@@ -91,6 +94,68 @@ class Job(BaseModel):
             f"workflow={self.workflow}, "
             f"next_run_time={self.next_run_time}, "
         )
+
+    @classmethod
+    def from_dict(cls, session, job_dict, workflow):
+        """
+        Create job from dict.
+        """
+        logger.debug(f"Loading workflow's {workflow} job from dict")
+        job_parser = JobSchemaParser()
+        (
+            job_name,
+            job_uses,
+            job_depends_on,
+            job_definition,
+        ) = job_parser.parse_schema(job_dict)
+        logger.info(f"Loading job {job_name} of workflow {workflow} from dict")
+        # job_depends_on must point to another job of same workflow
+        # Then the event listener will trigger the job by it's id
+        if job_depends_on:
+            logger.debug(f"Job {job_name} has dependency")
+            dependency_job = crud.get_one(
+                session,
+                cls,
+                workflow_id=workflow.id,
+                name=job_depends_on,
+            )
+            job_depends_on_id = dependency_job.id
+            logger.debug(f"Job {job_name} depends on: {job_depends_on_id}")
+        else:
+            logger.debug(f"Job {job_name} has no dependency")
+            job_depends_on_id = None
+
+        # Adding job's relevant information
+        logger.debug(f"Checking if job {job_name} exists")
+        job = crud.get_one(
+            session, cls, name=job_name, workflow_id=workflow.id
+        )
+        if job:
+            logger.debug(f"Checking if job {job_name} found: {job}")
+            if workflow.modified_since_last_load:
+                logger.debug(f"Workflow {workflow.id} has been modified")
+                filter_dict = dict(
+                    id=job.id,
+                )
+                update_dict = dict(
+                    uses=job_uses,
+                    definition=job_definition,
+                    depends_on=job_depends_on_id,
+                    is_active=True,
+                )
+                logger.debug(f"Updating {job}")
+                crud.update(session, cls, filter_dict, update_dict)
+        elif not job:
+            logger.debug(f"Creating job :{job_name}")
+            job = crud.create(
+                session,
+                cls,
+                name=job_name,
+                uses=job_uses,
+                definition=job_definition,
+                depends_on=job_depends_on_id,
+                workflow=workflow,
+            )
 
     @classmethod
     def trigger_dependencies(cls, job_id, scheduler, **kwargs):
@@ -124,43 +189,44 @@ class Job(BaseModel):
         """
         Schedule a job in apscheduler
         """
-        if self.is_active:
-            logger.debug(f"scheduling {self.id}")
-            logger.debug(self.definition)
-            schedule_params = self.definition.copy()
-            schedule_kwargs = schedule_params.get("kwargs")
-            if schedule_kwargs:
-                schedule_kwargs.update(kwargs)
+        logger.info(f"scheduling job: {self}")
+        schedule_params = self.definition.copy()
+        schedule_kwargs = schedule_params.get("kwargs")
+        if schedule_kwargs:
+            schedule_kwargs.update(kwargs)
 
-            if self.uses == "alteryx":
-                operator = AlteryxOperator
-            elif self.uses == "papermill":
-                operator = PapermillOperator
-            elif self.uses == "python":
-                operator = PythonOperator
-            schedule_params.update(dict(func=getattr(operator, "execute")))
+        if self.uses == "alteryx":
+            logger.debug("Job uses Alteryx")
+            operator = AlteryxOperator
+        elif self.uses == "papermill":
+            logger.debug("Job uses Papermill")
+            operator = PapermillOperator
+        elif self.uses == "python":
+            logger.debug("Job uses Python")
+            operator = PythonOperator
+        schedule_params.update(dict(func=getattr(operator, "execute")))
 
-            try:
-                self.job = scheduler.add_job(
-                    id=str(self.id), **schedule_params
-                )
-                self.update_next_run_time(self.id, scheduler)
-            except ConflictingIdError:
-                logger.warning(f"{self.id}, already scheduled, skipping.")
-            except ValueError as error:
-                # If someone set an invalid date value it will lead
-                # to this exception
-                logger.error(f"Value error: {error}")
-            except Exception as error:
-                logger.error(f"Error: {error}")
-        else:
-            logger.info(f"Job {self.id} is inactive, skipping schedule")
+        try:
+            self.job = scheduler.add_job(id=str(self.id), **schedule_params)
+            self.update_next_run_time(self.id, scheduler)
+            logger.debug(f"Job {self} successfully scheduled")
+        except ConflictingIdError:
+            logger.warning(f"{self}, already scheduled, skipping.")
+        except ValueError as error:
+            # If someone set an invalid date value it will lead
+            # to this exception
+            logger.error(f"{self} value error: {error}")
+        except Exception as error:
+            logger.error(f"Error: {error}")
 
     def unschedule(self, scheduler) -> None:
-        logger.debug(f"Unscheduling job: {self.id}")
+        """
+        Unschedule job
+        """
+        logger.debug(f"Unscheduling job: {self}")
         try:
-            scheduler.remove_job(self.name)
+            scheduler.remove_job(self.id)
         except JobLookupError:
             logger.warning(
-                f"tried to remove {self.name}, " "but it was not scheduled"
+                f"tried to remove {self}, " "but it was not scheduled"
             )

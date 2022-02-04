@@ -10,20 +10,16 @@ logger = logging.getLogger("workflower.loader")
 
 
 class Loader:
-    def load_one_workflow_from_file(
-        self, workflow_yaml_config_path: str
-    ) -> Workflow:
+    def load_one_workflow_from_file(self, workflow_yaml_config_path: str):
         """
         Load one workflow from a yaml file.
         """
-        # TODO
-        # Pytest this function
         logger.info(f"Loading pipeline file: {workflow_yaml_config_path}")
         Workflow.from_yaml(workflow_yaml_config_path)
 
     def load_all_workflows_from_dir(
         self, workflows_path: str = Config.WORKFLOWS_FILES_PATH
-    ) -> List:
+    ) -> None:
         """
         Load all.
         """
@@ -43,11 +39,4 @@ class Loader:
                             f"Error loading {workflow_yaml_config_path}:"
                             f" {traceback.format_exc()}"
                         )
-        Workflow.set_files_still_exists()
         logger.info(f"Workflows Loaded {counter}")
-
-    def load_all(self):
-        """
-        Load workflows.
-        """
-        self.load_all_workflows_from_dir()

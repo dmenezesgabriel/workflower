@@ -11,10 +11,9 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
-from workflower.loader import Loader
+from workflower.controllers.workflow import WorkflowContoller
 from workflower.models.base import database
 from workflower.models.event import Event
-from workflower.models.workflow import Workflow
 
 logger = logging.getLogger("workflower.app")
 
@@ -96,10 +95,8 @@ class SchedulerService:
         self.is_running = True
 
         while self.is_running:
-            logger.info("Loading Workflows")
-            workflows_loader = Loader()
-            workflows_loader.load_all()
-            Workflow.schedule_all_jobs(self.scheduler)
+            workflow_controller = WorkflowContoller()
+            workflow_controller.schedule_workflows_jobs(self.scheduler)
             logger.info(f"Sleeping {Config.CYCLE} seconds")
             await asyncio.sleep(Config.CYCLE)
 

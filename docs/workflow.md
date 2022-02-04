@@ -28,3 +28,53 @@ workflow:
 ## Tips
 
 An easy way of deactivating an workflow is inserting a underscore `_` at the beginning of it's file name, so it won't match with defined workflow name inside yaml or yml file.
+
+## Functioning
+
+```py
+# --------------------------------------------------------------------------- #
+# Workflow
+# --------------------------------------------------------------------------- #
+workflow.file_exists # ?
+workflow.is_active # ?
+workflow.modified_since_last_load # ?
+
+if workflow.file_exists is True:
+  workflow.is_active = True
+  workflow.update_jobs
+  workflow.schedule_jobs
+
+if workflow.file_exists is False:
+  # Remove
+  workflow.is_active = False
+  workflow_unschedule_jobs
+  workflow.update_jobs
+# --------------------------------------------------------------------------- #
+if (
+    workflow.file_exists is True and
+    workflow.modified_since_last_load is False
+  ):
+  workflow.is_active = True
+  workflow.schedule_jobs
+
+
+if (
+    workflow.file_exists is True and
+    workflow.modified_since_last_load is True
+  ):
+  workflow.is_active = True
+  # Reschedule
+  workflow.unschedule_jobs
+  workflow.update_jobs
+  workflow.schedule_jobs
+# --------------------------------------------------------------------------- #
+# Jobs
+# --------------------------------------------------------------------------- #
+workflow.file_exists # ?
+workflow.is_active # ?
+workflow.modified_since_last_load # ?
+
+job.exists # ?
+job.is_active #?
+job.modified # ?
+```
