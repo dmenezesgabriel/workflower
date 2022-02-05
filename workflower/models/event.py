@@ -42,7 +42,7 @@ class Event(BaseModel):
         """
         On job added.
         """
-        job = Job.get_one(name=event.job_id)
+        job = Job.get_one(id=event.job_id)
         cls.create(name="job_added", model="job", model_id=job.id)
 
     @classmethod
@@ -50,7 +50,7 @@ class Event(BaseModel):
         """
         On job removed.
         """
-        job = Job.get_one(name=event.job_id)
+        job = Job.get_one(id=event.job_id)
         cls.create(name="job_removed", model="job", model_id=job.id)
 
     @classmethod
@@ -58,7 +58,7 @@ class Event(BaseModel):
         """
         On job error.
         """
-        job = Job.get_one(name=event.job_id)
+        job = Job.get_one(id=event.job_id)
         cls.create(
             name="job_error",
             model="job",
@@ -72,7 +72,7 @@ class Event(BaseModel):
         On job executed.
         """
         logger.info(f"Job: {event.job_id}, successfully executed")
-        job = Job.get_one(name=event.job_id)
+        job = Job.get_one(id=event.job_id)
         cls.create(
             name="job_executed",
             model="job",

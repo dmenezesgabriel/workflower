@@ -6,6 +6,7 @@ Workflow is defined on a `.yml` file and can contain multiple jobs.
 - Workflow file name must be the same of workflow name, if not won't load
 - If a workflow file has been modified, modifications will be applied on next cycle
 - If a workflow file has been removed, the scheduled for all it's jobs will be removed
+- Dependency trigger jobs must be defined after it's depends_on job
 
   Example:
 
@@ -27,3 +28,53 @@ workflow:
 ## Tips
 
 An easy way of deactivating an workflow is inserting a underscore `_` at the beginning of it's file name, so it won't match with defined workflow name inside yaml or yml file.
+
+## Functioning
+
+```py
+# --------------------------------------------------------------------------- #
+# Workflow
+# --------------------------------------------------------------------------- #
+workflow.file_exists # ?
+workflow.is_active # ?
+workflow.modified_since_last_load # ?
+
+if workflow.file_exists is True:
+  workflow.is_active = True
+  workflow.update_jobs
+  workflow.schedule_jobs
+
+if workflow.file_exists is False:
+  # Remove
+  workflow.is_active = False
+  workflow_unschedule_jobs
+  workflow.update_jobs
+# --------------------------------------------------------------------------- #
+if (
+    workflow.file_exists is True and
+    workflow.modified_since_last_load is False
+  ):
+  workflow.is_active = True
+  workflow.schedule_jobs
+
+
+if (
+    workflow.file_exists is True and
+    workflow.modified_since_last_load is True
+  ):
+  workflow.is_active = True
+  # Reschedule
+  workflow.unschedule_jobs
+  workflow.update_jobs
+  workflow.schedule_jobs
+# --------------------------------------------------------------------------- #
+# Jobs
+# --------------------------------------------------------------------------- #
+workflow.file_exists # ?
+workflow.is_active # ?
+workflow.modified_since_last_load # ?
+
+job.exists # ?
+job.is_active #?
+job.modified # ?
+```

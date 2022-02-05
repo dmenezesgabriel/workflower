@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import threading
 
 from apscheduler.events import (
     EVENT_JOB_ADDED,
@@ -12,32 +11,42 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
-from workflower.loader import Loader
+from workflower.controllers.workflow import WorkflowContoller
 from workflower.models.base import database
 from workflower.models.event import Event
-from workflower.models.job import Job
-from workflower.models.workflow import Workflow
 
 logger = logging.getLogger("workflower.app")
 
 
 class SchedulerService:
+    """
+    Scheduler service.
+    """
+
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.is_running = False
 
     def on_job_executed(self, event) -> None:
+        """
+        On job executed event.
+        """
         Event.job_executed(event, self.scheduler)
 
     def create_default_directories(self) -> None:
+        """
+        Create application default configuration directories.
+        """
         if not os.path.isdir(Config.ENVIRONMENTS_DIR):
             os.makedirs(Config.ENVIRONMENTS_DIR)
 
         if not os.path.isdir(Config.DATA_DIR):
             os.makedirs(Config.DATA_DIR)
 
-    def setup_event_actions(self, scheduler):
-        """"""
+    def setup_event_actions(self, scheduler) -> None:
+        """
+        Add event listeners
+        """
         event_actions = [
             {"func": Event.job_added, "event": EVENT_JOB_ADDED},
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
@@ -55,9 +64,14 @@ class SchedulerService:
         Setup general app configuration.
         """
         self.create_default_directories()
-        jobstores = {"default": SQLAlchemyJobStore(engine=database.engine)}
+        jobstores = {
+            "default": SQLAlchemyJobStore(engine=database.engine),
+        }
         executors = {
-            "default": {"type": "threadpool", "max_workers": 20},
+            "default": {
+                "type": "threadpool",
+                "max_workers": 20,
+            },
         }
         self.scheduler = BackgroundScheduler()
         self.setup_event_actions(self.scheduler)
@@ -79,16 +93,10 @@ class SchedulerService:
         """
         self.scheduler.start()
         self.is_running = True
-        logger.debug(f"STUCK THREADS {threading.enumerate()}")
 
         while self.is_running:
-            logger.info("Loading Workflows")
-            workflows_loader = Loader()
-            workflows_loader.load_all()
-            workflows = Workflow.get_all()
-            Job.unschedule_deactivated_jobs(self.scheduler)
-            logger.info(f"Workflows Loaded {len(workflows)}")
-            Workflow.schedule_all_jobs(self.scheduler)
+            workflow_controller = WorkflowContoller()
+            workflow_controller.schedule_workflows_jobs(self.scheduler)
             logger.info(f"Sleeping {Config.CYCLE} seconds")
             await asyncio.sleep(Config.CYCLE)
 

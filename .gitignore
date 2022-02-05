@@ -12,3 +12,4 @@ kernel_specs/
 __pycache__
 .coverage
 data/
+sdx.ipynb
