@@ -17,9 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel, database
-from workflower.operators.alteryx import AlteryxOperator
-from workflower.operators.papermill import PapermillOperator
-from workflower.operators.python import PythonOperator
+from workflower.operators.factory import create_operator
 from workflower.utils import crud
 from workflower.utils.schema import JobSchemaParser
 
@@ -195,15 +193,7 @@ class Job(BaseModel):
         if schedule_kwargs:
             schedule_kwargs.update(kwargs)
 
-        if self.uses == "alteryx":
-            logger.debug("Job uses Alteryx")
-            operator = AlteryxOperator
-        elif self.uses == "papermill":
-            logger.debug("Job uses Papermill")
-            operator = PapermillOperator
-        elif self.uses == "python":
-            logger.debug("Job uses Python")
-            operator = PythonOperator
+        operator = create_operator(self.uses)
         schedule_params.update(dict(func=getattr(operator, "execute")))
 
         try:
