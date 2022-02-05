@@ -1,7 +1,7 @@
 import logging
 import os
 
-from workflower.loader import Loader
+from workflower.loader import WorkflowLoader
 from workflower.models.base import database
 from workflower.models.workflow import Workflow
 from workflower.utils import crud
@@ -13,6 +13,9 @@ class WorkflowContoller:
     """
     Workflow Controller.
     """
+
+    def __init__(self) -> None:
+        self.workflow_loader = WorkflowLoader()
 
     def update_workflows_files_exists_state(self, session, workflows):
         """
@@ -35,8 +38,7 @@ class WorkflowContoller:
         run Workflow Controller.
         """
         logger.info("Scheduling workflows jobs")
-        workflows_loader = Loader()
-        workflows_loader.load_all_workflows_from_dir()
+        self.workflow_loader.load_all_workflows_from_dir()
         with database.session_scope() as session:
             workflows = crud.get_all(session, Workflow)
             self.update_workflows_files_exists_state(session, workflows)

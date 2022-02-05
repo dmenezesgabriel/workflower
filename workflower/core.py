@@ -6,10 +6,10 @@ from concurrent.futures import ThreadPoolExecutor
 
 from workflower.api import create_api
 from workflower.log import setup_loggers
-from workflower.scheduler import create_scheduler
+from workflower.scheduler import SchedulerService
 from workflower.server import create_server
 
-scheduler = create_scheduler()
+scheduler = SchedulerService()
 api = create_api()
 server = create_server(api)
 setup_loggers()
