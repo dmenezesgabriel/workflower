@@ -1,7 +1,6 @@
 import logging
 import os
 import traceback
-from typing import List
 
 from workflower.config import Config
 from workflower.models.workflow import Workflow
@@ -9,7 +8,7 @@ from workflower.models.workflow import Workflow
 logger = logging.getLogger("workflower.loader")
 
 
-class Loader:
+class WorkflowLoader:
     def load_one_workflow_from_file(self, workflow_yaml_config_path: str):
         """
         Load one workflow from a yaml file.
