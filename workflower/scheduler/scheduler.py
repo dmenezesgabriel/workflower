@@ -1,5 +1,4 @@
 import logging
-import os
 
 from apscheduler.events import (
     EVENT_JOB_ADDED,
@@ -21,13 +20,23 @@ class SchedulerService:
     Scheduler service.
     """
 
-    def __init__(self):
+    def __init__(self, engine=database.engine):
         self._scheduler = BackgroundScheduler()
-        self.is_running = False
+        self._is_running = False
+        self._engine = engine
+        self._init()
 
     @property
     def scheduler(self):
         return self._scheduler
+
+    @property
+    def engine(self):
+        return self._engine
+
+    @property
+    def is_running(self):
+        return self._is_running
 
     def on_job_executed(self, event) -> None:
         """
@@ -35,20 +44,11 @@ class SchedulerService:
         """
         Event.job_executed(event, self._scheduler)
 
-    def create_default_directories(self) -> None:
-        """
-        Create application default configuration directories.
-        """
-        if not os.path.isdir(Config.ENVIRONMENTS_DIR):
-            os.makedirs(Config.ENVIRONMENTS_DIR)
-
-        if not os.path.isdir(Config.DATA_DIR):
-            os.makedirs(Config.DATA_DIR)
-
     def setup_event_actions(self, scheduler) -> None:
         """
         Add event listeners
         """
+        logger.info("Setting Up Scheduler Service Events")
         event_actions = [
             {"func": Event.job_added, "event": EVENT_JOB_ADDED},
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
@@ -65,9 +65,9 @@ class SchedulerService:
         """
         Setup general app configuration.
         """
-        self.create_default_directories()
+        logger.info("Setting Up Scheduler Service")
         jobstores = {
-            "default": SQLAlchemyJobStore(engine=database.engine),
+            "default": SQLAlchemyJobStore(engine=self._engine),
         }
         executors = {
             "default": {
@@ -83,23 +83,24 @@ class SchedulerService:
             timezone=Config.TIME_ZONE,
         )
 
-    def init(self):
+    def _init(self):
         """
         Initialize app.
         """
-        database.connect()
+        logger.info("Initializing Scheduler Service")
+        self.setup()
 
-    async def run(self) -> None:
+    def start(self) -> None:
         """
         Run app.
         """
+        logger.info("Starting Scheduler Service")
         self._scheduler.start()
-        self.is_running = True
+        self._is_running = True
 
     def stop(self):
         """
         Stop app.
         """
-        logger.info("Stopping App")
-        self.is_running = False
-        database.close()
+        logger.info("Stopping Scheduler Service")
+        self._is_running = False

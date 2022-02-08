@@ -22,7 +22,6 @@ class Module(BaseModule):
         workbooks_path = os.path.join(base_directory, "workbooks")
         _workbooks = []
         for root, dirs, files in os.walk(workbooks_path):
-            print(root)
             for file in files:
                 file_path = os.path.join(root, file)
                 base_file_name = (
