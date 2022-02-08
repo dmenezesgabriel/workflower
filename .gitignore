@@ -14,3 +14,4 @@ __pycache__
 data/
 sdx.ipynb
 unzipped/
+*.xls

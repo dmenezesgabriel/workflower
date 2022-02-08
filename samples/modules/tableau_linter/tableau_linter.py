@@ -1,6 +1,7 @@
 import os
 import zipfile
 
+import pandas as pd
 from workflower.modules.module import BaseModule
 from workflower.plugins.tableau_document import TableauDocumentPlugin
 
@@ -15,10 +16,20 @@ class Module(BaseModule):
         self._plugins = plugins
 
     def run(self):
+        # Load and unzip files
         tableau_document_plugin = self.get_plugin("tableau_document_plugin")
         base_directory = (
             r"C:\Users\gabri\Documents\repos\workflower\samples\tableau"
         )
+        output_directory = os.path.join(base_directory, "output")
+
+        # Makedirs
+        if not os.path.isdir(base_directory):
+            os.makedirs(base_directory)
+
+        if not os.path.isdir(output_directory):
+            os.makedirs(output_directory)
+
         workbooks_path = os.path.join(base_directory, "workbooks")
         _workbooks = []
         for root, dirs, files in os.walk(workbooks_path):
@@ -48,6 +59,8 @@ class Module(BaseModule):
                     "workbook", target_file
                 )
                 _workbooks.append(workbook)
+
+        # Parse Workbooks
         _rows = []
         for workbook in _workbooks:
             for worksheet in workbook.worksheets:
@@ -63,24 +76,25 @@ class Module(BaseModule):
                             print(formatted_text)
                             runs = formatted_text.run
                             if runs:
-                                counter = 0
                                 for run in runs:
-                                    _row = dict()
-                                    _row.update(
-                                        dict(
-                                            workbook_name=workbook.name,
-                                            worksheet_name=worksheet.name,
-                                            bold=run.bold,
-                                            underline=run.underline,
-                                            fontname=run.fontname,
-                                            fontsize=run.fontsize,
-                                            fontcolor=run.fontcolor,
-                                            fontalignment=run.fontalignment,
-                                        )
+                                    _row = dict(
+                                        workbook_name=workbook.name,
+                                        worksheet_name=worksheet.name,
+                                        bold=run.bold,
+                                        underline=run.underline,
+                                        fontname=run.fontname,
+                                        fontsize=run.fontsize,
+                                        fontcolor=run.fontcolor,
+                                        fontalignment=run.fontalignment,
+                                        type="worksheet_title_part",
+                                        content=run.content,
                                     )
-                                    counter += 1
-                                    _row[
-                                        f"title_block_{counter}"
-                                    ] = run.content
                                     _rows.append(_row)
-            print(_rows)
+            _df = pd.DataFrame(_rows)
+            excel_report = os.path.join(
+                output_directory, "workbooks_linter_report.xls"
+            )
+            _df.to_excel(
+                excel_report,
+                engine="openpyxl",
+            )

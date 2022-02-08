@@ -25,6 +25,6 @@ def run_workflow(path):
         )
         scheduler_service.start()
         #  wait till trigger deps
-        time.sleep(1.2)
+        time.sleep(5)
         workflow.unschedule_jobs(scheduler_service.scheduler)
         workflow.deactivate_all_jobs(session)
