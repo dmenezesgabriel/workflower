@@ -2,16 +2,11 @@ import asyncio
 import logging
 import os
 
-from apscheduler.events import (
-    EVENT_JOB_ADDED,
-    EVENT_JOB_ERROR,
-    EVENT_JOB_EXECUTED,
-    EVENT_JOB_REMOVED,
-)
+from apscheduler.events import (EVENT_JOB_ADDED, EVENT_JOB_ERROR,
+                                EVENT_JOB_EXECUTED, EVENT_JOB_REMOVED)
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
-from workflower.controllers.workflow import WorkflowContoller
 from workflower.models.base import database
 from workflower.models.event import Event
 
@@ -24,14 +19,18 @@ class SchedulerService:
     """
 
     def __init__(self):
-        self.scheduler = BackgroundScheduler()
+        self._scheduler = BackgroundScheduler()
         self.is_running = False
+
+    @property
+    def scheduler(self):
+        return self._scheduler
 
     def on_job_executed(self, event) -> None:
         """
         On job executed event.
         """
-        Event.job_executed(event, self.scheduler)
+        Event.job_executed(event, self._scheduler)
 
     def create_default_directories(self) -> None:
         """
@@ -73,9 +72,9 @@ class SchedulerService:
                 "max_workers": 20,
             },
         }
-        self.scheduler = BackgroundScheduler()
-        self.setup_event_actions(self.scheduler)
-        self.scheduler.configure(
+        self._scheduler = BackgroundScheduler()
+        self.setup_event_actions(self._scheduler)
+        self._scheduler.configure(
             jobstores=jobstores,
             executors=executors,
             timezone=Config.TIME_ZONE,
@@ -91,14 +90,11 @@ class SchedulerService:
         """
         Run app.
         """
-        self.scheduler.start()
+        self._scheduler.start()
         self.is_running = True
 
         while self.is_running:
-            workflow_controller = WorkflowContoller()
-            workflow_controller.schedule_workflows_jobs(self.scheduler)
-            logger.info(f"Sleeping {Config.CYCLE} seconds")
-            await asyncio.sleep(Config.CYCLE)
+            await asyncio.sleep(1)
 
     def stop(self):
         """

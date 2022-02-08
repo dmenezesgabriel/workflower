@@ -1,6 +1,8 @@
+import asyncio
 import logging
 import os
 
+from workflower.config import Config
 from workflower.loader import WorkflowLoader
 from workflower.models.base import database
 from workflower.models.workflow import Workflow
@@ -16,6 +18,7 @@ class WorkflowContoller:
 
     def __init__(self) -> None:
         self.workflow_loader = WorkflowLoader()
+        self.is_running = False
 
     def update_workflows_files_exists_state(self, session, workflows):
         """
@@ -68,3 +71,14 @@ class WorkflowContoller:
                     continue
                 logger.info("Scheduling jobs")
                 workflow.schedule_jobs(scheduler)
+
+    async def run(self, scheduler):
+        self.is_running = True
+
+        while self.is_running:
+            self.schedule_workflows_jobs(scheduler)
+            logger.info(f"Sleeping {Config.CYCLE} seconds")
+            await asyncio.sleep(Config.CYCLE)
+
+    def stop(self):
+        self.is_running = False
