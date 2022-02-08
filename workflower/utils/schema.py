@@ -112,7 +112,7 @@ def job_uses_options_in_expected(job_dict) -> bool:
     """
     Job uses must have expected options.
     """
-    job_uses_options = ["alteryx", "papermill", "python"]
+    job_uses_options = ["alteryx", "papermill", "python", "module"]
     if job_dict["uses"] not in job_uses_options:
         raise InvalidSchemaError(
             f"Job uses options must be in: {', '.join(job_uses_options)}"
@@ -216,6 +216,45 @@ def validate_python_job(job_dict: dict) -> None:
     python_job_use_has_expected_keys(job_dict)
 
 
+def module_job_use_has_expected_keys(job_dict: dict) -> bool:
+    """
+    Module job must have expected keys.
+    """
+    module_keys = ["module_path", "module_name"]
+    if not all(key in job_dict.keys() for key in module_keys):
+        raise InvalidSchemaError(
+            "Module jobs must contain: " f"{', '.join(module_keys)}"
+        )
+    return True
+
+
+def module_job_path_is_file(job_dict: dict) -> bool:
+    """
+    Module job path must point to an existing file.
+    """
+    if not os.path.isfile(job_dict["module_path"]):
+        raise InvalidFilePathError("Module path file not exists")
+    return True
+
+
+def module_job_paths_ends_with_yxmd(job_dict: dict) -> bool:
+    """
+    Module job paths must point to .yxmd type files.
+    """
+    if not job_dict["module_path"].endswith(".py"):
+        raise InvalidTypeError("module_path must be .py file")
+    return True
+
+
+def validate_module_job(job_dict: dict) -> None:
+    """
+    Validate Module job uses.
+    """
+    module_job_use_has_expected_keys(job_dict)
+    module_job_path_is_file(job_dict)
+    module_job_paths_ends_with_yxmd(job_dict)
+
+
 def validate_job_uses(job_dict: dict) -> None:
     """
     Validate job uses.
@@ -231,6 +270,8 @@ def validate_job_uses(job_dict: dict) -> None:
     # Job triggers
     if job_dict["uses"] == "python":
         validate_python_job(job_dict)
+    if job_dict["uses"] == "module":
+        validate_module_job(job_dict)
 
 
 def trigger_is_string_type(job_dict: dict) -> bool:
@@ -571,6 +612,18 @@ class JobSchemaParser:
                 )
             )
             self.uses_config.update(dict(func="PythonOperator.execute"))
+        elif job_uses == "module":
+            module_path = configuration_dict.get("module_path")
+            if not os.path.isfile(module_path):
+                logger.error("Not a valid job path")
+            module_name = configuration_dict.get("module_name")
+            self.uses_config.update(dict(func="ModuleOperator.execute"))
+            self.schema_kwargs.update(
+                dict(
+                    module_path=module_path,
+                    module_name=module_name,
+                )
+            )
 
     def parse_schema(self, configuration_dict: dict):
         """

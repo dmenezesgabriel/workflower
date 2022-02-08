@@ -1,4 +1,4 @@
-from tableau.title import Title
+from workflower.plugins.tableau_document.title import Title
 
 
 def _title_object_from_xml(title_xml):
