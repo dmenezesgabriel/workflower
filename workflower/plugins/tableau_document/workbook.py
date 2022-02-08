@@ -1,7 +1,7 @@
 import os
 import xml.etree.ElementTree as et
 
-from tableau.worksheet import Worksheet
+from workflower.plugins.tableau_document.worksheet import Worksheet
 
 
 def _worksheet_object_from_worksheet_xml(worksheet_xml):
