@@ -1,10 +1,19 @@
 import logging
+import time
 
 from sqlalchemy import Column, String
 from workflower.models.base import BaseModel
 from workflower.models.job import Job
 
 logger = logging.getLogger("workflower.models.event")
+
+
+def _update_job(event, scheduler):
+    Job.update_next_run_time(event.job_id, scheduler)
+    logger.debug("Checking if need to trigger a dependency job")
+    Job.trigger_dependencies(
+        event.job_id, scheduler, job_return_value=event.retval
+    )
 
 
 class Event(BaseModel):
@@ -79,8 +88,4 @@ class Event(BaseModel):
             model_id=job.id,
             output=event.retval,
         )
-        Job.update_next_run_time(event.job_id, scheduler)
-        logger.debug("Checking if need to trigger a dependency job")
-        Job.trigger_dependencies(
-            event.job_id, scheduler, job_return_value=event.retval
-        )
+        _update_job(event, scheduler)
