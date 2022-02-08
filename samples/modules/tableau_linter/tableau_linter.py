@@ -1,3 +1,4 @@
+import logging
 import os
 import zipfile
 
@@ -9,6 +10,11 @@ from workflower.plugins.tableau_document import TableauDocumentPlugin
 def extract_zipped_files(file_path, output_folder):
     with zipfile.ZipFile(file_path) as zip_ref:
         zip_ref.extractall(output_folder)
+
+
+# TODO
+# Make logger part of base module
+logger = logging.getLogger("workflower.modules.tableau_linter")
 
 
 class Module(BaseModule):
@@ -32,37 +38,48 @@ class Module(BaseModule):
 
         workbooks_path = os.path.join(base_directory, "workbooks")
         _workbooks = []
-        for root, dirs, files in os.walk(workbooks_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                base_file_name = (
-                    os.path.splitext(os.path.basename(file_path))[0]
-                    .replace(" ", "_")
-                    .lower()
-                )
-                if file_path.endswith(".twb"):
-                    target_path = root
-
-                if file_path.endswith(".twbx"):
-                    extraction_output_path = os.path.join(
-                        workbooks_path, "unzipped", base_file_name
+        counter = 0
+        # Try twice in case of stranger things
+        while counter < 2:
+            counter += 1
+            for root, dirs, files in os.walk(workbooks_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    base_file_name = (
+                        os.path.splitext(os.path.basename(file_path))[0]
+                        .replace(" ", "_")
+                        .lower()
                     )
-                    if not os.path.isdir(extraction_output_path):
-                        extract_zipped_files(file_path, extraction_output_path)
-                    target_path = extraction_output_path
-                else:
-                    continue
+                    if file_path.endswith(".twb"):
+                        target_path = root
 
-                new_file_extension = file.replace("twbx", "twb")
-                target_file = os.path.join(target_path, new_file_extension)
-                workbook = tableau_document_plugin.create_component(
-                    "workbook", target_file
-                )
-                _workbooks.append(workbook)
+                    if file_path.endswith(".twbx"):
+                        extraction_output_path = os.path.join(
+                            workbooks_path, "unzipped", base_file_name
+                        )
+                        if not os.path.isdir(extraction_output_path):
+                            extract_zipped_files(
+                                file_path, extraction_output_path
+                            )
+                        target_path = extraction_output_path
+                    else:
+                        continue
+                    try:
+                        new_file_extension = file.replace("twbx", "twb")
+                        target_file = os.path.join(
+                            target_path, new_file_extension
+                        )
+                        workbook = tableau_document_plugin.create_component(
+                            "workbook", target_file
+                        )
+                        _workbooks.append(workbook)
+                    except Exception as error:
+                        logger.error(error)
 
         # Parse Workbooks
         _rows = []
-        for workbook in _workbooks:
+        workbooks = set(_workbooks)
+        for workbook in workbooks:
             for worksheet in workbook.worksheets:
                 print(worksheet)
                 layout_options = worksheet.layout_options
