@@ -15,3 +15,10 @@ data/
 sdx.ipynb
 unzipped/
 *.xls
+*.twb*
+*.twbx*
+*.hyper*
+*.jpg*
+*.png*
+*.bin*
+*.key*
