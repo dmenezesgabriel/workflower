@@ -2,8 +2,12 @@ import asyncio
 import logging
 import os
 
-from apscheduler.events import (EVENT_JOB_ADDED, EVENT_JOB_ERROR,
-                                EVENT_JOB_EXECUTED, EVENT_JOB_REMOVED)
+from apscheduler.events import (
+    EVENT_JOB_ADDED,
+    EVENT_JOB_ERROR,
+    EVENT_JOB_EXECUTED,
+    EVENT_JOB_REMOVED,
+)
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
@@ -92,9 +96,6 @@ class SchedulerService:
         """
         self._scheduler.start()
         self.is_running = True
-
-        while self.is_running:
-            await asyncio.sleep(1)
 
     def stop(self):
         """
