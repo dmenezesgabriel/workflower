@@ -9,6 +9,7 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
+from workflower.database import DatabaseManager
 from workflower.models.base import database
 from workflower.models.event import Event
 
@@ -20,7 +21,7 @@ class SchedulerService:
     Scheduler service.
     """
 
-    def __init__(self, database=database):
+    def __init__(self, database: DatabaseManager = database) -> None:
         self._scheduler = BackgroundScheduler()
         self._is_running = False
         self._database = database

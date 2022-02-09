@@ -3,6 +3,7 @@ import logging
 import os
 
 from workflower.config import Config
+from workflower.database import DatabaseManager
 from workflower.loader import WorkflowLoader
 from workflower.models.base import database
 from workflower.models.workflow import Workflow
@@ -16,9 +17,10 @@ class WorkflowContoller:
     Workflow Controller.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, database: DatabaseManager = database) -> None:
         self.workflow_loader = WorkflowLoader()
         self.is_running = False
+        self._database = database
         self._init()
 
     def create_default_directories(self) -> None:
@@ -87,7 +89,7 @@ class WorkflowContoller:
         run Workflow Controller.
         """
         logger.info("Scheduling workflows jobs")
-        with database.session_scope() as session:
+        with self._database.session_scope() as session:
             workflows = self.workflow_loader.load_all_from_dir(session)
             for workflow in workflows:
                 self.update_workflow_files_exists_state(session, workflow)

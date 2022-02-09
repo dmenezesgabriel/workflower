@@ -7,6 +7,7 @@ import logging
 import os
 
 from workflower.config import Config
+from workflower.database import DatabaseManager
 from workflower.models.base import BaseModel, database
 
 # Models must be imported even if unused so the tables can be declared.
@@ -22,7 +23,9 @@ logger.setLevel(logging.INFO)
 
 
 def init_db(
-    database=database, data_dir=Config.DATA_DIR, create_data_directory=True
+    database: DatabaseManager = database,
+    data_dir=Config.DATA_DIR,
+    create_data_directory=True,
 ):
     """
     Create database tables.
