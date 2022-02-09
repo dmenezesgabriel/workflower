@@ -11,13 +11,13 @@ def temp_workflow_file(tmpdir_factory):
     file_content = """
     version: "1.0"
     workflow:
-    name: python_code_sample_interval_trigger
-    jobs:
+      name: python_code_sample_interval_trigger
+      jobs:
         - name: "hello_python_code"
-        uses: python
-        code: "print('Hello, World!')"
-        trigger: interval
-        minutes: 2
+          uses: python
+          code: "print('Hello, World!')"
+          trigger: interval
+          minutes: 2
     """
     p = tmpdir_factory.mktemp("workflow_files").join(
         "papermill_sample_cron_trigger_with_deps.yaml"
@@ -118,7 +118,7 @@ def test_from_dict(connection, temp_workflow_file):
     name = "papermill_sample_cron_trigger_with_deps"
     workflow_yaml_config_path = temp_workflow_file
     configuration_dict = {
-        "version": 1.0,
+        "version": "1.0",
         "workflow": {
             "name": name,
             "jobs": [],
