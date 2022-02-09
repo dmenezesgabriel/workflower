@@ -16,10 +16,10 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
-from workflower.models.base import BaseModel, database
+from workflower.models.base import BaseModel
 from workflower.operators.factory import create_operator
+from workflower.schema.parser import JobSchemaParser
 from workflower.utils import crud
-from workflower.utils.schema import JobSchemaParser
 
 logger = logging.getLogger("workflower.job")
 

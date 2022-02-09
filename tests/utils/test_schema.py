@@ -2,7 +2,7 @@ import unittest
 import unittest.mock
 
 import pytest
-import workflower.utils.schema as schema
+import workflower.schema.validator as validator
 from workflower.exceptions import (
     InvalidFilePathError,
     InvalidSchemaError,
@@ -20,7 +20,7 @@ class TestPipelineSchemaValidation:
         Pipeline keys must contain version and workflow.
         """
         dict_obj = {"version": "1.0", "workflow": {}}
-        assert schema.pipeline_keys_valid(dict_obj) is True
+        assert validator.pipeline_keys_valid(dict_obj) is True
 
     @pytest.mark.parametrize(
         "test_input", [({"workflow": {}}), ({"version": "1.0"})]
@@ -30,14 +30,14 @@ class TestPipelineSchemaValidation:
         If pipeline not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.pipeline_keys_valid(test_input)
+            validator.pipeline_keys_valid(test_input)
 
     def test_version_is_string_type_true(cls):
         """
         Version must be string data type.
         """
         dict_obj = {"version": "1.0", "workflow": {}}
-        assert schema.version_is_string_type(dict_obj) is True
+        assert validator.version_is_string_type(dict_obj) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -52,7 +52,7 @@ class TestPipelineSchemaValidation:
     )
     def test_version_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            schema.version_is_string_type(test_input)
+            validator.version_is_string_type(test_input)
 
 
 class TestWorkflowSchemaValidation:
@@ -71,7 +71,7 @@ class TestWorkflowSchemaValidation:
         """
         Workflow must be dict type.
         """
-        assert schema.workflow_value_is_dict_type(workflow_dict) is True
+        assert validator.workflow_value_is_dict_type(workflow_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -86,13 +86,13 @@ class TestWorkflowSchemaValidation:
     )
     def test_workflow_value_is_dict_type_not_dict(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            schema.workflow_value_is_dict_type(test_input)
+            validator.workflow_value_is_dict_type(test_input)
 
     def test_workflow_has_expected_keys(cls, workflow_dict):
         """
         Workflow must have expected keys.
         """
-        assert schema.workflow_has_expected_keys(workflow_dict) is True
+        assert validator.workflow_has_expected_keys(workflow_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -106,13 +106,13 @@ class TestWorkflowSchemaValidation:
         If Workflow not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.workflow_has_expected_keys(test_input)
+            validator.workflow_has_expected_keys(test_input)
 
     def test_workflow_name_is_string_type_true(cls, workflow_dict):
         """
         Workflow must be dict type.
         """
-        assert schema.workflow_name_is_string_type(workflow_dict) is True
+        assert validator.workflow_name_is_string_type(workflow_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -127,7 +127,7 @@ class TestWorkflowSchemaValidation:
     )
     def test_workflow_name_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            schema.workflow_name_is_string_type(test_input)
+            validator.workflow_name_is_string_type(test_input)
 
     def test_validate_workflow_definition_calls_workflow_value_check(
         cls, workflow_dict
@@ -135,7 +135,7 @@ class TestWorkflowSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.workflow_value_is_dict_type"
         ) as mock:
-            schema.validate_workflow_definition(workflow_dict)
+            validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
 
     def test_validate_workflow_definition_calls_workflow_keys_check(
@@ -144,7 +144,7 @@ class TestWorkflowSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.workflow_has_expected_keys"
         ) as mock:
-            schema.validate_workflow_definition(workflow_dict)
+            validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
 
     def test_validate_workflow_definition_calls_workflow_name_check(
@@ -153,7 +153,7 @@ class TestWorkflowSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.workflow_name_is_string_type"
         ) as mock:
-            schema.validate_workflow_definition(workflow_dict)
+            validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
 
 
@@ -166,7 +166,7 @@ class TestJobSchemaValidation:
         """
         Job must have expected keys.
         """
-        assert schema.job_has_expected_keys(job_dict) is True
+        assert validator.job_has_expected_keys(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -181,13 +181,13 @@ class TestJobSchemaValidation:
         If Job not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.job_has_expected_keys(test_input)
+            validator.job_has_expected_keys(test_input)
 
     def test_job_name_is_string_type_true(cls, job_dict):
         """
         Job name must be string type.
         """
-        assert schema.job_name_is_string_type(job_dict) is True
+        assert validator.job_name_is_string_type(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -202,13 +202,13 @@ class TestJobSchemaValidation:
     )
     def test_job_name_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            schema.job_name_is_string_type(test_input)
+            validator.job_name_is_string_type(test_input)
 
     def test_job_uses_is_string_type_true(cls, job_dict):
         """
         Job uses must be dict type.
         """
-        assert schema.job_uses_is_string_type(job_dict) is True
+        assert validator.job_uses_is_string_type(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -223,7 +223,7 @@ class TestJobSchemaValidation:
     )
     def test_job_uses_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            schema.job_uses_is_string_type(test_input)
+            validator.job_uses_is_string_type(test_input)
 
     @pytest.mark.parametrize(
         "test_input",
@@ -237,7 +237,7 @@ class TestJobSchemaValidation:
         """
         Job uses must have expected options.
         """
-        assert schema.job_uses_options_in_expected(test_input) is True
+        assert validator.job_uses_options_in_expected(test_input) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -252,7 +252,7 @@ class TestJobSchemaValidation:
         Job uses must have expected options.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.job_uses_options_in_expected(test_input)
+            validator.job_uses_options_in_expected(test_input)
 
     def test_validate_job_uses(cls):
         # TODO
@@ -331,7 +331,7 @@ class TestPapermillJobSchemaValidation:
         """
         Job must have expected keys.
         """
-        assert schema.papermill_job_use_has_expected_keys(job_dict) is True
+        assert validator.papermill_job_use_has_expected_keys(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -366,13 +366,13 @@ class TestPapermillJobSchemaValidation:
         If Job not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.papermill_job_use_has_expected_keys(test_input)
+            validator.papermill_job_use_has_expected_keys(test_input)
 
     def test_papermill_job_input_path_is_file(cls, job_dict):
         """
         Papermill input_path must be an existing file.
         """
-        assert schema.papermill_job_input_path_is_file(job_dict) is True
+        assert validator.papermill_job_input_path_is_file(job_dict) is True
 
     def test_papermill_job_input_path_is_file_not_exists(cls):
         """
@@ -380,13 +380,13 @@ class TestPapermillJobSchemaValidation:
         """
         job_dict = {"input_path": "./test.ipynb"}
         with pytest.raises(InvalidFilePathError):
-            schema.papermill_job_input_path_is_file(job_dict)
+            validator.papermill_job_input_path_is_file(job_dict)
 
     def test_papermill_job_paths_ends_with_ipynb_true(cls, job_dict):
         """
         Papermill job paths must point to .ipynb type files.
         """
-        assert schema.papermill_job_paths_ends_with_ipynb(job_dict) is True
+        assert validator.papermill_job_paths_ends_with_ipynb(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -418,7 +418,7 @@ class TestPapermillJobSchemaValidation:
         Papermill job paths must point to .ipynb type files.
         """
         with pytest.raises(InvalidTypeError):
-            schema.papermill_job_paths_ends_with_ipynb(test_input)
+            validator.papermill_job_paths_ends_with_ipynb(test_input)
 
     def test_validate_papermill_job_calls_papermill_job_use_has_expected_keys(
         cls, job_dict
@@ -426,7 +426,7 @@ class TestPapermillJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.papermill_job_use_has_expected_keys"
         ) as mock:
-            schema.validate_papermill_job(job_dict)
+            validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
 
     def test_validate_papermill_job_calls_papermill_job_input_path_is_file(
@@ -435,7 +435,7 @@ class TestPapermillJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.papermill_job_input_path_is_file"
         ) as mock:
-            schema.validate_papermill_job(job_dict)
+            validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
 
     def test_validate_papermill_job_calls_papermill_job_paths_ends_with_ipynb(
@@ -444,7 +444,7 @@ class TestPapermillJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.papermill_job_paths_ends_with_ipynb"
         ) as mock:
-            schema.validate_papermill_job(job_dict)
+            validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
 
 
@@ -479,7 +479,7 @@ class TestAlteryxJobSchemaValidation:
         """
         Job must have expected keys.
         """
-        assert schema.alteryx_job_use_has_expected_keys(job_dict) is True
+        assert validator.alteryx_job_use_has_expected_keys(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -498,13 +498,13 @@ class TestAlteryxJobSchemaValidation:
         If Job not contain expected keys should raise Exception.
         """
         with pytest.raises(InvalidSchemaError):
-            schema.alteryx_job_use_has_expected_keys(test_input)
+            validator.alteryx_job_use_has_expected_keys(test_input)
 
     def test_alteryx_job_path_is_file(cls, job_dict):
         """
         Alteryx path must be an existing file.
         """
-        assert schema.alteryx_job_path_is_file(job_dict) is True
+        assert validator.alteryx_job_path_is_file(job_dict) is True
 
     def test_alteryx_job_path_is_file_not_exists(cls):
         """
@@ -512,13 +512,13 @@ class TestAlteryxJobSchemaValidation:
         """
         job_dict = {"path": "./test.yxmd"}
         with pytest.raises(InvalidFilePathError):
-            schema.alteryx_job_path_is_file(job_dict)
+            validator.alteryx_job_path_is_file(job_dict)
 
     def test_alteryx_job_paths_ends_with_yxmd_true(cls, job_dict):
         """
         Alteryx job paths must point to .yxmd type files.
         """
-        assert schema.alteryx_job_paths_ends_with_yxmd(job_dict) is True
+        assert validator.alteryx_job_paths_ends_with_yxmd(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
@@ -539,7 +539,7 @@ class TestAlteryxJobSchemaValidation:
         Alteryx job paths must point to .yxmd type files.
         """
         with pytest.raises(InvalidTypeError):
-            schema.alteryx_job_paths_ends_with_yxmd(test_input)
+            validator.alteryx_job_paths_ends_with_yxmd(test_input)
 
     def test_validate_alteryx_job_calls_alteryx_job_use_has_expected_keys(
         cls, job_dict
@@ -547,7 +547,7 @@ class TestAlteryxJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.alteryx_job_use_has_expected_keys"
         ) as mock:
-            schema.validate_alteryx_job(job_dict)
+            validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
 
     def test_validate_alteryx_job_calls_alteryx_job_path_is_file(
@@ -556,7 +556,7 @@ class TestAlteryxJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.alteryx_job_path_is_file"
         ) as mock:
-            schema.validate_alteryx_job(job_dict)
+            validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
 
     def test_validate_alteryx_job_calls_alteryx_job_paths_ends_with_yxmd(
@@ -565,7 +565,7 @@ class TestAlteryxJobSchemaValidation:
         with unittest.mock.patch(
             "workflower.utils.schema.alteryx_job_paths_ends_with_yxmd"
         ) as mock:
-            schema.validate_alteryx_job(job_dict)
+            validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
 
 

@@ -8,13 +8,14 @@ from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import relationship
 from workflower.models.base import BaseModel
 from workflower.models.job import Job
+from workflower.schema.parser import WorkflowSchemaParser
+from workflower.schema.validator import validate_schema
 from workflower.utils import crud
 from workflower.utils.file import (
     get_file_modification_date,
     get_file_name,
     yaml_file_to_dict,
 )
-from workflower.utils.schema import WorkflowSchemaParser, validate_schema
 
 logger = logging.getLogger("workflower.models.workflow")
 
