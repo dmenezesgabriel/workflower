@@ -2,6 +2,9 @@
 Workflow class tests.
 """
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from workflower.config import Config
 from workflower.models.base import BaseModel, database
 from workflower.models.workflow import Workflow
 
@@ -109,7 +112,25 @@ def test_delete(connection):
     assert Workflow.get_one(name=name) is None
 
 
-def test_from_dict(connection, temp_workflow_file):
+@pytest.fixture(scope="function")
+def session():
+    """
+    sqlalchemy.orm.session.Session.
+    """
+    engine = create_engine(Config.APP_DATABASE_URL)
+    BaseModel.metadata.create_all(bind=engine)
+    Session = scoped_session(
+        sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    )
+    db_session = Session()
+    try:
+        yield db_session
+    finally:
+        db_session.close()
+        BaseModel.metadata.drop_all(bind=engine)
+
+
+def test_from_dict(session, temp_workflow_file):
     """
     Should create object from dict and yaml file path.
     """
@@ -125,7 +146,6 @@ def test_from_dict(connection, temp_workflow_file):
         },
     }
     # Preparing
-    Workflow.from_dict(workflow_yaml_config_path, configuration_dict)
-    workflow = Workflow.get_one(name=name)
+    Workflow.from_dict(session, configuration_dict, workflow_yaml_config_path)
     # Testing
-    assert workflow.name == name
+    assert session.query(Workflow).filter_by(name=name).first().name == name
