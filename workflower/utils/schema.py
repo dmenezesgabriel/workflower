@@ -421,34 +421,14 @@ class WorkflowSchemaParser:
         return workflow_name, jobs_dict
 
 
-class JobSchemaParser:
-    """
-    Job Schema parser.
-    """
+class ParseStrategy(ABC):
+    @abstractclassmethod
+    def parse_trigger(self, configuration_dict: dict):
+        pass
 
-    def __init__(self):
-        self.schema_args = []
-        self.schema_kwargs = {}
-        self.trigger_config = {}
-        self.uses_config = {}
 
-    def _parse_job_date_trigger_options(self, configuration_dict) -> dict:
-        """
-        parse_job a dict with date trigger options.
-        """
-        date_string_options = [
-            "run_date",
-            "timezone",
-        ]
-
-        date_string_options_dict = {
-            date_option: str(configuration_dict.get(date_option))
-            for date_option in date_string_options
-            if configuration_dict.get(date_option)
-        }
-        return date_string_options_dict
-
-    def _parse_job_interval_trigger_options(self, configuration_dict) -> dict:
+class IntervalTriggerParseStrategy(ParseStrategy):
+    def parse_trigger(self, configuration_dict) -> dict:
         """
         parse_job a dict with interval trigger options.
         """
@@ -478,7 +458,9 @@ class JobSchemaParser:
         }
         return {**interval_int_options_dict, **interval_string_options_dict}
 
-    def _parse_job_cron_trigger_options(self, configuration_dict) -> dict:
+
+class CronTriggerParseStrategy(ParseStrategy):
+    def parse_trigger(self, configuration_dict) -> dict:
         """
         parse_job a dict with cron trigger options.
         """
@@ -525,6 +507,73 @@ class JobSchemaParser:
             **interval_string_options_dict,
         }
 
+
+class DateTriggerParseStrategy(ParseStrategy):
+    def parse_trigger(self, configuration_dict) -> dict:
+        """
+        parse_job a dict with date trigger options.
+        """
+        date_string_options = [
+            "run_date",
+            "timezone",
+        ]
+
+        date_string_options_dict = {
+            date_option: str(configuration_dict.get(date_option))
+            for date_option in date_string_options
+            if configuration_dict.get(date_option)
+        }
+        return date_string_options_dict
+
+
+class DependencyTriggerParseStrategy(ParseStrategy):
+    def parse_trigger(self, configuration_dict) -> dict:
+        # Trigger "dependency" is not recognized by apscheduler, so it
+        # must be removed from job definition
+        configuration_dict.pop("trigger", None)
+
+
+def _create_trigger_parse_strategy(trigger_option: str):
+    strategies = dict(
+        interval=IntervalTriggerParseStrategy(),
+        cron=CronTriggerParseStrategy(),
+        date=DateTriggerParseStrategy(),
+        dependency=DependencyTriggerParseStrategy(),
+    )
+    return strategies[trigger_option]
+
+
+class JobTriggerSchemaParser:
+    """
+    Job Trigger Schema Context.
+    """
+
+    def __init__(self, strategy) -> None:
+        self._strategy = strategy
+
+    @property
+    def strategy(self):
+        return self._strategy
+
+    @strategy.setter
+    def strategy(self, strategy):
+        self._strategy = strategy
+
+    def parse_trigger(self, configuration_dict):
+        return self._strategy.parse_trigger(configuration_dict)
+
+
+class JobSchemaParser:
+    """
+    Job Schema parser.
+    """
+
+    def __init__(self):
+        self.schema_args = []
+        self.schema_kwargs = {}
+        self.trigger_config = {}
+        self.uses_config = {}
+
     def _parse_job_trigger_options(self, configuration_dict) -> None:
         """
         Define trigger options from dict.
@@ -532,30 +581,13 @@ class JobSchemaParser:
         job_trigger = configuration_dict.get("trigger")
         logger.debug(f"Job trigger {job_trigger}")
         #  interval trigger
-        if job_trigger == "interval":
-            self.trigger_config.update(dict(trigger="interval"))
-            interval_trigger_options = (
-                self._parse_job_interval_trigger_options(configuration_dict)
-            )
-            self.trigger_config.update(interval_trigger_options)
-        #  Cron trigger
-        elif job_trigger == "cron":
-            self.trigger_config.update(dict(trigger="cron"))
-            cron_trigger_options = self._parse_job_cron_trigger_options(
-                configuration_dict
-            )
-            self.trigger_config.update(cron_trigger_options)
-        #  Date trigger
-        elif job_trigger == "date":
-            self.trigger_config.update(dict(trigger="date"))
-            date_trigger_options = self._parse_job_date_trigger_options(
-                configuration_dict
-            )
-            self.trigger_config.update(date_trigger_options)
-        elif job_trigger == "dependency":
-            # Trigger "dependency" is not recognized by apscheduler, so it
-            # must be removed from job definition
-            configuration_dict.pop("trigger", None)
+        self.trigger_config.update(dict(trigger=job_trigger))
+        trigger_parser = JobTriggerSchemaParser(
+            _create_trigger_parse_strategy(job_trigger)
+        )
+        trigger_options = trigger_parser.parse_trigger(configuration_dict)
+        if trigger_options:
+            self.trigger_config.update(trigger_options)
 
     def _parse_job_uses(self, configuration_dict) -> dict:
         """
