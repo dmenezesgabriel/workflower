@@ -6,4 +6,5 @@ workflow:
       uses: module
       module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py"
       module_name: "tableau_linter"
-      trigger: date
+      trigger: interval
+      minutes: 1

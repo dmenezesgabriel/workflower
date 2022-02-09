@@ -20,10 +20,10 @@ class SchedulerService:
     Scheduler service.
     """
 
-    def __init__(self, engine=database.engine):
+    def __init__(self, database=database):
         self._scheduler = BackgroundScheduler()
         self._is_running = False
-        self._engine = engine
+        self._database = database
         self._init()
 
     @property
@@ -31,18 +31,27 @@ class SchedulerService:
         return self._scheduler
 
     @property
-    def engine(self):
-        return self._engine
-
-    @property
     def is_running(self):
         return self._is_running
+
+    def on_job_added(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_added(session, event)
+
+    def on_job_removed(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_removed(session, event)
 
     def on_job_executed(self, event) -> None:
         """
         On job executed event.
         """
-        Event.job_executed(event, self._scheduler)
+        with self._database.session_scope() as session:
+            Event.job_executed(session, event, self._scheduler)
+
+    def on_job_error(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_error(session, event)
 
     def setup_event_actions(self, scheduler) -> None:
         """
@@ -50,10 +59,10 @@ class SchedulerService:
         """
         logger.info("Setting Up Scheduler Service Events")
         event_actions = [
-            {"func": Event.job_added, "event": EVENT_JOB_ADDED},
+            {"func": self.on_job_added, "event": EVENT_JOB_ADDED},
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
-            {"func": Event.job_error, "event": EVENT_JOB_ERROR},
-            {"func": Event.job_removed, "event": EVENT_JOB_REMOVED},
+            {"func": self.on_job_error, "event": EVENT_JOB_ERROR},
+            {"func": self.on_job_removed, "event": EVENT_JOB_REMOVED},
         ]
         for event_action in event_actions:
             scheduler.add_listener(
@@ -67,7 +76,7 @@ class SchedulerService:
         """
         logger.info("Setting Up Scheduler Service")
         jobstores = {
-            "default": SQLAlchemyJobStore(engine=self._engine),
+            "default": SQLAlchemyJobStore(engine=self._database.engine),
         }
         executors = {
             "default": {

@@ -80,7 +80,7 @@ class WorkflowContoller:
             logger.info(f"{workflow.name} file removed, skipping")
             return
         logger.info("Scheduling jobs")
-        workflow.schedule_jobs(scheduler)
+        workflow.schedule_jobs(session, scheduler)
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """

@@ -205,7 +205,7 @@ class Workflow(BaseModel):
                 dict(is_active=False, next_run_time=None),
             )
 
-    def schedule_jobs(self, scheduler):
+    def schedule_jobs(self, session, scheduler):
         """
         Schedule workflow's jobs.
         """
@@ -221,6 +221,7 @@ class Workflow(BaseModel):
                     )
                     continue
                 job.schedule(scheduler)
+                Job.update_next_run_time(session, job.id, scheduler)
 
     def unschedule_jobs(self, scheduler):
         """
