@@ -376,27 +376,7 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
-class SchemaValidator(ABC):
-    """
-    Schema parse interface.
-    """
-
-    @abstractclassmethod
-    def validate_schema(self):
-        pass
-
-
-class SchemaParser(ABC):
-    """
-    Schema parse interface.
-    """
-
-    @abstractclassmethod
-    def parse_schema(self):
-        pass
-
-
-class PipelineSchemaParser(SchemaParser):
+class PipelineSchemaParser:
     """
     Pipeline Schema parser.
     """
@@ -415,7 +395,7 @@ class PipelineSchemaParser(SchemaParser):
         return version
 
 
-class WorkflowSchemaParser(SchemaParser):
+class WorkflowSchemaParser:
     """
     Workflow Schema parser.
     """
@@ -441,7 +421,7 @@ class WorkflowSchemaParser(SchemaParser):
         return workflow_name, jobs_dict
 
 
-class JobSchemaParser(SchemaParser):
+class JobSchemaParser:
     """
     Job Schema parser.
     """
