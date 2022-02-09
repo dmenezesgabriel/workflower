@@ -376,13 +376,23 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
+class SchemaValidator(ABC):
+    """
+    Schema parse interface.
+    """
+
+    @abstractclassmethod
+    def validate_schema(self):
+        pass
+
+
 class SchemaParser(ABC):
     """
     Schema parse interface.
     """
 
     @abstractclassmethod
-    def parse_Schema(self):
+    def parse_schema(self):
         pass
 
 
