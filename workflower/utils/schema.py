@@ -1,5 +1,6 @@
 import logging
 import os
+from abc import ABC, abstractclassmethod
 
 from workflower.config import Config
 from workflower.exceptions import (
@@ -375,7 +376,17 @@ def validate_schema(configuration_dict: dict) -> bool:
     return True
 
 
-class PipelineSchemaParser:
+class SchemaParser(ABC):
+    """
+    Schema parse interface.
+    """
+
+    @abstractclassmethod
+    def parse_Schema(self):
+        pass
+
+
+class PipelineSchemaParser(SchemaParser):
     """
     Pipeline Schema parser.
     """
@@ -394,7 +405,7 @@ class PipelineSchemaParser:
         return version
 
 
-class WorkflowSchemaParser:
+class WorkflowSchemaParser(SchemaParser):
     """
     Workflow Schema parser.
     """
@@ -420,7 +431,7 @@ class WorkflowSchemaParser:
         return workflow_name, jobs_dict
 
 
-class JobSchemaParser:
+class JobSchemaParser(SchemaParser):
     """
     Job Schema parser.
     """
