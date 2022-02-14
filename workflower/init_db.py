@@ -7,6 +7,7 @@ import logging
 import os
 
 from workflower.config import Config
+from workflower.database import DatabaseManager
 from workflower.models.base import BaseModel, database
 
 # Models must be imported even if unused so the tables can be declared.
@@ -21,13 +22,17 @@ logger = logging.getLogger("Init_db")
 logger.setLevel(logging.INFO)
 
 
-def init_db():
+def init_db(
+    database: DatabaseManager = database,
+    data_dir=Config.DATA_DIR,
+    create_data_directory=True,
+):
     """
     Create database tables.
     """
-
-    if not os.path.isdir(Config.DATA_DIR):
-        os.makedirs(Config.DATA_DIR)
+    if create_data_directory:
+        if not os.path.isdir(data_dir):
+            os.makedirs(data_dir)
     database.connect()
     logger.debug(f"Using engine: {database.engine}")
 

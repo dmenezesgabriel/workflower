@@ -16,12 +16,11 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
-from workflower.models.base import BaseModel, database
-from workflower.operators.alteryx import AlteryxOperator
-from workflower.operators.papermill import PapermillOperator
-from workflower.operators.python import PythonOperator
+from workflower.models.base import BaseModel
+from workflower.operators.factory import create_operator
+from workflower.plugins.factory import create_plugin
+from workflower.schema.parser import JobSchemaParser
 from workflower.utils import crud
-from workflower.utils.schema import JobSchemaParser
 
 logger = logging.getLogger("workflower.job")
 
@@ -84,7 +83,7 @@ class Job(BaseModel):
         self.workflow = workflow
         self.is_active = is_active
         self.next_run_time = next_run_time
-        self.job = None
+        self.job_scheduled_ref = None
 
     def __repr__(self) -> str:
         return (
@@ -158,21 +157,19 @@ class Job(BaseModel):
             )
 
     @classmethod
-    def trigger_dependencies(cls, job_id, scheduler, **kwargs):
+    def trigger_dependencies(cls, session, job_id, scheduler, **kwargs):
         """
         Trigger job's dependencies.
         """
-        with database.session_scope() as session:
-            dependency_jobs = crud.get_all(session, cls, depends_on=job_id)
-            if dependency_jobs:
-                for dependency_job in dependency_jobs:
-                    logger.debug(
-                        f"Dependency job {dependency_job.name} triggered"
-                    )
-                    dependency_job.schedule(scheduler, **kwargs)
+        dependency_jobs = crud.get_all(session, cls, depends_on=job_id)
+        if dependency_jobs:
+            for dependency_job in dependency_jobs:
+                logger.debug(f"Dependency job {dependency_job.name} triggered")
+                dependency_job.schedule(scheduler, **kwargs)
+                Job.update_next_run_time(session, dependency_job.id, scheduler)
 
     @classmethod
-    def update_next_run_time(cls, id, scheduler):
+    def update_next_run_time(cls, session, id, scheduler):
         """
         Update next_run_time in database's object row.
         """
@@ -180,36 +177,45 @@ class Job(BaseModel):
         job = scheduler.get_job(id)
         if job:
             logger.debug(f"found job id: {job}")
-            cls.update(
-                {"id": id},
-                {"next_run_time": str(job.next_run_time)},
+            crud.update(
+                session,
+                cls,
+                dict(id=id),
+                dict(next_run_time=str(job.next_run_time)),
             )
 
-    def schedule(self, scheduler, **kwargs) -> None:
+    def build_schedule_params(self, **kwargs):
+        """
+        Build schedule params.
+        """
+        schedule_params = self.definition.copy()
+        schedule_kwargs = schedule_params.get("kwargs")
+        plugins = schedule_kwargs.get("plugins")
+        if plugins:
+            plugins_list = list(
+                map(lambda plugin_name: create_plugin(plugin_name), plugins)
+            )
+            schedule_kwargs.update(dict(plugins=plugins_list))
+        if schedule_kwargs:
+            schedule_kwargs.update(kwargs)
+
+        operator = create_operator(self.uses)
+        schedule_params.update(dict(func=getattr(operator, "execute")))
+        return schedule_params
+
+    def schedule(self, scheduler, **kwargs):
         """
         Schedule a job in apscheduler
         """
         logger.info(f"scheduling job: {self}")
-        schedule_params = self.definition.copy()
-        schedule_kwargs = schedule_params.get("kwargs")
-        if schedule_kwargs:
-            schedule_kwargs.update(kwargs)
-
-        if self.uses == "alteryx":
-            logger.debug("Job uses Alteryx")
-            operator = AlteryxOperator
-        elif self.uses == "papermill":
-            logger.debug("Job uses Papermill")
-            operator = PapermillOperator
-        elif self.uses == "python":
-            logger.debug("Job uses Python")
-            operator = PythonOperator
-        schedule_params.update(dict(func=getattr(operator, "execute")))
+        schedule_params = self.build_schedule_params(**kwargs)
 
         try:
-            self.job = scheduler.add_job(id=str(self.id), **schedule_params)
-            self.update_next_run_time(self.id, scheduler)
+            self.job_scheduled_ref = scheduler.add_job(
+                id=str(self.id), **schedule_params
+            )
             logger.debug(f"Job {self} successfully scheduled")
+            return self.job_scheduled_ref
         except ConflictingIdError:
             logger.warning(f"{self}, already scheduled, skipping.")
         except ValueError as error:

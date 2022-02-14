@@ -6,15 +6,16 @@ import logging
 
 from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import relationship
-from workflower.models.base import BaseModel, database
+from workflower.models.base import BaseModel
 from workflower.models.job import Job
+from workflower.schema.parser import WorkflowSchemaParser
+from workflower.schema.validator import validate_schema
 from workflower.utils import crud
 from workflower.utils.file import (
     get_file_modification_date,
     get_file_name,
     yaml_file_to_dict,
 )
-from workflower.utils.schema import WorkflowSchemaParser, validate_schema
 
 logger = logging.getLogger("workflower.models.workflow")
 
@@ -99,7 +100,7 @@ class Workflow(BaseModel):
         crud.update(session, cls, filter_dict, update_dict)
 
     @classmethod
-    def from_dict(cls, configuration_dict, file_path=None):
+    def from_dict(cls, session, configuration_dict, file_path=None):
         """
         Workflow from dict.
         """
@@ -121,47 +122,47 @@ class Workflow(BaseModel):
                 )
                 return
 
-        with database.session_scope() as session:
-            #  Creating workflow object
-            workflow = crud.get_one(
+        #  Creating workflow object
+        workflow = crud.get_one(
+            session,
+            cls,
+            name=workflow_name,
+        )
+        if workflow:
+            if file_path:
+                #  Checking file modification date
+                cls.update_modified_file_state(session, workflow, file_path)
+                crud.update(
+                    session,
+                    cls,
+                    dict(id=workflow.id),
+                    dict(is_active=True),
+                )
+                workflow.update_jobs(session, jobs_dict)
+        elif not workflow:
+            workflow = crud.create(
                 session,
                 cls,
                 name=workflow_name,
+                file_path=file_path,
             )
-            if workflow:
-                if file_path:
-                    #  Checking file modification date
-                    cls.update_modified_file_state(
-                        session, workflow, file_path
-                    )
-                    if workflow.modified_since_last_load:
-                        workflow.deactivate_jobs_removed_from_file(
-                            session, jobs_dict
-                        )
-            elif not workflow:
-                workflow = crud.create(
-                    session,
-                    cls,
-                    name=workflow_name,
-                    file_path=file_path,
-                )
-            logger.debug(f"workflow object: {workflow}")
-            logger.debug("Loading or updating jobs")
-            for workflow_job_dict in jobs_dict:
-                # Get job attributes from dict
-                # Make apscheduler job definition
-                Job.from_dict(session, workflow_job_dict, workflow)
+        logger.debug(f"workflow object: {workflow}")
+        logger.debug("Loading or updating jobs")
+        for workflow_job_dict in jobs_dict:
+            # Get job attributes from dict
+            # Make apscheduler job definition
+            Job.from_dict(session, workflow_job_dict, workflow)
         return workflow
 
     @classmethod
-    def from_yaml(cls, file_path):
+    def from_yaml(cls, session, file_path):
         """
         Workflow from yaml file.
         """
         configuration_dict = yaml_file_to_dict(file_path)
-        cls.from_dict(configuration_dict, file_path)
+        return cls.from_dict(session, configuration_dict, file_path)
 
-    def deactivate_jobs_removed_from_file(
+    def update_jobs(
         self,
         session,
         jobs_dict,
@@ -174,12 +175,26 @@ class Workflow(BaseModel):
                 crud.update(
                     session,
                     Job,
-                    {"name": job.name},
-                    {
-                        "is_active": False,
-                        "next_run_time": None,
-                    },
+                    dict(name=job.name),
+                    dict(is_active=False, next_run_time=None),
                 )
+            else:
+                crud.update(
+                    session,
+                    Job,
+                    dict(name=job.name),
+                    dict(is_active=True),
+                )
+
+    def activate_all_jobs(self, session):
+        for job in self.jobs:
+            logger.debug(f"Activate {job.name}")
+            crud.update(
+                session,
+                Job,
+                dict(name=job.name),
+                dict(is_active=True),
+            )
 
     def deactivate_all_jobs(self, session):
         for job in self.jobs:
@@ -187,31 +202,27 @@ class Workflow(BaseModel):
             crud.update(
                 session,
                 Job,
-                {"name": job.name},
-                {
-                    "is_active": False,
-                    "next_run_time": None,
-                },
+                dict(name=job.name),
+                dict(is_active=False, next_run_time=None),
             )
 
-    def schedule_jobs(self, scheduler):
+    def schedule_jobs(self, session, scheduler):
         """
         Schedule workflow's jobs.
         """
-        if self.file_exists:
-            for job in self.jobs:
-                # If job has dependencies wait till the event of
-                # it's job dependency occurs
-                if job.is_active:
-                    if job.depends_on:
-                        logger.info(
-                            f"{job.name} depends on {job.depends_on}, "
-                            "putting to wait"
-                        )
-                        continue
-                    job.schedule(scheduler)
-        else:
-            logger.info(f"{self.name} file removed, skipping")
+        logger.info(f"Scheduling jobs from workflow {self.id}")
+        for job in self.jobs:
+            # If job has dependencies wait till the event of
+            # it's job dependency occurs
+            if job.is_active:
+                if job.depends_on:
+                    logger.info(
+                        f"{job.name} depends on {job.depends_on}, "
+                        "putting to wait"
+                    )
+                    continue
+                job.schedule(scheduler)
+                Job.update_next_run_time(session, job.id, scheduler)
 
     def unschedule_jobs(self, scheduler):
         """

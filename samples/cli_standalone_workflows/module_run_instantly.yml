@@ -1,0 +1,16 @@
+version: "1.0"
+workflow:
+  name: module_run_instantly
+  jobs:
+    - name: tableau_linter_module
+      uses: module
+      module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py"
+      module_name: "tableau_linter"
+      plugins:
+        - tableau_document
+      trigger: date
+    - name: "hello_python_code"
+      uses: python
+      code: "print('Hello, World!')"
+      trigger: dependency
+      depends_on: tableau_linter_module

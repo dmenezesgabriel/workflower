@@ -1,6 +1,4 @@
-import asyncio
 import logging
-import os
 
 from apscheduler.events import (
     EVENT_JOB_ADDED,
@@ -11,7 +9,7 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.config import Config
-from workflower.controllers.workflow import WorkflowContoller
+from workflower.database import DatabaseManager
 from workflower.models.base import database
 from workflower.models.event import Event
 
@@ -23,35 +21,49 @@ class SchedulerService:
     Scheduler service.
     """
 
-    def __init__(self):
-        self.scheduler = BackgroundScheduler()
-        self.is_running = False
+    def __init__(self, database: DatabaseManager = database) -> None:
+        self._scheduler = BackgroundScheduler()
+        self._is_running = False
+        self._database = database
+        self._init()
+
+    @property
+    def scheduler(self):
+        return self._scheduler
+
+    @property
+    def is_running(self):
+        return self._is_running
+
+    def on_job_added(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_added(session, event)
+
+    def on_job_removed(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_removed(session, event)
 
     def on_job_executed(self, event) -> None:
         """
         On job executed event.
         """
-        Event.job_executed(event, self.scheduler)
+        with self._database.session_scope() as session:
+            Event.job_executed(session, event, self._scheduler)
 
-    def create_default_directories(self) -> None:
-        """
-        Create application default configuration directories.
-        """
-        if not os.path.isdir(Config.ENVIRONMENTS_DIR):
-            os.makedirs(Config.ENVIRONMENTS_DIR)
-
-        if not os.path.isdir(Config.DATA_DIR):
-            os.makedirs(Config.DATA_DIR)
+    def on_job_error(self, event) -> None:
+        with self._database.session_scope() as session:
+            Event.job_error(session, event)
 
     def setup_event_actions(self, scheduler) -> None:
         """
         Add event listeners
         """
+        logger.info("Setting Up Scheduler Service Events")
         event_actions = [
-            {"func": Event.job_added, "event": EVENT_JOB_ADDED},
+            {"func": self.on_job_added, "event": EVENT_JOB_ADDED},
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
-            {"func": Event.job_error, "event": EVENT_JOB_ERROR},
-            {"func": Event.job_removed, "event": EVENT_JOB_REMOVED},
+            {"func": self.on_job_error, "event": EVENT_JOB_ERROR},
+            {"func": self.on_job_removed, "event": EVENT_JOB_REMOVED},
         ]
         for event_action in event_actions:
             scheduler.add_listener(
@@ -63,9 +75,9 @@ class SchedulerService:
         """
         Setup general app configuration.
         """
-        self.create_default_directories()
+        logger.info("Setting Up Scheduler Service")
         jobstores = {
-            "default": SQLAlchemyJobStore(engine=database.engine),
+            "default": SQLAlchemyJobStore(engine=self._database.engine),
         }
         executors = {
             "default": {
@@ -73,37 +85,32 @@ class SchedulerService:
                 "max_workers": 20,
             },
         }
-        self.scheduler = BackgroundScheduler()
-        self.setup_event_actions(self.scheduler)
-        self.scheduler.configure(
+        self._scheduler = BackgroundScheduler()
+        self.setup_event_actions(self._scheduler)
+        self._scheduler.configure(
             jobstores=jobstores,
             executors=executors,
             timezone=Config.TIME_ZONE,
         )
 
-    def init(self):
+    def _init(self):
         """
         Initialize app.
         """
-        database.connect()
+        logger.info("Initializing Scheduler Service")
+        self.setup()
 
-    async def run(self) -> None:
+    def start(self) -> None:
         """
         Run app.
         """
-        self.scheduler.start()
-        self.is_running = True
-
-        while self.is_running:
-            workflow_controller = WorkflowContoller()
-            workflow_controller.schedule_workflows_jobs(self.scheduler)
-            logger.info(f"Sleeping {Config.CYCLE} seconds")
-            await asyncio.sleep(Config.CYCLE)
+        logger.info("Starting Scheduler Service")
+        self._scheduler.start()
+        self._is_running = True
 
     def stop(self):
         """
         Stop app.
         """
-        logger.info("Stopping App")
-        self.is_running = False
-        database.close()
+        logger.info("Stopping Scheduler Service")
+        self._is_running = False

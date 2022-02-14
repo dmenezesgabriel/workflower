@@ -2,6 +2,9 @@
 Workflow class tests.
 """
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from workflower.config import Config
 from workflower.models.base import BaseModel, database
 from workflower.models.workflow import Workflow
 
@@ -11,13 +14,13 @@ def temp_workflow_file(tmpdir_factory):
     file_content = """
     version: "1.0"
     workflow:
-    name: python_code_sample_interval_trigger
-    jobs:
+      name: python_code_sample_interval_trigger
+      jobs:
         - name: "hello_python_code"
-        uses: python
-        code: "print('Hello, World!')"
-        trigger: interval
-        minutes: 2
+          uses: python
+          code: "print('Hello, World!')"
+          trigger: interval
+          minutes: 2
     """
     p = tmpdir_factory.mktemp("workflow_files").join(
         "papermill_sample_cron_trigger_with_deps.yaml"
@@ -109,7 +112,25 @@ def test_delete(connection):
     assert Workflow.get_one(name=name) is None
 
 
-def test_from_dict(connection, temp_workflow_file):
+@pytest.fixture(scope="function")
+def session():
+    """
+    sqlalchemy.orm.session.Session.
+    """
+    engine = create_engine(Config.APP_DATABASE_URL)
+    BaseModel.metadata.create_all(bind=engine)
+    Session = scoped_session(
+        sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    )
+    db_session = Session()
+    try:
+        yield db_session
+    finally:
+        db_session.close()
+        BaseModel.metadata.drop_all(bind=engine)
+
+
+def test_from_dict(session, temp_workflow_file):
     """
     Should create object from dict and yaml file path.
     """
@@ -118,14 +139,13 @@ def test_from_dict(connection, temp_workflow_file):
     name = "papermill_sample_cron_trigger_with_deps"
     workflow_yaml_config_path = temp_workflow_file
     configuration_dict = {
-        "version": 1.0,
+        "version": "1.0",
         "workflow": {
             "name": name,
             "jobs": [],
         },
     }
     # Preparing
-    Workflow.from_dict(workflow_yaml_config_path, configuration_dict)
-    workflow = Workflow.get_one(name=name)
+    Workflow.from_dict(session, configuration_dict, workflow_yaml_config_path)
     # Testing
-    assert workflow.name == name
+    assert session.query(Workflow).filter_by(name=name).first().name == name

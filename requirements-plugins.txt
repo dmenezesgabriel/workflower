@@ -1,0 +1,2 @@
+# Outlook plugin
+pywin32==303

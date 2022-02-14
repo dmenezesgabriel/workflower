@@ -2,4 +2,4 @@ XlsxWriter==1.0.2
 xlrd==1.2.0
 ipywidgets==7.0.0
 holidays==0.12
-openpyxl==2.4.8
+

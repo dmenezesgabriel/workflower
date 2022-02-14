@@ -17,13 +17,13 @@ def temp_workflow_file(tmpdir_factory):
     file_content = """
     version: "1.0"
     workflow:
-    name: python_code_sample_interval_trigger
-    jobs:
-      - name: "hello_python_code"
-        uses: python
-        code: "print('Hello, World!')"
-        trigger: interval
-        minutes: 2
+      name: python_code_sample_interval_trigger
+      jobs:
+        - name: "hello_python_code"
+          uses: python
+          code: "print('Hello, World!')"
+          trigger: interval
+          minutes: 2
     """
     p = tmpdir_factory.mktemp("file").join("test_file.yaml")
     p.write_text(file_content, encoding="utf-8")
