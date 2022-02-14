@@ -18,3 +18,4 @@ class Module(BaseModule):
             print(40 * "=")
             print(f"Workbook{workbook.name}")
             print(40 * "=")
+        server_manager.sigin_out()
