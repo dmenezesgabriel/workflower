@@ -1,7 +1,6 @@
 *.db
 *.sqlite*
 *.env*
-*.env*
 !*.template
 *venv*
 *_output.ipynb

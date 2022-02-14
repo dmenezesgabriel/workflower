@@ -23,6 +23,12 @@ then
     echo "Run prod"
     eval "$(cat .env.prod.template)"  && \
     python . run
+elif [ $1 == "env" ];
+then
+    echo "Run with .env"
+    eval "$(cat .env)"  && \
+    python . init-db && \
+    python . run
 else
     echo "No arg received ending"
 fi
