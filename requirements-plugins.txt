@@ -1,2 +1,2 @@
-# Outlook plugin
-pywin32==303
+# Tableau server Plugin
+tableauserverclient==0.17.0

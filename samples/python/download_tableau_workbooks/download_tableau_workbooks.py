@@ -28,7 +28,7 @@ def main():
     if not os.path.isdir(DOWNLOADS_DIR):
         os.makedirs(DOWNLOADS_DIR)
 
-    with server.auth.sign(tableau_auth):
+    with server.auth.sign_in(tableau_auth):
         all_workbooks = TSC.Pager(server.workbooks)
         workbooks_dict = []
         for workbook in all_workbooks:

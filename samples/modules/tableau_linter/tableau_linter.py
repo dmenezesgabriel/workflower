@@ -20,7 +20,7 @@ class Module(BaseModule):
     def __init__(self, plugins=None) -> None:
         self._plugins = plugins
 
-    def run(self):
+    def run(self, *args, **kwargs):
         # Load and unzip files
         tableau_document_plugin = self.get_plugin("tableau_document_plugin")
         base_directory = (
