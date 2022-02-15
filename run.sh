@@ -29,7 +29,6 @@ case "${unameOut}" in
     MINGW*)     machine=MinGw;;
     *)          machine="UNKNOWN:${unameOut}"
 esac
-${machine}
 
 while true; do
     read -p "waiting command... " cmd

@@ -1,10 +1,29 @@
 import argparse
 import logging
+import os
 import sys
 
 from workflower.cli.commands import FUNCTION_MAP
+from workflower.config import Config
 
 logger = logging.getLogger("workflower.cli.client")
+
+
+def _load_splash():
+    splash_path = os.path.join(
+        Config.BASE_DIR, "workflower", "resources", "splash.txt"
+    )
+    with open(splash_path, "r") as f:
+        splash = f.read()
+    return splash
+
+
+def _show_splash():
+    splash = _load_splash()
+    clear_console = "clear" if os.name == "posix" else "CLS"
+    os.system(clear_console)
+    sys.stdout.write(splash)
+    sys.stdout.write("\n")
 
 
 def _get_command(command, *args, **kwagrs):
@@ -26,6 +45,8 @@ class CLI:
         """
         Setup and parse command line arguments and options.
         """
+
+        _show_splash()
         self.parser = argparse.ArgumentParser(
             prog="workflower",
             description="Workflow automation tool.",
