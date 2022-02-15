@@ -2,6 +2,16 @@
 # =========================================================================== #
 # Clean app data
 # =========================================================================== #
+set -e
+# set -x # DEBUG
+VERSION=0.1.0
+NAME="CLI Helper"
+
+echo "========================"
+echo "Hello $(whoami)",
+echo "Welcome to $NAME"
+echo "========================"
+
 if [ $1 == "clean" ];
 then
     echo "Removing development sqlite databases"
@@ -10,6 +20,14 @@ then
     find . -name "*output.ipynb" -type f -delete
     echo "Removing logs"
     find . -name "*.log*" -type f -delete
+# =========================================================================== #
+# Setup env
+# =========================================================================== #
+elif [ $1 == "setup" ];
+then
+    echo "Setup"
+    python -m venv ~/environments/workflower
+    echo "$(ls -lh ~/environments/workflower)"
 # =========================================================================== #
 # Run development environment
 # =========================================================================== #
