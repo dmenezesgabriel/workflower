@@ -36,6 +36,7 @@ while true; do
     then
         echo "Removing development sqlite databases"
         find . -name "*dev.sqlite*" -type f -delete
+        find . -name "*temp.sqlite*" -type f -delete
         echo "Removing notebooks outputs"
         find . -name "*output.ipynb" -type f -delete
         echo "Removing logs"

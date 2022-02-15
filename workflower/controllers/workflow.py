@@ -90,7 +90,12 @@ class WorkflowContoller:
         """
         logger.info("Scheduling workflows jobs")
         with self._database.session_scope() as session:
-            workflows = self.workflow_loader.load_all_from_dir(session)
+            # Load all workflows into database, it won't load if file has been
+            # removed.
+            self.workflow_loader.load_all_from_dir(session)
+            # Load all workflows on database, including if the file has ben
+            # removed.
+            workflows = crud.get_all(session, Workflow)
             for workflow in workflows:
                 self.update_workflow_files_exists_state(session, workflow)
                 self.schedule_one_workflow_jobs(session, workflow, scheduler)
