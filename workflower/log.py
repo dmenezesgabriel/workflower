@@ -55,8 +55,8 @@ def setup_loggers():
     # File
     file_handler = RotatingFileHandler(
         log_file_path,
-        maxBytes=50000,
-        backupCount=3,
+        maxBytes=Config.LOGGING_FILE_MAX_BYTES,
+        backupCount=Config.LOGGING_FILE_BACKUP_COUNT,
     )
     file_handler.setFormatter(formatter)
 

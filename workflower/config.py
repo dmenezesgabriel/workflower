@@ -26,6 +26,8 @@ class Config:
         ),
     )
     LOGGING_FILE = os.getenv("LOGGING_FILE", "log.log")
+    LOGGING_FILE_MAX_BYTES = int(os.getenv("LOGGING_FILE_MAX_BYTES", 90000))
+    LOGGING_FILE_BACKUP_COUNT = int(os.getenv("LOGGING_FILE_BACKUP_COUNT", 1))
     ENVIRONMENTS_DIR = os.getenv(
         "ENVIRONMENTS_DIR",
         os.path.join(
