@@ -104,7 +104,6 @@ class Workflow(BaseModel):
         """
         Workflow from dict.
         """
-        validate_schema(configuration_dict)
         workflow_parser = WorkflowSchemaParser()
         workflow_name, jobs_dict = workflow_parser.parse_schema(
             configuration_dict
@@ -121,7 +120,7 @@ class Workflow(BaseModel):
                     "skipping load"
                 )
                 return
-
+        validate_schema(configuration_dict)
         #  Creating workflow object
         workflow = crud.get_one(
             session,
