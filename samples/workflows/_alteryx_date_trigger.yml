@@ -1,9 +1,31 @@
-version: "1.0"
+# version: is referent to yaml schema, the version of the way th yml or yaml
+# file should be written, it must be string type.
+version: "1.0" # str
 workflow:
-  name: alteryx_date_trigger
+  # workflow's name must always match it's file name, if not will no be load,
+  # in this case the file name should be alteryx_date_trigger.yml
+  # An easy way of deactivating an workflow is putting an underscore prefix in
+  # it's name, like alteryx_date_trigger.yml
+  name: alteryx_date_trigger # str
+  # Workflow can have one or more jobs
   jobs:
-    - name: "sample_combine_two_sheets"
+    # The job name does not affect in execution like workflow's, but it should
+    # be clear for people you may share.
+    - name: "sample_combine_two_sheets" # str
+      # Job can use
+      # - python
+      # - papermill
+      # - module
+      # - alteryx
       uses: alteryx
-      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
-      trigger: date
-      run_date: "2022-01-14 18:55:05"
+      # when job uses alteryx, it should have path
+      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd" # str
+      # trigger can be
+      # - date
+      # - interval
+      # - cron
+      # - dependency
+      trigger: date # str
+      # - run_date (str): the date/time to run the job at, if not present will run on next execution cycle.
+      run_date: "2022-01-14 18:55:05" # str
+      # - timezone (optional - str): time zone for `run_date`
