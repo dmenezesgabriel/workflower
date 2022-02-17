@@ -1,0 +1,15 @@
+version: "1.0"
+workflow:
+  name: dependency_log_pattern_match
+  jobs:
+    - name: "first_job"
+      uses: python
+      code: "print('First Job!')"
+      trigger: date
+    - name: "second_job"
+      uses: python
+      code: "print('Second Job!')"
+      trigger: dependency
+      depends_on: first_job
+      dependency_logs_pattern: "First"
+      run_if_pattern_match: False

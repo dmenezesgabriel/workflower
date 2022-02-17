@@ -39,10 +39,25 @@ class Job(BaseModel):
         "definition",
         JSON,
     )
+    # TODO
+    # depends on trigger should be a apscheduler.abc.Trigger subclass.
+    # This code is too coupled :(
+    # Another option is consume this from definition to be less coupled.
+    # =========================================================================
     depends_on = Column(
         "depends_on",
         String,
     )
+    dependency_logs_pattern = Column(
+        "dependency_logs_pattern",
+        String,
+    )
+    run_if_pattern_match = Column(
+        "run_if_pattern_match",
+        Boolean,
+        default=True,
+    )
+    # =========================================================================
     workflow_id = Column(
         "workflow_id",
         Integer,
@@ -73,6 +88,8 @@ class Job(BaseModel):
         definition,
         depends_on,
         workflow,
+        dependency_logs_pattern=None,
+        run_if_pattern_match=True,
         is_active=True,
         next_run_time=None,
     ):
@@ -80,6 +97,8 @@ class Job(BaseModel):
         self.uses = uses
         self.definition = definition
         self.depends_on = depends_on
+        self.dependency_logs_pattern = dependency_logs_pattern
+        self.run_if_pattern_match = run_if_pattern_match
         self.workflow = workflow
         self.is_active = is_active
         self.next_run_time = next_run_time
@@ -90,6 +109,8 @@ class Job(BaseModel):
             f"Job(name={self.name}, uses={self.uses}, "
             f"definition={self.definition}, "
             f"depends_on={self.depends_on}, "
+            f"dependency_logs_pattern={self.dependency_logs_pattern}, "
+            f"run_if_pattern_match={self.run_if_pattern_match}, "
             f"workflow={self.workflow}, "
             f"next_run_time={self.next_run_time}, "
         )
@@ -105,6 +126,8 @@ class Job(BaseModel):
             job_name,
             job_uses,
             job_depends_on,
+            dependency_logs_pattern,
+            run_if_pattern_match,
             job_definition,
         ) = job_parser.parse_schema(job_dict)
         logger.info(f"Loading job {job_name} of workflow {workflow} from dict")
@@ -140,6 +163,8 @@ class Job(BaseModel):
                     uses=job_uses,
                     definition=job_definition,
                     depends_on=job_depends_on_id,
+                    dependency_logs_pattern=dependency_logs_pattern,
+                    run_if_pattern_match=run_if_pattern_match,
                     is_active=True,
                 )
                 logger.debug(f"Updating {job}")
@@ -153,37 +178,10 @@ class Job(BaseModel):
                 uses=job_uses,
                 definition=job_definition,
                 depends_on=job_depends_on_id,
+                dependency_logs_pattern=dependency_logs_pattern,
+                run_if_pattern_match=run_if_pattern_match,
                 workflow=workflow,
             )
-
-    @classmethod
-    def trigger_dependencies(cls, session, job_id, scheduler, **kwargs):
-        """
-        Trigger job's dependencies.
-        """
-        dependency_jobs = crud.get_all(session, cls, depends_on=job_id)
-        if dependency_jobs:
-            for dependency_job in dependency_jobs:
-                # TODO
-                # ============================================================
-                # This is a don't forget note with ugly code.
-                # ============================================================
-                # previous_job_output = job_return_value.lower()
-                # dependency_job.on_pattern: some_regex
-                # dependency_job.pattern_exists_action:
-                # - skip
-                # - run
-                #
-                # match = re.findall("some_regex", previous_job_output)
-                # if match:
-                #   if dependency_job.pattern_exists_action == "skip":
-                #       continue
-                #   elif dependency_job.pattern_exists_action == "run":
-                #       schedule
-                # ============================================================
-                logger.debug(f"Dependency job {dependency_job.name} triggered")
-                dependency_job.schedule(scheduler, **kwargs)
-                Job.update_next_run_time(session, dependency_job.id, scheduler)
 
     @classmethod
     def update_next_run_time(cls, session, id, scheduler):

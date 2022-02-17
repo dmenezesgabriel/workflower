@@ -441,10 +441,26 @@ class JobSchemaParser:
         job_name = configuration_dict.get("name")
         job_uses = configuration_dict.get("uses")
         job_depends_on = configuration_dict.get("depends_on", None)
+        if job_depends_on:
+            dependency_logs_pattern = configuration_dict.get(
+                "dependency_logs_pattern", None
+            )
+            run_if_pattern_match = configuration_dict.get(
+                "run_if_pattern_match", None
+            )
+        else:
+            dependency_logs_pattern = None
+            run_if_pattern_match = None
         job_trigger_options = self._parse_job_trigger(configuration_dict)
         job_uses_options = self._parse_job_uses(configuration_dict)
         job_config = dict(
             executor="default", **job_trigger_options, **job_uses_options
         )
-
-        return job_name, job_uses, job_depends_on, job_config
+        return (
+            job_name,
+            job_uses,
+            job_depends_on,
+            dependency_logs_pattern,
+            run_if_pattern_match,
+            job_config,
+        )
