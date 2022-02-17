@@ -48,7 +48,7 @@ workflow:
       depends_on: first_job # str
       # The part below is optional for this trigger, you can pass a string
       # pattern to check if it's in previous job logs output.
-      dependency_logs_pattern: "First" # str
+      dependency_logs_pattern: "first" # str
       # Decide if run when has dependency log pattern and it matches with
       # previous job logs output.
-      run_if_pattern_match: False # bool
+      run_if_pattern_match: True # bool

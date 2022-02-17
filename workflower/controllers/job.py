@@ -24,8 +24,8 @@ class JobController:
                     # TODO
                     # Make it as Regex
                     matches = (
-                        dependency_job.dependency_logs_pattern
-                        in job_return_value
+                        str(dependency_job.dependency_logs_pattern).lower()
+                        in job_return_value.lower()
                     )
 
                     # | matches | run_if_pattern_match | schedule |

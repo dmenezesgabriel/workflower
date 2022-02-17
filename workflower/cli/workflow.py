@@ -50,7 +50,7 @@ class Runner:
             # added to scheduler by the execution event, scheduler will be
             # shutted down
             # wait till trigger deps
-            time.sleep(1)
+            time.sleep(10)
         self._is_running = False
 
 
