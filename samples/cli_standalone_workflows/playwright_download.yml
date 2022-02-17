@@ -1,0 +1,9 @@
+version: "1.0"
+workflow:
+  name: playwright_download
+  jobs:
+    - name: playwright_download
+      uses: module
+      module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\playwright\\playwright_download.py"
+      module_name: "playwright_download"
+      trigger: date
