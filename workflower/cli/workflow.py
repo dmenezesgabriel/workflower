@@ -13,14 +13,12 @@ from workflower.models.base import BaseModel
 from workflower.scheduler import SchedulerService
 
 logger = logging.getLogger("workflower.cli.workflow")
+# Must improve this
 database_file = os.path.join(Config.DATA_DIR, "temp.sqlite")
 database_uri = f"sqlite:///{database_file}"
 
 
 class Runner:
-    # TODO
-    # must improve this
-
     def __init__(self, database_uri=database_uri) -> None:
         self._database_uri = database_uri
         self._database = None
@@ -46,11 +44,18 @@ class Runner:
             # Start after a job is scheduled will grantee scheduler is up
             # until job finishess execution
             scheduler_service.start()
+            # TODO
+            # =============================================================== #
+            # As is
             # After job is executed if we don 't wait till the next jobs is
             # added to scheduler by the execution event, scheduler will be
             # shutted down
             # wait till trigger deps
             time.sleep(10)
+            # To be
+            # Know which jobs must be executed
+            # Keep scheduler service running until last job finished
+            # =============================================================== #
         self._is_running = False
 
 
