@@ -93,6 +93,11 @@ class Job(BaseModel):
         is_active=True,
         next_run_time=None,
     ):
+        # TODO
+        # Add state according with triggers
+        # scheduled
+        # running
+        # executed (if trigger says tha should run only once)
         self.name = name
         self.uses = uses
         self.definition = definition

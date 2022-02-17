@@ -7,7 +7,11 @@ logger = logging.getLogger("workflower.job_controller")
 
 
 class JobController:
-    # Must be refactored.
+    # TODO
+    # ======================================================================= #
+    # - add regex to logs pattern match
+    # - trigger dependencies should be a trigger
+    # ======================================================================= #
     @staticmethod
     def trigger_dependencies(
         session, job_id, scheduler, job_return_value, **kwargs
@@ -28,11 +32,14 @@ class JobController:
                         in job_return_value.lower()
                     )
 
+                    # ======================================================= #
                     # | matches | run_if_pattern_match | schedule |
                     # | True    | True                 | True     |
                     # | False   | True                 | False    |
                     # | True    | False                | False    |
                     # | False   | False                | True     |
+                    # ======================================================= #
+
                     if matches:
                         logger.info("Dependency job pattern matches")
                         if not dependency_job.run_if_pattern_match:
