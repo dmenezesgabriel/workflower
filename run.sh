@@ -95,6 +95,6 @@ while true; do
     # Unreckognized command
     # ======================================================================= #
     else
-        echo "No arg received try again..."
+        echo "Unreckognized arg, try again..."
     fi
 done
