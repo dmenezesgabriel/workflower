@@ -164,6 +164,23 @@ class Job(BaseModel):
         dependency_jobs = crud.get_all(session, cls, depends_on=job_id)
         if dependency_jobs:
             for dependency_job in dependency_jobs:
+                # TODO
+                # ============================================================
+                # This is a don't forget note with ugly code.
+                # ============================================================
+                # previous_job_output = job_return_value.lower()
+                # dependency_job.on_pattern: some_regex
+                # dependency_job.pattern_exists_action:
+                # - skip
+                # - run
+                #
+                # match = re.findall("some_regex", previous_job_output)
+                # if match:
+                #   if dependency_job.pattern_exists_action == "skip":
+                #       continue
+                #   elif dependency_job.pattern_exists_action == "run":
+                #       schedule
+                # ============================================================
                 logger.debug(f"Dependency job {dependency_job.name} triggered")
                 dependency_job.schedule(scheduler, **kwargs)
                 Job.update_next_run_time(session, dependency_job.id, scheduler)
