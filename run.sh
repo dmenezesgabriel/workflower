@@ -1,7 +1,5 @@
 #!/bin/bash
-# =========================================================================== #
-# Clean app data
-# =========================================================================== #
+
 set -e
 # set -x # DEBUG
 VERSION=0.1.0
@@ -30,8 +28,12 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
+# Run
 while true; do
     read -p "waiting command... " cmd
+    # ======================================================================= #
+    # Clean app data
+    # ======================================================================= #
     if [ $cmd == "clean" ];
     then
         echo "Removing development sqlite databases"
@@ -83,10 +85,16 @@ while true; do
         eval "$(cat .env)"  && \
         python . init-db && \
         python . run
+    # ======================================================================= #
+    # Exit program
+    # ======================================================================= #
     elif [ $cmd == "exit" ];
     then
         exit
+    # ======================================================================= #
+    # Unreckognized command
+    # ======================================================================= #
     else
-        echo "No arg received ending"
+        echo "No arg received try again..."
     fi
 done
