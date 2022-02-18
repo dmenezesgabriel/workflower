@@ -7,7 +7,9 @@ NAME="CLI Helper"
 
 ENV_PATH=~/environments/workflower
 LINE_BREAK="===========================================================\n"
-prompt_help() {
+CLI_WORKFLOWS_PATH=./samples/cli_standalone_workflows
+
+greet() {
     # ======================================================================= #
     # Prompt Introduction
     # ======================================================================= #
@@ -15,14 +17,18 @@ prompt_help() {
     echo "Hello $(whoami),"
     echo "Welcome to $NAME, version $VERSION"
     printf $LINE_BREAK
+}
+
+prompt_help() {
     echo "Commands:"
+    echo "- help: promp command options"
     echo "- setup: create $ENV_PATH"
     echo "- dev: init database and run app with dev config"
     echo "- prod: init database and run app with prod config"
     echo "- env: init database and run app with .env config"
     echo "- test: run tests"
     echo "- exit: exit program"
-    printf $LINE_BREAK
+    printf "\n"
 }
 
 get_platform_function() {
@@ -103,16 +109,20 @@ run_cli () {
     # env paths
     set_venv_paths
     # Prompt help
+    greet
     prompt_help
     # Run
 
     while true; do
-        printf "\n"
         read -p "waiting command: " cmd
+        printf "\n"
         # =================================================================== #
         # Clean app data
         # =================================================================== #
-        if [ $cmd == "clean" ];
+        if [ $cmd == "help" ];
+            then
+                prompt_help
+        elif [ $cmd == "clean" ];
             then
                 echo "Removing development sqlite databases"
                 find . -name "*dev.sqlite*" -type f -delete
@@ -174,11 +184,21 @@ run_cli () {
         # =================================================================== #
         elif [ $cmd == "workflow" ];
             then
-                read -p "Workflow path: " workflow_path
+                declare -A workflows_dict
+                workflows_counter=0
+                echo "Choose a workflow: "
+                for entry in "$CLI_WORKFLOWS_PATH"/*
+                do
+                let "workflows_counter+=1"
+                workflows_dict["$workflows_counter"]="$entry"
+                echo "$workflows_counter - $entry"
+                done
+
+                read -p "Workflow path: " workflow_number
                 echo "Run with .env"
                 . $venv_activate
                 eval "$(cat .env)"  && \
-                python . run_workflow --i $workflow_path
+                python . run_workflow --i "${workflows_dict[$workflow_number]}"
         # =================================================================== #
         # Exit program
         # =================================================================== #
