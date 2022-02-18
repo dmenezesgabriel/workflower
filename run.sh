@@ -6,15 +6,15 @@ VERSION=0.1.0
 NAME="CLI Helper"
 
 ENV_PATH=~/environments/workflower
-
+LINE_BREAK="===========================================================\n"
 prompt_help() {
     # ======================================================================= #
     # Prompt Introduction
     # ======================================================================= #
-    echo "==========================================================="
+    printf $LINE_BREAK
     echo "Hello $(whoami),"
     echo "Welcome to $NAME, version $VERSION"
-    echo "==========================================================="
+    printf $LINE_BREAK
     echo "Commands:"
     echo "- setup: create $ENV_PATH"
     echo "- dev: init database and run app with dev config"
@@ -22,7 +22,7 @@ prompt_help() {
     echo "- env: init database and run app with .env config"
     echo "- test: run tests"
     echo "- exit: exit program"
-    echo "==========================================================="
+    printf $LINE_BREAK
 }
 
 get_platform_function() {
@@ -95,16 +95,20 @@ run_cli () {
     # ======================================================================= #
     # Run cli
     # ======================================================================= #
-    # Prompt help
-    echo "Starting CLI"
-    prompt_help
+    printf $LINE_BREAK
+    echo "Starting CLI..."
+    printf $LINE_BREAK
     #  Get platform
     get_platform_function
     # env paths
     set_venv_paths
+    # Prompt help
+    prompt_help
     # Run
+
     while true; do
-        read -p "waiting command... " cmd
+        printf "\n"
+        read -p "waiting command: " cmd
         # =================================================================== #
         # Clean app data
         # =================================================================== #
@@ -165,6 +169,16 @@ run_cli () {
                 eval "$(cat .env)"  && \
                 python . init-db && \
                 python . run
+        # =================================================================== #
+        # Standalone
+        # =================================================================== #
+        elif [ $cmd == "workflow" ];
+            then
+                read -p "Workflow path: " workflow_path
+                echo "Run with .env"
+                . $venv_activate
+                eval "$(cat .env)"  && \
+                python . run_workflow --i $workflow_path
         # =================================================================== #
         # Exit program
         # =================================================================== #
