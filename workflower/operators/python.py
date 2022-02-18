@@ -18,7 +18,6 @@ class PythonOperator(BaseOperator):
         script_path=None,
         code=None,
         requirements_path=None,
-        create_env=True,
         env_path=None,
         pip_index_url=None,
         pip_trusted_host=None,
@@ -30,13 +29,12 @@ class PythonOperator(BaseOperator):
         Run python with papermill.
         """
         output = {"logs": []}
-        if create_env:
-            venv_name = str(uuid.uuid4())
-            env_path, env_executable = create_venv(
-                venv_name, environments_dir=environments_dir
-            )
-        else:
-            env_executable = sys.executable
+
+        venv_name = str(uuid.uuid4())
+        env_path, env_executable = create_venv(
+            venv_name, environments_dir=environments_dir
+        )
+
         output.update(dict(env_executable=env_executable))
 
         if requirements_path:
