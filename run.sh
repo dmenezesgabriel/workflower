@@ -9,12 +9,21 @@ ENV_PATH=~/environments/workflower
 LINE_BREAK="===========================================================\n"
 CLI_WORKFLOWS_PATH=./samples/cli_standalone_workflows
 
+bold_green_prefix="\033[1;32m"
+bold_green_suffix="\033[00m"
+bold_yellow_prefix="\033[1;33m"
+bold_yellow_suffix="\033[00m"
+yellow_prefix="\033[33m"
+yellow_suffix="\033[00m"
+red_prefix="\033[31m"
+red_suffix="\033[00m"
+
 greet() {
     # ======================================================================= #
     # Prompt Introduction
     # ======================================================================= #
     printf $LINE_BREAK
-    echo "Hello $(whoami),"
+    echo -e "$bold_green_prefix"Hello "$(whoami)","$bold_green_suffix"
     echo "Welcome to $NAME, version $VERSION"
     printf $LINE_BREAK
     printf "\n"
@@ -116,7 +125,7 @@ run_cli () {
     # Run
 
     while true; do
-        read -p "waiting command: " cmd
+        read -p "$(echo -e $bold_yellow_prefix"Waiting command: "$bold_yellow_suffix)" cmd
         printf "\n"
         # =================================================================== #
         # Clean app data
@@ -212,7 +221,7 @@ run_cli () {
         # Unreckognized command
         # =================================================================== #
         else
-            echo "Unreckognized arg, try again..."
+            echo -e "$red_prefix"Unreckognized arg, try again..."$red_suffix"
         fi
     done
 }
