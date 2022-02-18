@@ -151,6 +151,8 @@ run_cli () {
                 create_env
                 echo "$(ls -lh $ENV_PATH)"
                 install_deps
+                . $venv_activate && \
+                playwright install
         # =================================================================== #
         # Run development environment
         # =================================================================== #
