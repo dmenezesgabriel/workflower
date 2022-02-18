@@ -17,6 +17,7 @@ greet() {
     echo "Hello $(whoami),"
     echo "Welcome to $NAME, version $VERSION"
     printf $LINE_BREAK
+    printf "\n"
 }
 
 prompt_help() {
@@ -101,14 +102,15 @@ run_cli () {
     # ======================================================================= #
     # Run cli
     # ======================================================================= #
-    printf $LINE_BREAK
+    printf "\n"
     echo "Starting CLI..."
-    printf $LINE_BREAK
+    printf "\n"
     #  Get platform
     get_platform_function
     # env paths
     set_venv_paths
     # Prompt help
+    printf "\n"
     greet
     prompt_help
     # Run
@@ -180,20 +182,21 @@ run_cli () {
                 python . init-db && \
                 python . run
         # =================================================================== #
-        # Standalone
+        # Standalone cli workflow
         # =================================================================== #
         elif [ $cmd == "workflow" ];
             then
                 declare -A workflows_dict
                 workflows_counter=0
-                echo "Choose a workflow: "
+                echo "Choose a workflow number: "
+                printf "\n"
                 for entry in "$CLI_WORKFLOWS_PATH"/*
                 do
                 let "workflows_counter+=1"
                 workflows_dict["$workflows_counter"]="$entry"
                 echo "$workflows_counter - $entry"
                 done
-
+                printf "\n"
                 read -p "Workflow path: " workflow_number
                 echo "Run with .env"
                 . $venv_activate
