@@ -2,6 +2,8 @@
 
 Make your workday smell like daisies.
 
+From developers to data people (engineers, analysts and scientists).
+
 ## Short Description
 
 A minimal workflow orchestrator for data pipelines, made to work on a windows or linux machine.
@@ -80,3 +82,18 @@ workflow:
       # previous job logs output.
       run_if_pattern_match: False # bool
 ```
+
+## Glossary
+
+**Workflow**:
+A set of jobs that should be executed with some recurrence.
+**Job**:
+A task tha can be execute a python code, a jupyter notebook or some other thing needed.
+**Uses**:
+What is the operator where the job is executed on, like python, papermill(runs jupyter notebooks).
+**Trigger**:
+Type of schedule definition, can be a fixed date, cron, or time interval.
+**Plugins**:
+Plugins are operator's extensions that helps to execute a job, that can be a pack with a bunch of code classes to help publish a dashboard from an external source.
+**Plugin Components**:
+Components are plugin parts, or code classes with auxiliary functions.
