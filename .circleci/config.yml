@@ -49,7 +49,7 @@ jobs:
           command: echo "$(ls -lh) "
       - run:
           name: Disable jekyll builds
-          command: touch docs/_build/.nojekyll
+          command: touch ./.nojekyll
       - run:
           name: Install and configure dependencies
           command: |
