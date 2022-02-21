@@ -45,6 +45,9 @@ jobs:
           name: Disable jekyll builds
           command: touch docs/_build/.nojekyll
       - run:
+          name: Disable jekyll builds
+          command: touch ./.nojekyll
+      - run:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.0.1
