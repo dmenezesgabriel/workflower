@@ -323,25 +323,60 @@
 </pre></div>
 </div>
 <p><strong>Example</strong>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># version: is referent to yaml schema, the version of the way th yml or yaml</span><span class="w"></span>
+<span class="c1"># file should be written, it must be string type.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
 <span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill_cron_trigger_with_deps</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># workflow&#39;s name must always match it&#39;s file name, if not will no be load,</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># in this case the file name should be dependency_log_pattern_match.yml</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># An easy way of deactivating an workflow is putting an underscore prefix in</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># it&#39;s name, like _dependency_log_pattern_match.yml</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency_log_pattern_match</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow can have one or more jobs</span><span class="w"></span>
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
-<span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># trigger config</span><span class="w"></span>
-<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
-<span class="w">      </span><span class="nt">minute</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*/3&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># Second job, triggered after first</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;python_get_argv&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
-<span class="w">      </span><span class="nt">script_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\get_argv.py&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"></span>
-<span class="w">      </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notebook_install_packages</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The job name does not affect in execution like workflow&#39;s, but it should</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># be clear for people you may share.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;first_job&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job can use</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job uses python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;First</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - interval</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - cron</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - dependency</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># if trigger is type date and has no other key reference like :run_date:</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># it will be executed immediately accordingly to configured scheduler</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># sleep cycle</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;second_job&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job can use</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job uses python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Second</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - interval</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - cron</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - dependency</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># If trigger is dependency it must depends on a job in the same workflow</span><span class="w"></span>
+<span class="w">      </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first_job</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># The part below is optional for this trigger, you can pass a string</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># pattern to check if it&#39;s in previous job logs output.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">dependency_logs_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;First&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Decide if run when has dependency log pattern and it matches with</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># previous job logs output.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">run_if_pattern_match</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"> </span><span class="c1"># bool</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
