@@ -42,9 +42,6 @@ jobs:
       - attach_workspace:
           at: docs/_build
       - run:
-          name: Disable jekyll builds
-          command: touch docs/_build/.nojekyll
-      - run:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.0.1
@@ -56,6 +53,22 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "doc updates [skip ci]" --dist docs/_build/* --dest .
+      - run:
+          name: gh-pages checkout
+          command: |
+            export COMMIT_MESSAGE=\"$(git log --format=oneline -1 --pretty=format:'%h - %B')\"
+            echo $COMMIT_MESSAGE
+            git checkout gh-pages
+      - run:
+          name: Disable jekyll builds
+          command: touch ./.nojekyll
+      - run:
+          name: commit .nojekyll
+          command: |
+            git add -fA
+            git commit --allow-empty -m "$COMMIT_MESSAGE"
+            git push -f origin gh-pages
+            echo "Deployed successfully"
 
 workflows:
   version: 2
