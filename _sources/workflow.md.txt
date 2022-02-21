@@ -29,4 +29,6 @@ workflow:
 
 ## Tips
 
+### Deactivating .yml workflows
+
 An easy way of deactivating an workflow is inserting a underscore `_` at the beginning of it's file name, so it won't match with defined workflow name inside yaml or yml file.
