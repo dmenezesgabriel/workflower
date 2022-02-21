@@ -76,7 +76,7 @@ jobs:
           command: |
             git add .
             git checkout gh-pages
-            gir pull origin gh-pages
+            git pull origin gh-pages
       # Create .nokeyll file in gh-branches root, required by
       # github pages configuration.
       - run:
