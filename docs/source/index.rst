@@ -10,7 +10,6 @@ Welcome to Workflower's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   cycle
    workflow
    job
 

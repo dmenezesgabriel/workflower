@@ -113,8 +113,7 @@ build_docs() {
     # Build docs
     ###########################################################################
     . $venv_activate && \
-    sphinx-build ./docs/source ./docs/build
-    touch ./docs/.nojekyll
+    sphinx-build ./docs/source ./docs/_build
 }
 
 publish_docs() {
