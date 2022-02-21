@@ -71,25 +71,26 @@ jobs:
       # ======================================================================
       # Disable default jekyll usage on github's pages
       # ======================================================================
-      # - run:
-      #     name: gh-pages checkout
-      #     command: |
-      #       git checkout gh-pages
-      # # Create .nokeyll file in gh-branches root, required by
-      # # github pages configuration.
-      # - run:
-      #     name: Disable jekyll builds
-      #     command: touch ./.nojekyll
-      # # Add and commit file to git repository branch
-      # - run:
-      #     name: commit .nojekyll to gh-pages branch
-      #     command: |
-      #       export COMMIT_MESSAGE=\"$(git log --format=oneline -1 --pretty=format:'%h - %B')\"
-      #       echo $COMMIT_MESSAGE
-      #       git add -fA
-      #       git commit --allow-empty -m "$COMMIT_MESSAGE"
-      #       git push -f origin gh-pages
-      #       echo "Deployed successfully"
+      - run:
+          name: gh-pages -b checkout
+          command: |
+            git add -fA
+            git checkout gh-pages
+      # Create .nokeyll file in gh-branches root, required by
+      # github pages configuration.
+      - run:
+          name: Disable jekyll builds
+          command: touch ./.nojekyll
+      # Add and commit file to git repository branch
+      - run:
+          name: commit .nojekyll to gh-pages branch
+          command: |
+            export COMMIT_MESSAGE=\"$(git log --format=oneline -1 --pretty=format:'%h - %B')\"
+            echo $COMMIT_MESSAGE
+            git add -fA
+            git commit --allow-empty -m "$COMMIT_MESSAGE"
+            git push -f origin gh-pages
+            echo "Deployed successfully"
 
 workflows:
   version: 2
