@@ -1,0 +1,8 @@
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+Module
+=================
+.. automodule:: workflower.modules.module
+   :members:

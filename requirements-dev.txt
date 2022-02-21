@@ -1,5 +1,11 @@
+# Formatting
 flake8==4.0.1
 black==21.12b0
 isort==5.10.1
+# Tests
 pytest==6.2.5
 coverage==6.3
+# Docs
+sphinx==4.4.0
+myst-parser==0.17.0
+sphinx-rtd-theme==1.0.0

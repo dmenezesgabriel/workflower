@@ -20,6 +20,13 @@ Configure a .env file following the _.env.\*.template_ examples then:
 ./run.sh
 ```
 
+or:
+
+```sh
+alias "workflower"="./run.sh"
+workflower
+```
+
 ## Workflow samples
 
 ### Dependencies
