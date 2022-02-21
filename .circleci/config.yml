@@ -29,9 +29,9 @@ jobs:
           command: pip install -r requirements-dev.txt
       - run:
           name: Build docs
-          command: sphinx-build ./docs/source docs/_build
+          command: sphinx-build docs/source docs/_build
       - persist_to_workspace:
-          root: docs/_build
+          root: docs/
           paths: ["_build"]
 
   docs-deploy:
