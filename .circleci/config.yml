@@ -66,7 +66,7 @@ jobs:
           name: Deploy docs to gh-pages branch
           command: |
             gh-pages \
-            --dotfiles --message "doc updates" \
+            --dotfiles --message "[skip ci] doc updates" \
             --dist docs/_build/* --dest .
       # ======================================================================
       # Disable default jekyll usage on github's pages
@@ -86,7 +86,7 @@ jobs:
       - run:
           name: commit .nojekyll to gh-pages branch
           command: |
-            export COMMIT_MESSAGE=\"$(git log --format=oneline -1 --pretty=format:'%h - %B')\"
+            export COMMIT_MESSAGE=\"\[skip ci\] $(git log --format=oneline -1 --pretty=format:'%h - %B')\"
             echo $COMMIT_MESSAGE
             git add .
             git commit --allow-empty -m "$COMMIT_MESSAGE"
