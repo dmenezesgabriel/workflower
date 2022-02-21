@@ -45,11 +45,11 @@ jobs:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.0.1
-            git config user.email "ci-build@klukas.net"
-            git config user.name "ci-build"
+            git config user.email "dmenezes.gabriel@gmail.com"
+            git config user.name "workflower-docs-ci"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dist docs/_build/html
+          command: gh-pages --dist docs/_build/
 
 workflows:
   version: 2
