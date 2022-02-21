@@ -22,5 +22,3 @@ unzipped/
 *.bin*
 *.key*
 *download/
-doctrees/
-.buildinfo
