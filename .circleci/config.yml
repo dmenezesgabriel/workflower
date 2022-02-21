@@ -45,15 +45,6 @@ jobs:
           name: Disable jekyll builds
           command: touch docs/_build/.nojekyll
       - run:
-          name: pwd
-          command: echo "$(pwd)"
-      - run:
-          name: ls
-          command: echo "$(ls -lh)"
-      - run:
-          name: Disable jekyll builds
-          command: touch docs/_build/.nojekyll
-      - run:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.0.1
@@ -64,7 +55,7 @@ jobs:
             - ${DEPLOY_KEY_FINGERPRINT}
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "update" --dist docs/_build/
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/_build/
 
 workflows:
   version: 2
@@ -74,7 +65,7 @@ workflows:
       - docs-build
       - docs-deploy:
           requires:
-            - test
+            # - test
             - docs-build
           filters:
             branches:
