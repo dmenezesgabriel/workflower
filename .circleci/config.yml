@@ -48,11 +48,11 @@ jobs:
           name: Install and configure dependencies
           command: |
             npm install -g --silent gh-pages@2.0.1
-            git config user.email $GH_EMAIL
-            git config user.name $GH_USER
+            git config user.email ${GH_EMAIL}
+            git config user.name ${GH_USER}
       - add_ssh_keys:
           fingerprints:
-            - $DEPLOY_KEY_FINGERPRINT
+            - ${DEPLOY_KEY_FINGERPRINT}
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/_build/
