@@ -95,33 +95,39 @@
 </section>
 <section id="alteryx">
 <h2>alteryx<a class="headerlink" href="#alteryx" title="Permalink to this headline"></a></h2>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-workflow:
-  name: alteryx_interval_trigger
-  jobs:
-    - name: &quot;combine_two_sheets&quot;
-      uses: alteryx
-      path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;
-      trigger: interval
-      minutes: 1
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># alteryx_interval_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application use only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;combine_two_sheets&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># define</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
 <section id="papermill">
 <h2>papermill<a class="headerlink" href="#papermill" title="Permalink to this headline"></a></h2>
 <p><a class="reference external" href="https://github.com/nteract/papermill">Papermill</a> is a python library to run <a class="reference external" href="https://jupyter.org/">Jupyter</a> notebooks <strong>programmatically</strong>.</p>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-workflow:
-  name: papermill_cron_trigger
-  jobs:
-    - name: &quot;notebook_install_packages&quot;
-      uses: papermill
-      # Papermill paths
-      input_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;
-      output_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;
-      # trigger config
-      trigger: cron
-      minute: &quot;*/2&quot;
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill_cron_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
+<span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger config</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minute</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*/2&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -130,30 +136,30 @@ workflow:
 <ul class="simple">
 <li><p><strong>code</strong>:</p></li>
 </ul>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-workflow:
-  name: python_code_interval_trigger
-  jobs:
-    - name: &quot;hello_python_code&quot;
-      uses: python
-      code: &quot;print(&#39;Hello, World!&#39;)&quot;
-      trigger: interval
-      minutes: 2
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_code_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_code&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Hello,</span><span class="nv"> </span><span class="s">World!&#39;)&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p><strong>script</strong>:</p></li>
 </ul>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-workflow:
-  name: python_script_interval_trigger
-  jobs:
-    - name: &quot;hello_python_script&quot;
-      uses: python
-      script_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py&quot;
-      requirements_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt&quot;
-      trigger: interval
-      minutes: 1
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_script_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_script&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="nt">script_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">requirements_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -161,18 +167,18 @@ workflow:
 <h2>module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h2>
 <p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.operators.operator.BaseOperator</span></code> subclass which will execute what is defined on run function.</p>
 <p>A Module can use application plugins.</p>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-workflow:
-  name: module_interval_trigger
-  jobs:
-    - name: &quot;tableau_linter_module&quot;
-      uses: module
-      module_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py&quot;
-      module_name: &quot;tableau_linter&quot;
-      plugins:
-        - tableau_document_plugin
-      trigger: interval
-      minutes: 1
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter_module&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module</span><span class="w"></span>
+<span class="w">      </span><span class="nt">module_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">module_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tableau_document_plugin</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

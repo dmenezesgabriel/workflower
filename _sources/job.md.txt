@@ -13,12 +13,18 @@ Uses definition, define which **Operator** to use.
 
 ## alteryx
 
-```yml
+```yaml
+# alteryx_interval_trigger.yml
+# workflow definition's version, for application use only.
 version: "1.0"
 workflow:
+  # Workflow name must match with file name.
   name: alteryx_interval_trigger
+  # Workflow jobs definition
   jobs:
+    # The name of a job does not affect the applications behaviour
     - name: "combine_two_sheets"
+      # define
       uses: alteryx
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
       trigger: interval
@@ -29,7 +35,7 @@ workflow:
 
 [Papermill](https://github.com/nteract/papermill) is a python library to run [Jupyter](https://jupyter.org/) notebooks **programmatically**.
 
-```yml
+```yaml
 version: "1.0"
 workflow:
   name: papermill_cron_trigger
@@ -48,7 +54,7 @@ workflow:
 
 - **code**:
 
-```yml
+```yaml
 version: "1.0"
 workflow:
   name: python_code_interval_trigger
@@ -62,7 +68,7 @@ workflow:
 
 - **script**:
 
-```yml
+```yaml
 version: "1.0"
 workflow:
   name: python_script_interval_trigger
@@ -81,7 +87,7 @@ Module is a `workflower.operators.operator.BaseOperator` subclass which will exe
 
 A Module can use application plugins.
 
-```yml
+```yaml
 version: "1.0"
 workflow:
   name: module_interval_trigger

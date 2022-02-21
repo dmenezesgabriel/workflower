@@ -72,7 +72,7 @@
              
   <section id="workflow">
 <h1>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline"></a></h1>
-<p>Workflow is defined on a <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file and can contain multiple jobs.</p>
+<p>Workflow is defined on a <code class="docutils literal notranslate"><span class="pre">.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> file and can contain multiple jobs.</p>
 <ul>
 <li><p>Workflow name must be unique</p></li>
 <li><p>Workflow file name must be the same of workflow name, if not won’t load</p></li>
@@ -82,18 +82,18 @@
 <p>Example:</p>
 </li>
 </ul>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
-# This a Workflow definition
-workflow:
-  # Workflow name must be unique
-  name: alteryx_sample_date_trigger
-  # This is a Job definition
-  jobs:
-    - name: &quot;sample_combine_two_sheets&quot;
-      uses: alteryx
-      path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;
-      trigger: date
-      run_date: &quot;2022-01-14 18:55:05&quot;
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="c1"># This a Workflow definition</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must be unique</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx_sample_date_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># This is a Job definition</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_combine_two_sheets&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span><span class="w"></span>
+<span class="w">      </span><span class="nt">run_date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2022-01-14</span><span class="nv"> </span><span class="s">18:55:05&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 <section id="tips">
