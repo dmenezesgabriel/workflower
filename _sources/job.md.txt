@@ -1,6 +1,6 @@
 # Job
 
-A **job** is a workflow's task that should be scheduled.
+A task that can be execute python code, jupyter notebook or some other thing needed.
 
 ## Uses
 
@@ -135,7 +135,7 @@ workflow:
 requests
 ```
 
-### module
+### Module
 
 Module is a `workflower.modules.module.BaseModule` subclass which will execute what is defined on run function. This class will be used by `workflower.operators.module.ModuleOperator`.
 

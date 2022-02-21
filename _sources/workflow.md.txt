@@ -1,9 +1,11 @@
 # Workflow
 
+A set of **jobs**.
+
 Workflow is defined on a `.yml` or `.yaml` file and can contain multiple jobs.
 
-- Workflow name must be unique
-- Workflow file name must be the same of workflow name, if not won't load
+- Workflow name **must** be unique
+- Workflow file name must be the **same** of workflow name, if not won't load
 - If a workflow file has been modified, modifications will be applied on next cycle
 - If a workflow file has been removed, the scheduled for all it's jobs will be removed
 - Dependency trigger jobs must be defined after it's depends_on job

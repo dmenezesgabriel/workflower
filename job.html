@@ -44,7 +44,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#alteryx">Alteryx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#papermill">Papermill</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#python">Python</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module">module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module">Module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#triggers">Triggers</a><ul>
@@ -84,7 +84,7 @@
              
   <section id="job">
 <h1>Job<a class="headerlink" href="#job" title="Permalink to this headline"></a></h1>
-<p>A <strong>job</strong> is a workflow’s task that should be scheduled.</p>
+<p>A task that can be execute python code, jupyter notebook or some other thing needed.</p>
 <section id="uses">
 <h2>Uses<a class="headerlink" href="#uses" title="Permalink to this headline"></a></h2>
 <p>Uses definition, define which <strong>Operator</strong> to use.</p>
@@ -208,7 +208,7 @@
 </div>
 </section>
 <section id="module">
-<h3>module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h3>
+<h3>Module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h3>
 <p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.modules.module.BaseModule</span></code> subclass which will execute what is defined on run function. This class will be used by <code class="docutils literal notranslate"><span class="pre">workflower.operators.module.ModuleOperator</span></code>.</p>
 <p>The module operator expects a valid module path, containing a file with a <code class="docutils literal notranslate"><span class="pre">Module</span></code> class and a <code class="docutils literal notranslate"><span class="pre">run</span></code> function.</p>
 <p><strong>Module example</strong>:</p>

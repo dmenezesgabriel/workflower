@@ -72,10 +72,11 @@
              
   <section id="workflow">
 <h1>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline"></a></h1>
+<p>A set of <strong>jobs</strong>.</p>
 <p>Workflow is defined on a <code class="docutils literal notranslate"><span class="pre">.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> file and can contain multiple jobs.</p>
 <ul>
-<li><p>Workflow name must be unique</p></li>
-<li><p>Workflow file name must be the same of workflow name, if not won’t load</p></li>
+<li><p>Workflow name <strong>must</strong> be unique</p></li>
+<li><p>Workflow file name must be the <strong>same</strong> of workflow name, if not won’t load</p></li>
 <li><p>If a workflow file has been modified, modifications will be applied on next cycle</p></li>
 <li><p>If a workflow file has been removed, the scheduled for all it’s jobs will be removed</p></li>
 <li><p>Dependency trigger jobs must be defined after it’s depends_on job</p>
