@@ -41,6 +41,10 @@
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Job</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#uses">Uses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alteryx">alteryx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#papermill">papermill</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python">python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module">module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#triggers">Triggers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#date">Date</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#interval">Interval</a></li>
@@ -79,33 +83,98 @@
   <section id="job">
 <h1>Job<a class="headerlink" href="#job" title="Permalink to this headline"></a></h1>
 <p>A <strong>job</strong> is a workflow’s task that should be scheduled.</p>
-<p>A job can be:</p>
-<ul class="simple">
-<li><p>Python script</p></li>
-<li><p>Jupyter notebook</p></li>
-<li><p>Python module</p></li>
-<li><p>Alteryx workflow</p></li>
-</ul>
-<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span># This a Workflow definition
-version: &quot;1.0&quot;
-workflow:
-  # Workflow name must be unique
-  name: alteryx_sample_date_trigger
-  # This is a Job definition
-  jobs:
-    - name: &quot;sample_combine_two_sheets&quot;
-      uses: alteryx
-      path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;
-      trigger: date
-      run_date: &quot;2022-01-14 18:55:05&quot;
-</pre></div>
-</div>
 <section id="uses">
 <h2>Uses<a class="headerlink" href="#uses" title="Permalink to this headline"></a></h2>
+<p>Uses definition, define which <strong>Operator</strong> to use.</p>
 <ul class="simple">
 <li><p>alteryx</p></li>
 <li><p>papermill</p></li>
+<li><p>module</p></li>
+<li><p>python</p></li>
 </ul>
+</section>
+<section id="alteryx">
+<h2>alteryx<a class="headerlink" href="#alteryx" title="Permalink to this headline"></a></h2>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
+workflow:
+  name: alteryx_interval_trigger
+  jobs:
+    - name: &quot;combine_two_sheets&quot;
+      uses: alteryx
+      path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;
+      trigger: interval
+      minutes: 1
+</pre></div>
+</div>
+</section>
+<section id="papermill">
+<h2>papermill<a class="headerlink" href="#papermill" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://github.com/nteract/papermill">Papermill</a> is a python library to run <a class="reference external" href="https://jupyter.org/">Jupyter</a> notebooks <strong>programmatically</strong>.</p>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
+workflow:
+  name: papermill_cron_trigger
+  jobs:
+    - name: &quot;notebook_install_packages&quot;
+      uses: papermill
+      # Papermill paths
+      input_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;
+      output_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;
+      # trigger config
+      trigger: cron
+      minute: &quot;*/2&quot;
+</pre></div>
+</div>
+</section>
+<section id="python">
+<h2>python<a class="headerlink" href="#python" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><strong>code</strong>:</p></li>
+</ul>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
+workflow:
+  name: python_code_interval_trigger
+  jobs:
+    - name: &quot;hello_python_code&quot;
+      uses: python
+      code: &quot;print(&#39;Hello, World!&#39;)&quot;
+      trigger: interval
+      minutes: 2
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>script</strong>:</p></li>
+</ul>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
+workflow:
+  name: python_script_interval_trigger
+  jobs:
+    - name: &quot;hello_python_script&quot;
+      uses: python
+      script_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py&quot;
+      requirements_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt&quot;
+      trigger: interval
+      minutes: 1
+</pre></div>
+</div>
+</section>
+<section id="module">
+<h2>module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h2>
+<p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.operators.operator.BaseOperator</span></code> subclass which will execute what is defined on run function.</p>
+<p>A Module can use application plugins.</p>
+<div class="highlight-yml notranslate"><div class="highlight"><pre><span></span>version: &quot;1.0&quot;
+workflow:
+  name: module_interval_trigger
+  jobs:
+    - name: &quot;tableau_linter_module&quot;
+      uses: module
+      module_path: &quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py&quot;
+      module_name: &quot;tableau_linter&quot;
+      plugins:
+        - tableau_document_plugin
+      trigger: interval
+      minutes: 1
+</pre></div>
+</div>
 </section>
 <section id="triggers">
 <h2>Triggers<a class="headerlink" href="#triggers" title="Permalink to this headline"></a></h2>
@@ -125,8 +194,8 @@ workflow:
 <ul class="simple">
 <li><p>run_date (str): the date/time to run the job at, if not present will run on next execution cycle.</p></li>
 <li><p>timezone (str): time zone for <code class="docutils literal notranslate"><span class="pre">run_date</span></code></p></li>
-<li><p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/date.html">APScheduler reference</a></p></li>
 </ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/date.html">APScheduler reference</a></p>
 </section>
 <section id="interval">
 <h3>Interval<a class="headerlink" href="#interval" title="Permalink to this headline"></a></h3>
@@ -143,8 +212,8 @@ workflow:
 <li><p>end_date (str): latest possible date/time to trigger on</p></li>
 <li><p>timezone (str): time zone to use for the date/time calculations</p></li>
 <li><p>jitter (int): delay the job execution by jitter seconds at most</p></li>
-<li><p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/interval.html">APScheduler reference</a></p></li>
 </ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/interval.html">APScheduler reference</a></p>
 </section>
 <section id="cron">
 <h3>Cron<a class="headerlink" href="#cron" title="Permalink to this headline"></a></h3>
@@ -164,13 +233,35 @@ workflow:
 <li><p>end_date (str): latest possible date/time to trigger on (inclusive)</p></li>
 <li><p>timezone (str): time zone to use for the date/time calculations (defaults to scheduler timezone)</p></li>
 <li><p>jitter (int): delay the job execution by jitter seconds at most</p></li>
-<li><p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html">APScheduler reference</a></p></li>
 </ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html">APScheduler reference</a></p>
 </section>
 <section id="dependency">
 <h3>Dependency<a class="headerlink" href="#dependency" title="Permalink to this headline"></a></h3>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"></span>
 <span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_job_name</span><span class="w"></span>
+</pre></div>
+</div>
+<p><strong>Example</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill_cron_trigger_with_deps</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
+<span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger config</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minute</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*/3&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Second job, triggered after first</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;python_get_argv&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
+<span class="w">      </span><span class="nt">script_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\get_argv.py&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"></span>
+<span class="w">      </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notebook_install_packages</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
