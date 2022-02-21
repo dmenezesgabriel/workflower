@@ -64,7 +64,7 @@ jobs:
             - ${DEPLOY_KEY_FINGERPRINT}
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message --dist docs/_build/
+          command: gh-pages --dotfiles --message "update" --dist docs/_build/
 
 workflows:
   version: 2
