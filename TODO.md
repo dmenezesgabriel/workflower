@@ -7,3 +7,4 @@
 - Refactor schema validator to use strategy pattern as schema parser and move then to utils.
 - Some times execution events seems to not be registered on database, investigate.
 - Make database replication.
+- Add alembic for database migrations
