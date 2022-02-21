@@ -4,11 +4,10 @@ A **job** is a workflow's task that should be scheduled.
 
 A job can be:
 
-- [x] An Alteryx workflow
-- [x] An jupyter notebook
-- [ ] A Knime workflow
-- [ ] A Python script
-- [ ] An utility function
+- Python script
+- Jupyter notebook
+- Python module
+- Alteryx workflow
 
 ```yml
 # This a Workflow definition
@@ -48,6 +47,8 @@ timezone: "America/Sao_Paulo"
 - run_date (str): the date/time to run the job at, if not present will run on next execution cycle.
 - timezone (str): time zone for `run_date`
 
+- [APScheduler reference](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/date.html)
+
 ### Interval
 
 ```yaml
@@ -63,6 +64,8 @@ trigger: interval
 - end_date (str): latest possible date/time to trigger on
 - timezone (str): time zone to use for the date/time calculations
 - jitter (int): delay the job execution by jitter seconds at most
+
+- [APScheduler reference](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/interval.html)
 
 ### Cron
 
@@ -83,13 +86,11 @@ trigger: cron
 - timezone (str): time zone to use for the date/time calculations (defaults to scheduler timezone)
 - jitter (int): delay the job execution by jitter seconds at most
 
+- [APScheduler reference](https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html)
+
 ### Dependency
 
 ```yaml
 trigger: dependency
 depends_on: other_job_name
 ```
-
-## Note
-
-This is a proxy, and an extend for the amazing [APScheduler's triggers](https://apscheduler.readthedocs.io/en/3.x/index.html)
