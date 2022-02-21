@@ -40,10 +40,10 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: docs/_build
+          at: .
       - run:
           name: Disable jekyll builds
-          command: touch docs/_build/.nojekyll
+          command: touch ./.nojekyll
       - run:
           name: Install and configure dependencies
           command: |
@@ -55,7 +55,7 @@ jobs:
             - ${DEPLOY_KEY_FINGERPRINT}
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist .
+          command: gh-pages --dotfiles --message "Updates" --dist .
 
 workflows:
   version: 2
