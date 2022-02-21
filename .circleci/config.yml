@@ -86,7 +86,7 @@ jobs:
       - run:
           name: commit .nojekyll to gh-pages branch
           command: |
-            export COMMIT_MESSAGE=\"\[skip ci\] $(git log --format=oneline -1 --pretty=format:'%h - %B')\"
+            export COMMIT_MESSAGE=\"[skip ci] $(git log --format=oneline -1 --pretty=format:'%h - %B')\"
             echo $COMMIT_MESSAGE
             git add .
             git commit --allow-empty -m "$COMMIT_MESSAGE"
