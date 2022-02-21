@@ -95,19 +95,23 @@
 </section>
 <section id="alteryx">
 <h2>alteryx<a class="headerlink" href="#alteryx" title="Permalink to this headline"></a></h2>
+<p>Alteryx job use definition tell the job to use <code class="docutils literal notranslate"><span class="pre">workflower.operators.alteryx.AlteryxOperator</span></code>, which once called will run an Alteryx <code class="docutils literal notranslate"><span class="pre">.xymd</span></code> file on command line, if the machine has a valid Alteryx installation and active license.</p>
+<p>The Alteryx workflow <code class="docutils literal notranslate"><span class="pre">path</span></code> must be present on job’s yaml definition.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># alteryx_interval_trigger.yml</span><span class="w"></span>
 <span class="c1"># workflow definition&#39;s version, for application use only.</span><span class="w"></span>
 <span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
 <span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx_interval_trigger</span><span class="w"></span>
-<span class="w">  </span><span class="c1"># Workflow jobs definition</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;combine_two_sheets&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># define</span><span class="w"></span>
 <span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Alteryx .xymd file path.</span><span class="w"></span>
 <span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
 <span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
 <span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
 </pre></div>
@@ -116,16 +120,34 @@
 <section id="papermill">
 <h2>papermill<a class="headerlink" href="#papermill" title="Permalink to this headline"></a></h2>
 <p><a class="reference external" href="https://github.com/nteract/papermill">Papermill</a> is a python library to run <a class="reference external" href="https://jupyter.org/">Jupyter</a> notebooks <strong>programmatically</strong>.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.papermill.PapermillOperator</span></code>.</p>
+<p>Papermill expects a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file’s path as input so it can execute programmatically, and after it’s execution, an <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> executed file is generated with it’s cell’s outputs and erros if there were any. The <em>output</em> path is also expected, and must be in an existing directory.</p>
+<p>At every execution a python virtual environment is created, so the packages needed for the job won’t conflict with applications’s packages, after the execution the environment is deleted.</p>
+<p>You can install the packages with <code class="docutils literal notranslate"><span class="pre">%pip</span></code> cell magic:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="c1"># Will print the execution environment path.</span>
+<span class="n">pandas</span><span class="o">.</span><span class="n">__path__</span>
+</pre></div>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># papermill_cron_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application use only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
 <span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill_cron_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill expects an .ipynb file path as input.</span><span class="w"></span>
 <span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill&#39;s execution results in a jupyter notebook output at a given path.</span><span class="w"></span>
 <span class="w">      </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># trigger config</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
 <span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
 <span class="w">      </span><span class="nt">minute</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*/2&quot;</span><span class="w"></span>
 </pre></div>
@@ -133,6 +155,7 @@
 </section>
 <section id="python">
 <h2>python<a class="headerlink" href="#python" title="Permalink to this headline"></a></h2>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.python.PythonOperator</span></code>.</p>
 <ul class="simple">
 <li><p><strong>code</strong>:</p></li>
 </ul>

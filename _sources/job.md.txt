@@ -13,6 +13,10 @@ Uses definition, define which **Operator** to use.
 
 ## alteryx
 
+Alteryx job use definition tell the job to use `workflower.operators.alteryx.AlteryxOperator`, which once called will run an Alteryx `.xymd` file on command line, if the machine has a valid Alteryx installation and active license.
+
+The Alteryx workflow `path` must be present on job's yaml definition.
+
 ```yaml
 # alteryx_interval_trigger.yml
 # workflow definition's version, for application use only.
@@ -20,13 +24,15 @@ version: "1.0"
 workflow:
   # Workflow name must match with file name.
   name: alteryx_interval_trigger
-  # Workflow jobs definition
+  # Workflow jobs definition.
   jobs:
-    # The name of a job does not affect the applications behaviour
+    # The name of a job does not affect the applications behaviour.
     - name: "combine_two_sheets"
       # define
       uses: alteryx
+      # Alteryx .xymd file path.
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
+      # Job trigger configuration
       trigger: interval
       minutes: 1
 ```
@@ -35,22 +41,47 @@ workflow:
 
 [Papermill](https://github.com/nteract/papermill) is a python library to run [Jupyter](https://jupyter.org/) notebooks **programmatically**.
 
+The operator used by the application is `workflower.operators.papermill.PapermillOperator`.
+
+Papermill expects a `.ipynb` file's path as input so it can execute programmatically, and after it's execution, an `.ipynb` executed file is generated with it's cell's outputs and erros if there were any. The _output_ path is also expected, and must be in an existing directory.
+
+At every execution a python virtual environment is created, so the packages needed for the job won't conflict with applications's packages, after the execution the environment is deleted.
+
+You can install the packages with `%pip` cell magic:
+
+```py
+%pip install pandas
+
+import pandas
+# Will print the execution environment path.
+pandas.__path__
+```
+
 ```yaml
+# papermill_cron_trigger.yml
+# workflow definition's version, for application use only.
 version: "1.0"
 workflow:
+  # Workflow name must match with file name.
   name: papermill_cron_trigger
+  # Workflow jobs definition.
   jobs:
+    # The name of a job does not affect the applications behaviour.
     - name: "notebook_install_packages"
       uses: papermill
       # Papermill paths
+      # Papermill expects an .ipynb file path as input.
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb"
+      # Papermill's execution results in a jupyter notebook output at a given path.
       output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb"
-      # trigger config
+      # Job trigger configuration
       trigger: cron
       minute: "*/2"
 ```
 
 ## python
+
+The operator used by the application is `workflower.operators.python.PythonOperator`.
 
 - **code**:
 
