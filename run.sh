@@ -117,12 +117,11 @@ build_docs() {
     touch ./docs/.nojekyll
 }
 
-force_build_gh_pages() {
+publish_docs() {
     ###########################################################################
     # Force build ghpages
     ###########################################################################
-    git commit -m 'rebuild pages' --allow-empty
-    git push origin master
+
 }
 
 run_cli () {
@@ -202,7 +201,7 @@ run_cli () {
         # =================================================================== #
         elif [ $cmd == "pages" ];
             then
-            force_build_gh_pages
+            publish_docs
         # =================================================================== #
         # Run production environment
         # =================================================================== #
