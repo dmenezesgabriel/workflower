@@ -74,7 +74,7 @@ jobs:
       - run:
           name: gh-pages -b checkout
           command: |
-            git add -fA
+            git add .
             git checkout gh-pages
       # Create .nokeyll file in gh-branches root, required by
       # github pages configuration.
@@ -87,7 +87,7 @@ jobs:
           command: |
             export COMMIT_MESSAGE=\"$(git log --format=oneline -1 --pretty=format:'%h - %B')\"
             echo $COMMIT_MESSAGE
-            git add -fA
+            git add .
             git commit --allow-empty -m "$COMMIT_MESSAGE"
             git push -f origin gh-pages
             echo "Deployed successfully"
