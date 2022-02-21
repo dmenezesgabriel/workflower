@@ -122,7 +122,7 @@ force_build_gh_pages() {
     # Force build ghpages
     ###########################################################################
     git commit -m 'rebuild pages' --allow-empty
-    git push origin <branch-name>
+    git push origin master
 }
 
 run_cli () {
