@@ -1,6 +1,6 @@
 # Cycle
 
-Every configured `CYCLE` seconds do
+Every configured `CYCLE` seconds do:
 
 - [x] Search for YAML workflow configuration files on configured directory
 - [x] Load workflows
