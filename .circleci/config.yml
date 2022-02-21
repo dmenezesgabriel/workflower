@@ -55,7 +55,7 @@ jobs:
             - ${DEPLOY_KEY_FINGERPRINT}
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist docs/_build/
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist .
 
 workflows:
   version: 2
