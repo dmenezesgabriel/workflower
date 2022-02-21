@@ -70,22 +70,6 @@
              
   <section id="cycle">
 <h1>Cycle<a class="headerlink" href="#cycle" title="Permalink to this headline"></a></h1>
-<p>Every configured <code class="docutils literal notranslate"><span class="pre">CYCLE</span></code> seconds do:</p>
-<ul class="simple">
-<li><p>[x] Search for YAML workflow configuration files on configured directory</p></li>
-<li><p>[x] Load workflows</p></li>
-<li><p>[x] Parse YAML workflow configuration files found</p></li>
-<li><p>[x] Run user input validations and raise errors if not compliant</p></li>
-<li><p>[x] Write Workflows and it’s respective jobs in database</p></li>
-<li><p>[x] Write App events on database.</p></li>
-<li><p>[x] Verify if the job has dependencies</p></li>
-<li><p>[x] If job has dependencies, <em>schedule</em> execution on it’s dependency job done <strong>event</strong></p></li>
-<li><p>[x] Schedule job</p></li>
-<li><p>[x] Alteryx job’s execution detail will be stored at database</p></li>
-<li><p>[x] Papermill job’s execution detail will be stored at database</p></li>
-<li><p>[x] Python job’s execution detail will be stored at database</p></li>
-<li><p>[x] Repeat unless stopped</p></li>
-</ul>
 </section>
 
 
