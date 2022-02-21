@@ -1,6 +1,6 @@
 # Workflow
 
-Workflow is defined on a `.yml` file and can contain multiple jobs.
+Workflow is defined on a `.yml` or `.yaml` file and can contain multiple jobs.
 
 - Workflow name must be unique
 - Workflow file name must be the same of workflow name, if not won't load
@@ -10,7 +10,7 @@ Workflow is defined on a `.yml` file and can contain multiple jobs.
 
   Example:
 
-```yml
+```yaml
 version: "1.0"
 # This a Workflow definition
 workflow:
