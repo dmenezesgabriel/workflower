@@ -4,6 +4,8 @@ Make your workday smell like daisies.
 
 From developers to data people (engineers, analysts and scientists).
 
+[docs](https://dmenezesgabriel.github.io/workflower/)
+
 ## Short Description
 
 A minimal workflow orchestrator for data pipelines, made to work on a windows or linux machine.

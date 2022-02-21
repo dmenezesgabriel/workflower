@@ -114,6 +114,7 @@ build_docs() {
     ###########################################################################
     . $venv_activate && \
     sphinx-build ./docsrc/source ./docs
+    touch ./docs/.nojekyll
 }
 
 run_cli () {
