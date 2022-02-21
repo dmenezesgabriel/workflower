@@ -121,7 +121,11 @@ publish_docs() {
     ###########################################################################
     # Force build ghpages
     ###########################################################################
-
+    eval "$(cat .env)"  && \
+    curl \
+        -H "Accept: application/vnd.github.v3+json" \
+        -u ${GH_NAME}:${GH_TOKEN} -X POST \
+        https://api.github.com/repos/${GH_NAME}/${GH_REPO}/pages/builds
 }
 
 run_cli () {
