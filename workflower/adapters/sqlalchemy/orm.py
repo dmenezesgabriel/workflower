@@ -5,6 +5,7 @@
 # - https://github.com/pcieslinski/courses_platform
 # - https://github.com/evoludigit/clean_fastapi
 # - https://github.com/kurosouza/webshop
+from workflower.adapters.sqlalchemy.setup import metadata
 from workflower.domain.entities.event import Event
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -16,14 +17,11 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
-    MetaData,
     String,
     Table,
     UniqueConstraint,
 )
 from sqlalchemy.orm import mapper, relationship
-
-metadata: MetaData = MetaData()
 
 workflow: Table = Table(
     "workflow",
