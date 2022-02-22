@@ -5,6 +5,10 @@
 # - https://github.com/pcieslinski/courses_platform
 # - https://github.com/evoludigit/clean_fastapi
 # - https://github.com/kurosouza/webshop
+from workflower.domain.entities.event import Event
+from workflower.domain.entities.job import Job
+from workflower.domain.entities.workflow import Workflow
+
 from sqlalchemy import (
     JSON,
     Boolean,
@@ -18,9 +22,6 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.orm import mapper, relationship
-from workflower.domain.entities.event import Event
-from workflower.domain.entities.job import Job
-from workflower.domain.entities.workflow import Workflow
 
 metadata: MetaData = MetaData()
 

@@ -1,43 +1,12 @@
 import logging
-from abc import ABC, abstractclassmethod
-from typing import List, Literal, Type, Union
+from typing import List
 
-from pytest import Session
-from workflower.domain.entities.event import Event
-from workflower.domain.entities.job import Job
-from workflower.domain.entities.workflow import Workflow
+from workflower.adapters.repository import Entity, Model
+from workflower.application.interfaces.repository import Repository
 
-Model = Union[Type[Workflow], Type[Job], Type[Event]]
-Entity = Union[Workflow, Job, Event]
-Relationships = Literal["jobs"]
+from sqlalchemy.orm.session import Session
 
 logger = logging.getLogger("workflower.adapters.repository")
-
-
-class Repository(ABC):
-    """
-    Port for defining Entities storage interface.
-    """
-
-    @abstractclassmethod
-    def add(self, entity: Entity):
-        raise NotImplementedError
-
-    @abstractclassmethod
-    def get(self):
-        raise NotImplementedError
-
-    @abstractclassmethod
-    def list(self, entity: Entity) -> List[Entity]:
-        raise NotImplementedError
-
-    @abstractclassmethod
-    def update(self, entity: Entity):
-        raise NotImplementedError
-
-    @abstractclassmethod
-    def remove(self, entity: Entity):
-        raise NotImplementedError
 
 
 class SqlAlchemyRepository(Repository):
