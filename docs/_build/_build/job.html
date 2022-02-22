@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job &mdash; Workflower 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Workflow" href="workflow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Workflower
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Job</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operator">Operator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#alteryx">Alteryx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#papermill">Papermill</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python">Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module">Module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#triggers">Triggers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#date">Date</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interval">Interval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cron">Cron</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dependency">Dependency</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Workflower</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Job</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/job.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="job">
+<h1>Job<a class="headerlink" href="#job" title="Permalink to this headline"></a></h1>
+<p>A task that can be execute python code, jupyter notebook or some other thing needed.</p>
+<section id="operator">
+<h2>Operator<a class="headerlink" href="#operator" title="Permalink to this headline"></a></h2>
+<p>Operator definition, define which <strong>Operator</strong> to use.</p>
+<ul class="simple">
+<li><p>alteryx</p></li>
+<li><p>papermill</p></li>
+<li><p>module</p></li>
+<li><p>python</p></li>
+</ul>
+<section id="alteryx">
+<h3>Alteryx<a class="headerlink" href="#alteryx" title="Permalink to this headline"></a></h3>
+<p>Alteryx job use definition tell the job to use <code class="docutils literal notranslate"><span class="pre">workflower.operators.alteryx.AlteryxOperator</span></code>, which once called will run an Alteryx <code class="docutils literal notranslate"><span class="pre">.xymd</span></code> file on command line, if the machine has a valid Alteryx installation and active license.</p>
+<p>The Alteryx workflow <code class="docutils literal notranslate"><span class="pre">path</span></code> must be present on job’s yaml definition.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># alteryx_interval_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;combine_two_sheets&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># define</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Alteryx .xymd file path.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="papermill">
+<h3>Papermill<a class="headerlink" href="#papermill" title="Permalink to this headline"></a></h3>
+<p><a class="reference external" href="https://github.com/nteract/papermill">Papermill</a> is a python library to run <a class="reference external" href="https://jupyter.org/">Jupyter</a> notebooks <strong>programmatically</strong>.</p>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.papermill.PapermillOperator</span></code>.</p>
+<p>Papermill expects a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file’s path as input so it can execute programmatically, and after it’s execution, an <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> executed file is generated with it’s cell’s outputs and erros if there were any. The <em>output</em> path is also expected, and must be in an existing directory.</p>
+<p>At every execution a python virtual environment <a class="reference external" href="https://docs.python.org/3/library/venv.html">(venv)</a> is created, so the packages needed for the job won’t conflict with applications’s packages, after the execution the environment is deleted.</p>
+<p>You can install the packages with <code class="docutils literal notranslate"><span class="pre">%pip</span></code> cell magic:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="c1"># Will print the execution environment path.</span>
+<span class="n">pandas</span><span class="o">.</span><span class="n">__path__</span>
+</pre></div>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># papermill_cron_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill_cron_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill expects an .ipynb file path as input.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Papermill&#39;s execution results in a jupyter notebook output at a given path.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">output_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minute</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*/2&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline"></a></h3>
+<p>The python job use can run a script or a code string, the execution happens on a temporary virtual environment <a class="reference external" href="https://docs.python.org/3/library/venv.html">(venv)</a> that is deleted at the end of execution.</p>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.python.PythonOperator</span></code>, and it expects a <code class="docutils literal notranslate"><span class="pre">code</span></code> string definition or <code class="docutils literal notranslate"><span class="pre">script</span> <span class="pre">path</span></code>, both can use a <em>requirements.txt</em> file for external libraries.</p>
+<p>A script execution expects a <code class="docutils literal notranslate"><span class="pre">.py</span></code> existing file.</p>
+<ul class="simple">
+<li><p><strong>code</strong>:</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># python_code_interval_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_code_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow jobs definition.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_code&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Code string</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Hello,</span><span class="nv"> </span><span class="s">World!&#39;)&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>script</strong>:</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># python_script_interval_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_script_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_script&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Script path</span><span class="w"></span>
+<span class="w">      </span><span class="nt">script_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Requirements path</span><span class="w"></span>
+<span class="w">      </span><span class="nt">requirements_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># requirements.txt</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">requests</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="module">
+<h3>Module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h3>
+<p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.modules.module.BaseModule</span></code> subclass which will execute what is defined on run function. This class will be used by <code class="docutils literal notranslate"><span class="pre">workflower.operators.module.ModuleOperator</span></code>.</p>
+<p>The module operator expects a valid module path, containing a file with a <code class="docutils literal notranslate"><span class="pre">Module</span></code> class and a <code class="docutils literal notranslate"><span class="pre">run</span></code> function.</p>
+<p><strong>Module example</strong>:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">workflower.modules.module</span> <span class="kn">import</span> <span class="n">BaseModule</span>
+
+<span class="kn">from</span> <span class="nn">playwright.sync_api</span> <span class="kn">import</span> <span class="n">sync_playwright</span>
+
+
+<span class="k">class</span> <span class="nc">Module</span><span class="p">(</span><span class="n">BaseModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugins</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span> <span class="o">=</span> <span class="n">plugins</span>
+
+    <span class="c1"># Expected run function with the business logic that will be called by the ModuleOperator.</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">sync_playwright</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">browser</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">()</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="s2">&quot;http://playwright.dev&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span>
+            <span class="n">browser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>A Module can use application plugins.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># module_interval_trigger.yml</span><span class="w"></span>
+<span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow name must match with file name.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module_interval_trigger</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter_module&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module</span><span class="w"></span>
+<span class="w">      </span><span class="nt">module_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="nt">module_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Module plugins.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">plugins</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tableau_document_plugin</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+<span class="w">      </span><span class="nt">minutes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="triggers">
+<h2>Triggers<a class="headerlink" href="#triggers" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>date</p></li>
+<li><p>interval</p></li>
+<li><p>cron</p></li>
+<li><p>dependency</p></li>
+</ul>
+<section id="date">
+<h3>Date<a class="headerlink" href="#date" title="Permalink to this headline"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span><span class="w"></span>
+<span class="nt">run_date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2022-01-01</span><span class="nv"> </span><span class="s">16:30:05&quot;</span><span class="w"></span>
+<span class="nt">timezone</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;America/Sao_Paulo&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>run_date (str)</strong>: the date/time to run the job at, if not present will run on next execution cycle.</p></li>
+<li><p><strong>timezone (str)</strong>: time zone for <code class="docutils literal notranslate"><span class="pre">run_date</span></code></p></li>
+</ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/date.html">APScheduler reference</a></p>
+</section>
+<section id="interval">
+<h3>Interval<a class="headerlink" href="#interval" title="Permalink to this headline"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">interval</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>weeks (int)</strong>: number of weeks to wait</p></li>
+<li><p><strong>days (int)</strong>: number of days to wait</p></li>
+<li><p><strong>hours (int)</strong>: number of hours to wait</p></li>
+<li><p><strong>minutes (int)</strong>: number of minutes to wait</p></li>
+<li><p><strong>seconds (int)</strong>: number of seconds to wait</p></li>
+<li><p><strong>start_date (str)</strong>: starting point for the interval calculation</p></li>
+<li><p><strong>end_date (str)</strong>: latest possible date/time to trigger on</p></li>
+<li><p><strong>timezone (str)</strong>: time zone to use for the date/time calculations</p></li>
+<li><p><strong>jitter (int)</strong>: delay the job execution by jitter seconds at most</p></li>
+</ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/interval.html">APScheduler reference</a></p>
+</section>
+<section id="cron">
+<h3>Cron<a class="headerlink" href="#cron" title="Permalink to this headline"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cron</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>year (int|str)</strong>: 4-digit year</p></li>
+<li><p><strong>month (int|str)</strong>: month (1-12)</p></li>
+<li><p><strong>day (int|str)</strong>: day of month (1-31)</p></li>
+<li><p><strong>week (int|str)</strong>: ISO week (1-53)</p></li>
+<li><p><strong>day_of_week (int|str)</strong>: number or name of weekday (0-6 or mon,tue,wed,thu,fri,sat,sun)</p></li>
+<li><p><strong>hour (int|str)</strong>: hour (0-23)</p></li>
+<li><p><strong>minute (int|str)</strong>: minute (0-59)</p></li>
+<li><p><strong>second (int|str)</strong>: second (0-59)</p></li>
+<li><p><strong>start_date (str)</strong>: earliest possible date/time to trigger on (inclusive)</p></li>
+<li><p><strong>end_date (str)</strong>: latest possible date/time to trigger on (inclusive)</p></li>
+<li><p><strong>timezone (str)</strong>: time zone to use for the date/time calculations (defaults to scheduler timezone)</p></li>
+<li><p><strong>jitter (int)</strong>: delay the job execution by jitter seconds at most</p></li>
+</ul>
+<p><a class="reference external" href="https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html">APScheduler reference</a></p>
+</section>
+<section id="dependency">
+<h3>Dependency<a class="headerlink" href="#dependency" title="Permalink to this headline"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"></span>
+<span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">other_job_name</span><span class="w"></span>
+</pre></div>
+</div>
+<p><strong>Example</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># version: is referent to yaml schema, the version of the way th yml or yaml</span><span class="w"></span>
+<span class="c1"># file should be written, it must be string type.</span><span class="w"></span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="nt">workflow</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># workflow&#39;s name must always match it&#39;s file name, if not will no be load,</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># in this case the file name should be dependency_log_pattern_match.yml</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># An easy way of deactivating an workflow is putting an underscore prefix in</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># it&#39;s name, like _dependency_log_pattern_match.yml</span><span class="w"></span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency_log_pattern_match</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Workflow can have one or more jobs</span><span class="w"></span>
+<span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># The job name does not affect in execution like workflow&#39;s, but it should</span><span class="w"></span>
+<span class="w">    </span><span class="c1"># be clear for people you may share.</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;first_job&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job can use</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job operator python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;First</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - interval</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - cron</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - dependency</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># if trigger is type date and has no other key reference like :run_date:</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># it will be executed immediately accordingly to configured scheduler</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># sleep cycle</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;second_job&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Job can use</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - python</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job operator python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Second</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - interval</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - cron</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># - dependency</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trigger</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dependency</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># If trigger is dependency it must depends on a job in the same workflow</span><span class="w"></span>
+<span class="w">      </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first_job</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># The part below is optional for this trigger, you can pass a string</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># pattern to check if it&#39;s in previous job logs output.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">dependency_logs_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;First&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># Decide if run when has dependency log pattern and it matches with</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># previous job logs output.</span><span class="w"></span>
+<span class="w">      </span><span class="nt">run_if_pattern_match</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"> </span><span class="c1"># bool</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="workflow.html" class="btn btn-neutral float-left" title="Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Gabriel Dias Menezes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
