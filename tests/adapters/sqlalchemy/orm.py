@@ -28,4 +28,17 @@ class TestWorkflowMapper:
 
 
 class TestJobMapper:
-    pass
+    def test_job_mapper_can_load_jobs(self, session):
+        session.execute(
+            """
+            INSERT INTO job (name, operator, definition) VALUES
+            ("test0", "python", '{"trigger": "date"}')
+            """
+        )
+        jobs = session.query(Job).all()
+        assert jobs[0].name == "test0"
+
+        # name,
+        # operator,
+        # definition,
+        # workflow,
