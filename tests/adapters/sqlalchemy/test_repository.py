@@ -83,6 +83,32 @@ class TestSqlAlchemyRepository:
         assert workflows[1].name == "test1"
         assert workflows[2].name == "test2"
 
+    def test_repository_update_entity(self, session_factory):
+        first_session = session_factory()
+
+        assert first_session.query(Workflow).all() == []
+
+        first_session.execute(
+            """
+            INSERT INTO workflow (name) VALUES
+            ("test0")
+            """
+        )
+        first_session.commit()
+
+        assert len(first_session.query(Workflow).all()) == 1
+
+        second_session = session_factory()
+
+        repository = SqlAlchemyRepository(second_session, model=Workflow)
+        repository.update(dict(id=1), dict(name="new_name"))
+        second_session.commit()
+
+        third_session = session_factory()
+        second_repository = SqlAlchemyRepository(third_session, model=Workflow)
+        record = second_repository.get(id=1)
+        record.name == "new_name"
+
     def test_repository_deletes_entity(self, session_factory):
         session = session_factory()
 
