@@ -2,9 +2,9 @@
 
 A task that can be execute python code, jupyter notebook or some other thing needed.
 
-## Uses
+## Operator
 
-Uses definition, define which **Operator** to use.
+Operator definition, define which **Operator** to use.
 
 - alteryx
 - papermill
@@ -29,7 +29,7 @@ workflow:
     # The name of a job does not affect the applications behaviour.
     - name: "combine_two_sheets"
       # define
-      uses: alteryx
+      operator: alteryx
       # Alteryx .xymd file path.
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
       # Job trigger configuration
@@ -68,7 +68,7 @@ workflow:
   jobs:
     # The name of a job does not affect the applications behaviour.
     - name: "notebook_install_packages"
-      uses: papermill
+      operator: papermill
       # Papermill paths
       # Papermill expects an .ipynb file path as input.
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb"
@@ -100,7 +100,7 @@ workflow:
   jobs:
     # The name of a job does not affect the applications behaviour.
     - name: "hello_python_code"
-      uses: python
+      operator: python
       # Code string
       code: "print('Hello, World!')"
       # Job trigger configuration
@@ -120,7 +120,7 @@ workflow:
   jobs:
     # The name of a job does not affect the applications behaviour.
     - name: "hello_python_script"
-      uses: python
+      operator: python
       # Script path
       script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py"
       # Requirements path
@@ -177,7 +177,7 @@ workflow:
   jobs:
     # The name of a job does not affect the applications behaviour.
     - name: "tableau_linter_module"
-      uses: module
+      operator: module
       module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py"
       module_name: "tableau_linter"
       # Module plugins.
@@ -276,8 +276,8 @@ workflow:
       # - papermill
       # - module
       # - alteryx
-      uses: python # str
-      # when job uses python, can have a code or script_path option
+      operator: python # str
+      # when job operator python, can have a code or script_path option
       code: "print('First Job!')" # str
       # trigger can be
       # - date
@@ -294,8 +294,8 @@ workflow:
       # - papermill
       # - module
       # - alteryx
-      uses: python # str
-      # when job uses python, can have a code or script_path option
+      operator: python # str
+      # when job operator python, can have a code or script_path option
       code: "print('Second Job!')" # str
       # trigger can be
       # - date

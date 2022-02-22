@@ -81,7 +81,7 @@ def job_has_expected_keys(job_dict: dict) -> bool:
     """
     Validate job attributes.
     """
-    job_keys = ["name", "uses", "trigger"]
+    job_keys = ["name", "operator", "trigger"]
     if not all(key in job_dict.keys() for key in job_keys):
         raise InvalidSchemaError(
             "The job must have all of it's keys: " f"{', '.join(job_keys)}"
@@ -98,23 +98,23 @@ def job_name_is_string_type(job_dict: dict) -> bool:
     return True
 
 
-def job_uses_is_string_type(job_dict: dict) -> bool:
+def job_operator_is_string_type(job_dict: dict) -> bool:
     """
-    Validate job uses data type.
+    Validate job operator data type.
     """
-    if not isinstance(job_dict["uses"], str):
+    if not isinstance(job_dict["operator"], str):
         raise InvalidTypeError("Name must be type string")
     return True
 
 
-def job_uses_options_in_expected(job_dict) -> bool:
+def job_operator_options_in_expected(job_dict) -> bool:
     """
-    Job uses must have expected options.
+    Job operator must have expected options.
     """
-    job_uses_options = ["alteryx", "papermill", "python", "module"]
-    if job_dict["uses"] not in job_uses_options:
+    job_operator_options = ["alteryx", "papermill", "python", "module"]
+    if job_dict["operator"] not in job_operator_options:
         raise InvalidSchemaError(
-            f"Job uses options must be in: {', '.join(job_uses_options)}"
+            f"Job operator options must be in: {', '.join(job_operator_options)}"
         )
     return True
 
@@ -192,7 +192,7 @@ def alteryx_job_paths_ends_with_yxmd(job_dict: dict) -> bool:
 
 def validate_alteryx_job(job_dict: dict) -> None:
     """
-    Validate Alteryx job uses.
+    Validate Alteryx job operator.
     """
     alteryx_job_use_has_expected_keys(job_dict)
     alteryx_job_path_is_file(job_dict)
@@ -247,29 +247,29 @@ def module_job_paths_ends_with_yxmd(job_dict: dict) -> bool:
 
 def validate_module_job(job_dict: dict) -> None:
     """
-    Validate Module job uses.
+    Validate Module job operator.
     """
     module_job_use_has_expected_keys(job_dict)
     module_job_path_is_file(job_dict)
     module_job_paths_ends_with_yxmd(job_dict)
 
 
-def validate_job_uses(job_dict: dict) -> None:
+def validate_job_operator(job_dict: dict) -> None:
     """
-    Validate job uses.
+    Validate job operator.
     """
-    job_uses_is_string_type(job_dict)
-    job_uses_options_in_expected(job_dict)
+    job_operator_is_string_type(job_dict)
+    job_operator_options_in_expected(job_dict)
     # Papermill
-    if job_dict["uses"] == "papermill":
+    if job_dict["operator"] == "papermill":
         validate_papermill_job(job_dict)
     # Alteryx
-    if job_dict["uses"] == "alteryx":
+    if job_dict["operator"] == "alteryx":
         validate_alteryx_job(job_dict)
     # Job triggers
-    if job_dict["uses"] == "python":
+    if job_dict["operator"] == "python":
         validate_python_job(job_dict)
-    if job_dict["uses"] == "module":
+    if job_dict["operator"] == "module":
         validate_module_job(job_dict)
 
 
@@ -355,8 +355,8 @@ def validate_workflow_jobs_definition(configuration_dict: dict) -> None:
         jobs_names.append(job["name"])
         job_name_is_string_type(job)
         job_has_expected_keys(job)
-        #  Job uses
-        validate_job_uses(job)
+        #  Job operator
+        validate_job_operator(job)
 
 
 def validate_schema(configuration_dict: dict) -> bool:

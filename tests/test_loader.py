@@ -33,7 +33,7 @@ def temp_workflow_file(tmpdir_factory):
         name: test_file
         jobs:
           - name: "hello_python_code"
-            uses: python
+            operator: python
             code: "print('Hello, World!')"
             trigger: interval
             minutes: 2

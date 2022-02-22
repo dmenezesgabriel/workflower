@@ -240,7 +240,7 @@ class AlteryxOperatorParseStrategy(ParseStrategy):
     """
 
     def __init__(self) -> None:
-        self.uses_config = {}
+        self.operator_config = {}
         self.schema_args = []
         self.schema_kwargs = {}
 
@@ -249,10 +249,10 @@ class AlteryxOperatorParseStrategy(ParseStrategy):
         if not os.path.isfile(workflow_file_path):
             logger.error("Not a valid job path")
         self.schema_kwargs.update(dict(workflow_file_path=workflow_file_path))
-        self.uses_config.update(dict(func="AlteryxOperator.execute"))
+        self.operator_config.update(dict(func="AlteryxOperator.execute"))
         result_dict = dict()
-        if self.uses_config:
-            result_dict.update(self.uses_config)
+        if self.operator_config:
+            result_dict.update(self.operator_config)
         if self.schema_args:
             result_dict.update(dict(args=self.schema_args))
         if self.schema_kwargs:
@@ -266,7 +266,7 @@ class PapermillOperatorParseStrategy(ParseStrategy):
     """
 
     def __init__(self) -> None:
-        self.uses_config = {}
+        self.operator_config = {}
         self.schema_args = []
         self.schema_kwargs = {}
 
@@ -275,7 +275,7 @@ class PapermillOperatorParseStrategy(ParseStrategy):
         if not os.path.isfile(input_path):
             logger.error("Not a valid job path")
         output_path = configuration_dict.get("output_path")
-        self.uses_config.update(dict(func="PapermillOperator.execute"))
+        self.operator_config.update(dict(func="PapermillOperator.execute"))
         self.schema_kwargs.update(
             dict(
                 input_path=input_path,
@@ -287,8 +287,8 @@ class PapermillOperatorParseStrategy(ParseStrategy):
             )
         )
         result_dict = dict()
-        if self.uses_config:
-            result_dict.update(self.uses_config)
+        if self.operator_config:
+            result_dict.update(self.operator_config)
         if self.schema_args:
             result_dict.update(dict(args=self.schema_args))
         if self.schema_kwargs:
@@ -302,7 +302,7 @@ class PythonOperatorParseStrategy(ParseStrategy):
     """
 
     def __init__(self) -> None:
-        self.uses_config = {}
+        self.operator_config = {}
         self.schema_args = []
         self.schema_kwargs = {}
 
@@ -329,10 +329,10 @@ class PythonOperatorParseStrategy(ParseStrategy):
                 environments_dir=Config.ENVIRONMENTS_DIR,
             )
         )
-        self.uses_config.update(dict(func="PythonOperator.execute"))
+        self.operator_config.update(dict(func="PythonOperator.execute"))
         result_dict = dict()
-        if self.uses_config:
-            result_dict.update(self.uses_config)
+        if self.operator_config:
+            result_dict.update(self.operator_config)
         if self.schema_args:
             result_dict.update(dict(args=self.schema_args))
         if self.schema_kwargs:
@@ -346,7 +346,7 @@ class ModuleOperatorParseStrategy(ParseStrategy):
     """
 
     def __init__(self) -> None:
-        self.uses_config = {}
+        self.operator_config = {}
         self.schema_args = []
         self.schema_kwargs = {}
 
@@ -356,7 +356,7 @@ class ModuleOperatorParseStrategy(ParseStrategy):
             logger.error("Not a valid job path")
         module_name = configuration_dict.get("module_name")
         module_plugins = configuration_dict.get("plugins")
-        self.uses_config.update(dict(func="ModuleOperator.execute"))
+        self.operator_config.update(dict(func="ModuleOperator.execute"))
         self.schema_kwargs.update(
             dict(
                 module_path=module_path,
@@ -365,8 +365,8 @@ class ModuleOperatorParseStrategy(ParseStrategy):
             )
         )
         result_dict = dict()
-        if self.uses_config:
-            result_dict.update(self.uses_config)
+        if self.operator_config:
+            result_dict.update(self.operator_config)
         if self.schema_args:
             result_dict.update(dict(args=self.schema_args))
         if self.schema_kwargs:
@@ -390,7 +390,7 @@ class JobOperatorSchemaParser:
     def strategy(self, strategy: ParseStrategy):
         self._strategy = strategy
 
-    def parse_uses(self, configuration_dict: dict):
+    def parse_operator(self, configuration_dict: dict):
         return self._strategy.parse(configuration_dict)
 
 
@@ -423,23 +423,23 @@ class JobSchemaParser:
         )
         return trigger_parser.parse(configuration_dict)
 
-    def _parse_job_uses(self, configuration_dict: dict) -> dict:
+    def _parse_job_operator(self, configuration_dict: dict) -> dict:
         """
-        Define job uses from dict.
+        Define job operator from dict.
         """
-        job_uses = configuration_dict.get("uses")
-        logger.debug(f"Job trigger {job_uses}")
-        uses_parser = JobOperatorSchemaParser(
-            _create_operator_parse_strategy(job_uses)
+        job_operator = configuration_dict.get("operator")
+        logger.debug(f"Job trigger {job_operator}")
+        operator_parser = JobOperatorSchemaParser(
+            _create_operator_parse_strategy(job_operator)
         )
-        return uses_parser.parse_uses(configuration_dict)
+        return operator_parser.parse_operator(configuration_dict)
 
     def parse_schema(self, configuration_dict: dict) -> tuple:
         """
         Parse Job schema.
         """
         job_name = configuration_dict.get("name")
-        job_uses = configuration_dict.get("uses")
+        job_operator = configuration_dict.get("operator")
         job_depends_on = configuration_dict.get("depends_on", None)
         if job_depends_on:
             dependency_logs_pattern = configuration_dict.get(
@@ -452,13 +452,13 @@ class JobSchemaParser:
             dependency_logs_pattern = None
             run_if_pattern_match = None
         job_trigger_options = self._parse_job_trigger(configuration_dict)
-        job_uses_options = self._parse_job_uses(configuration_dict)
+        job_operator_options = self._parse_job_operator(configuration_dict)
         job_config = dict(
-            executor="default", **job_trigger_options, **job_uses_options
+            executor="default", **job_trigger_options, **job_operator_options
         )
         return (
             job_name,
-            job_uses,
+            job_operator,
             job_depends_on,
             dependency_logs_pattern,
             run_if_pattern_match,

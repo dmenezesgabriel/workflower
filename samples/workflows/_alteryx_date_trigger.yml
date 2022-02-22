@@ -17,8 +17,8 @@ workflow:
       # - papermill
       # - module
       # - alteryx
-      uses: alteryx
-      # when job uses alteryx, it should have path
+      operator: alteryx
+      # when job operator alteryx, it should have path
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd" # str
       # trigger can be
       # - date

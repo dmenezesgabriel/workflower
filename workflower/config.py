@@ -46,7 +46,7 @@ class Config:
         "LOGGING_PATH",
         os.path.join(
             DATA_DIR,
-            "logs",
+            "log",
         ),
     )
     LOGGING_FILE = os.getenv("LOGGING_FILE", "log.log")

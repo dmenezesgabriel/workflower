@@ -31,8 +31,8 @@ class Job(BaseModel):
         "name",
         String,
     )
-    uses = Column(
-        "uses",
+    operator = Column(
+        "operator",
         String,
     )
     definition = Column(
@@ -84,7 +84,7 @@ class Job(BaseModel):
     def __init__(
         self,
         name,
-        uses,
+        operator,
         definition,
         depends_on,
         workflow,
@@ -99,7 +99,7 @@ class Job(BaseModel):
         # running
         # executed (if trigger says tha should run only once)
         self.name = name
-        self.uses = uses
+        self.operator = operator
         self.definition = definition
         self.depends_on = depends_on
         self.dependency_logs_pattern = dependency_logs_pattern
@@ -111,7 +111,7 @@ class Job(BaseModel):
 
     def __repr__(self) -> str:
         return (
-            f"Job(name={self.name}, uses={self.uses}, "
+            f"Job(name={self.name}, operator={self.operator}, "
             f"definition={self.definition}, "
             f"depends_on={self.depends_on}, "
             f"dependency_logs_pattern={self.dependency_logs_pattern}, "
@@ -129,7 +129,7 @@ class Job(BaseModel):
         job_parser = JobSchemaParser()
         (
             job_name,
-            job_uses,
+            job_operator,
             job_depends_on,
             dependency_logs_pattern,
             run_if_pattern_match,
@@ -165,7 +165,7 @@ class Job(BaseModel):
                     id=job.id,
                 )
                 update_dict = dict(
-                    uses=job_uses,
+                    operator=job_operator,
                     definition=job_definition,
                     depends_on=job_depends_on_id,
                     dependency_logs_pattern=dependency_logs_pattern,
@@ -180,7 +180,7 @@ class Job(BaseModel):
                 session,
                 cls,
                 name=job_name,
-                uses=job_uses,
+                operator=job_operator,
                 definition=job_definition,
                 depends_on=job_depends_on_id,
                 dependency_logs_pattern=dependency_logs_pattern,
@@ -219,7 +219,7 @@ class Job(BaseModel):
         if schedule_kwargs:
             schedule_kwargs.update(kwargs)
 
-        operator = create_operator(self.uses)
+        operator = create_operator(self.operator)
         schedule_params.update(dict(func=getattr(operator, "execute")))
         return schedule_params
 

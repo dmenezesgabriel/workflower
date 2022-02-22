@@ -160,7 +160,7 @@ class TestWorkflowSchemaValidation:
 class TestJobSchemaValidation:
     @pytest.fixture(scope="function")
     def job_dict(cls):
-        return {"name": "job_name", "uses": "python", "trigger": "date"}
+        return {"name": "job_name", "operator": "python", "trigger": "date"}
 
     def test_job_has_expected_keys(cls, job_dict):
         """
@@ -171,9 +171,9 @@ class TestJobSchemaValidation:
     @pytest.mark.parametrize(
         "test_input",
         [
-            ({"uses": "python", "trigger": "date"}),
+            ({"operator": "python", "trigger": "date"}),
             ({"name": "job_name", "trigger": "date"}),
-            ({"name": "job_name", "uses": "python"}),
+            ({"name": "job_name", "operator": "python"}),
         ],
     )
     def test_job_has_expected_keys_missing_keys(cls, test_input):
@@ -204,57 +204,57 @@ class TestJobSchemaValidation:
         with pytest.raises(InvalidTypeError):
             validator.job_name_is_string_type(test_input)
 
-    def test_job_uses_is_string_type_true(cls, job_dict):
+    def test_job_operator_is_string_type_true(cls, job_dict):
         """
-        Job uses must be dict type.
+        Job operator must be dict type.
         """
-        assert validator.job_uses_is_string_type(job_dict) is True
+        assert validator.job_operator_is_string_type(job_dict) is True
 
     @pytest.mark.parametrize(
         "test_input",
         [
-            ({"uses": 1}),
-            ({"uses": 1.1}),
-            ({"uses": True}),
-            ({"uses": {}}),
-            ({"uses": []}),
-            ({"uses": ()}),
+            ({"operator": 1}),
+            ({"operator": 1.1}),
+            ({"operator": True}),
+            ({"operator": {}}),
+            ({"operator": []}),
+            ({"operator": ()}),
         ],
     )
-    def test_job_uses_is_string_type_not_string(cls, test_input):
+    def test_job_operator_is_string_type_not_string(cls, test_input):
         with pytest.raises(InvalidTypeError):
-            validator.job_uses_is_string_type(test_input)
+            validator.job_operator_is_string_type(test_input)
 
     @pytest.mark.parametrize(
         "test_input",
         [
-            ({"uses": "alteryx"}),
-            ({"uses": "papermill"}),
-            ({"uses": "python"}),
+            ({"operator": "alteryx"}),
+            ({"operator": "papermill"}),
+            ({"operator": "python"}),
         ],
     )
-    def test_job_uses_options_in_expected(cls, test_input):
+    def test_job_operator_options_in_expected(cls, test_input):
         """
-        Job uses must have expected options.
+        Job operator must have expected options.
         """
-        assert validator.job_uses_options_in_expected(test_input) is True
+        assert validator.job_operator_options_in_expected(test_input) is True
 
     @pytest.mark.parametrize(
         "test_input",
         [
-            ({"uses": "altery"}),
-            ({"uses": "papermil"}),
-            ({"uses": "pyton"}),
+            ({"operator": "altery"}),
+            ({"operator": "papermil"}),
+            ({"operator": "pyton"}),
         ],
     )
-    def test_job_uses_options_in_expected_not_in_expected(cls, test_input):
+    def test_job_operator_options_in_expected_not_in_expected(cls, test_input):
         """
-        Job uses must have expected options.
+        Job operator must have expected options.
         """
         with pytest.raises(InvalidSchemaError):
-            validator.job_uses_options_in_expected(test_input)
+            validator.job_operator_options_in_expected(test_input)
 
-    def test_validate_job_uses(cls):
+    def test_validate_job_operator(cls):
         # TODO
         # Implement this
         pass
@@ -318,7 +318,7 @@ class TestPapermillJobSchemaValidation:
     def job_dict(cls, jupyter_notebook_file):
         return {
             "name": "job_name",
-            "uses": "papermill",
+            "operator": "papermill",
             "trigger": "interval",
             "minutes": 1,
             "input_path": str(jupyter_notebook_file(name="notebook.ipynb")),
@@ -339,7 +339,7 @@ class TestPapermillJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "papermill",
+                    "operator": "papermill",
                     "trigger": "date",
                     "input_path": "",
                 }
@@ -347,7 +347,7 @@ class TestPapermillJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "papermill",
+                    "operator": "papermill",
                     "trigger": "date",
                     "output_path": "",
                 }
@@ -355,7 +355,7 @@ class TestPapermillJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "papermill",
+                    "operator": "papermill",
                     "trigger": "date",
                 }
             ),
@@ -394,7 +394,7 @@ class TestPapermillJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "papermill",
+                    "operator": "papermill",
                     "trigger": "interval",
                     "minutes": 1,
                     "input_path": "./test.txt",
@@ -404,7 +404,7 @@ class TestPapermillJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "papermill",
+                    "operator": "papermill",
                     "trigger": "interval",
                     "minutes": 1,
                     "input_path": "./test.ipynb",
@@ -469,7 +469,7 @@ class TestAlteryxJobSchemaValidation:
     def job_dict(cls, alteryx_workflow_file):
         return {
             "name": "job_name",
-            "uses": "alteryx",
+            "operator": "alteryx",
             "path": alteryx_workflow_file,
             "trigger": "interval",
             "minutes": 1,
@@ -487,7 +487,7 @@ class TestAlteryxJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "alteryx",
+                    "operator": "alteryx",
                     "trigger": "date",
                 }
             ),
@@ -526,7 +526,7 @@ class TestAlteryxJobSchemaValidation:
             (
                 {
                     "name": "job_name",
-                    "uses": "alteryx",
+                    "operator": "alteryx",
                     "trigger": "interval",
                     "minutes": 1,
                     "path": "./test.txt",

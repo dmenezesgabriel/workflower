@@ -115,8 +115,8 @@ Waiting command:
   A set of jobs that should be executed with some recurrence.
 - **Job**:
   A task that can be execute a python code, a jupyter notebook or some other thing needed.
-- **Uses**:
-  What is the operator where the job is executed on, like python, papermill(runs jupyter notebooks).
+- **Operator**:
+  The operator where the job is executed on, like python, papermill(runs jupyter notebooks).
 - **Trigger**:
   Type of schedule definition, can be a fixed date, cron, or time interval.
 - **Plugins**:

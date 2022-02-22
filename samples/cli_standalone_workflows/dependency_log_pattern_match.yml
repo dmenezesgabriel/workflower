@@ -17,8 +17,8 @@ workflow:
       # - papermill
       # - module
       # - alteryx
-      uses: python # str
-      # when job uses python, can have a code or script_path option
+      operator: python # str
+      # when job operator python, can have a code or script_path option
       code: "print('First Job!')" # str
       # trigger can be
       # - date
@@ -35,8 +35,8 @@ workflow:
       # - papermill
       # - module
       # - alteryx
-      uses: python # str
-      # when job uses python, can have a code or script_path option
+      operator: python # str
+      # when job operator python, can have a code or script_path option
       code: "print('Second Job!')" # str
       # trigger can be
       # - date

@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import sys
-
+import traceback
 from workflower.cli.commands import FUNCTION_MAP
 from workflower.config import Config
 
@@ -78,7 +78,7 @@ class CLI:
                         _get_command(command)
 
             except Exception as e:
-                logger.error(f"Invalid argument: {e}")
+                logger.error(f"{traceback.print_exc()}")
                 sys.exit(1)
 
         else:

@@ -17,7 +17,7 @@ def temp_workflow_file(tmpdir_factory):
       name: python_code_sample_interval_trigger
       jobs:
         - name: "hello_python_code"
-          uses: python
+          operator: python
           code: "print('Hello, World!')"
           trigger: interval
           minutes: 2

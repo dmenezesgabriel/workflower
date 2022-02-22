@@ -3,7 +3,7 @@ workflow:
   name: alteryx_interval_trigger
   jobs:
     - name: "combine_two_sheets"
-      uses: alteryx
+      operator: alteryx
       path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
       trigger: interval
       minutes: 1

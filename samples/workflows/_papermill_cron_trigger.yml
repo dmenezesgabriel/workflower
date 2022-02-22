@@ -3,7 +3,7 @@ workflow:
   name: papermill_cron_trigger
   jobs:
     - name: "notebook_install_packages"
-      uses: papermill
+      operator: papermill
       # Papermill paths
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb"
       output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb"

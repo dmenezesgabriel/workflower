@@ -3,7 +3,7 @@ workflow:
   name: playwright_hello
   jobs:
     - name: playwright_hello
-      uses: module
+      operator: module
       module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\playwright\\playwright_hello.py"
       module_name: "playwright_hello"
       trigger: date

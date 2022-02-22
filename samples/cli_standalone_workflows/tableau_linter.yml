@@ -3,14 +3,14 @@ workflow:
   name: module_run_instantly
   jobs:
     - name: tableau_linter_module
-      uses: module
+      operator: module
       module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py"
       module_name: "tableau_linter"
       plugins:
         - tableau_document_plugin
       trigger: date
     - name: "hello_python_code"
-      uses: python
+      operator: python
       code: "print('Hello, World!')"
       trigger: dependency
       depends_on: tableau_linter_module
