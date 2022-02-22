@@ -35,7 +35,7 @@ class Workflow:
         file_last_modified_at=None,
         modified_since_last_load=False,
         #  Jobs
-        jobs=None,
+        jobs: List[Job] = None,
     ):
         self.name = name
         self.file_path = file_path
@@ -43,7 +43,7 @@ class Workflow:
         self.file_last_modified_at = file_last_modified_at
         self.modified_since_last_load = modified_since_last_load
         self.is_active = is_active
-        self.jobs: List[Job] or None = jobs
+        self.jobs = jobs or []
 
     def __repr__(self) -> str:
         return (
