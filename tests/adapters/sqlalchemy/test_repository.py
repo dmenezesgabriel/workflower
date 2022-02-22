@@ -1,5 +1,3 @@
-from re import A
-
 from workflower.adapters.sqlalchemy.repository import SqlAlchemyRepository
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
