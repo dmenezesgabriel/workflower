@@ -1,12 +1,43 @@
 import logging
 import os
 import traceback
+from abc import ABC, abstractclassmethod
 from typing import List
 
 from workflower.config import Config
-from workflower.models.workflow import Workflow
+from workflower.domain.entities.workflow import Workflow
+from workflower.schema.parser import WorkflowSchemaParser
+from workflower.utils.file import yaml_file_to_dict
 
 logger = logging.getLogger("workflower.loader")
+
+
+class LoadStrategy(ABC):
+    @abstractclassmethod
+    def load(self):
+        raise NotImplementedError
+
+
+class YmlLoadStrategy(LoadStrategy):
+    def load(self, file_path: str):
+        return yaml_file_to_dict(file_path)
+
+
+class WorkflowFileLoader:
+    def __init__(self, strategy: LoadStrategy):
+        self._strategy = strategy
+
+    @property
+    def strategy(self):
+        return self._strategy
+
+    @strategy.setter
+    def strategy(self, strategy: LoadStrategy):
+        self._strategy = strategy
+
+    def load_workflow(self, file_path: str):
+        WorkflowSchemaParser()
+        self._strategy.load(file_path)
 
 
 class WorkflowLoader:

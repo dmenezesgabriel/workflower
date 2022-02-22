@@ -14,6 +14,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Column,
+    DateTime,
     ForeignKey,
     Index,
     Integer,
@@ -22,10 +23,18 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.orm import mapper, relationship
+from sqlalchemy.sql import func
 
 workflow: Table = Table(
     "workflow",
     metadata,
+    Column(
+        "id",
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        index=True,
+    ),
     Column(
         "name",
         String,
@@ -56,11 +65,28 @@ workflow: Table = Table(
         Boolean,
         default=False,
     ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        server_default=func.now(),
+    ),
+    Column(
+        "updated_at",
+        DateTime(timezone=True),
+        onupdate=func.now(),
+    ),
 )
 
 job: Table = Table(
     "job",
     metadata,
+    Column(
+        "id",
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        index=True,
+    ),
     Column(
         "name",
         String,
@@ -89,7 +115,7 @@ job: Table = Table(
     Column(
         "workflow_id",
         Integer,
-        ForeignKey("workflows.id"),
+        ForeignKey("workflow.id"),
     ),
     Column(
         "is_active",
@@ -100,6 +126,16 @@ job: Table = Table(
         "next_run_time",
         String,
     ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        server_default=func.now(),
+    ),
+    Column(
+        "updated_at",
+        DateTime(timezone=True),
+        onupdate=func.now(),
+    ),
     UniqueConstraint("name", "workflow_id", name="_name_workflow_id_uc"),
     Index("name_workflow_id_idx", "name", "workflow_id"),
 )
@@ -107,6 +143,13 @@ job: Table = Table(
 event: Table = Table(
     "event",
     metadata,
+    Column(
+        "id",
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        index=True,
+    ),
     Column(
         "name",
         String,
@@ -127,6 +170,16 @@ event: Table = Table(
         "output",
         String,
     ),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        server_default=func.now(),
+    ),
+    Column(
+        "updated_at",
+        DateTime(timezone=True),
+        onupdate=func.now(),
+    ),
 )
 
 
@@ -134,12 +187,10 @@ def run_mappers():
     """
     Provides mapping between db tables and domain models.
     """
-    mapper(Workflow, workflow, properties={"jobs": relationship("Job")})
+    mapper(Workflow, workflow, properties={"jobs": relationship(Job)})
     mapper(
         Job,
         job,
-        properties={
-            "workflow": relationship("Workflow", back_populates="jobs")
-        },
+        properties={"workflow": relationship(Workflow, back_populates="jobs")},
     )
     mapper(Event, event)
