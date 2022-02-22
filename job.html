@@ -40,7 +40,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Job</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#uses">Uses</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operator">Operator</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#alteryx">Alteryx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#papermill">Papermill</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#python">Python</a></li>
@@ -85,9 +85,9 @@
   <section id="job">
 <h1>Job<a class="headerlink" href="#job" title="Permalink to this headline"></a></h1>
 <p>A task that can be execute python code, jupyter notebook or some other thing needed.</p>
-<section id="uses">
-<h2>Uses<a class="headerlink" href="#uses" title="Permalink to this headline"></a></h2>
-<p>Uses definition, define which <strong>Operator</strong> to use.</p>
+<section id="operator">
+<h2>Operator<a class="headerlink" href="#operator" title="Permalink to this headline"></a></h2>
+<p>Operator definition, define which <strong>Operator</strong> to use.</p>
 <ul class="simple">
 <li><p>alteryx</p></li>
 <li><p>papermill</p></li>
@@ -109,7 +109,7 @@
 <span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;combine_two_sheets&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># define</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alteryx</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Alteryx .xymd file path.</span><span class="w"></span>
 <span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
@@ -142,7 +142,7 @@
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;notebook_install_packages&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">papermill</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Papermill paths</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Papermill expects an .ipynb file path as input.</span><span class="w"></span>
 <span class="w">      </span><span class="nt">input_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb&quot;</span><span class="w"></span>
@@ -172,7 +172,7 @@
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_code&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Code string</span><span class="w"></span>
 <span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Hello,</span><span class="nv"> </span><span class="s">World!&#39;)&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Job trigger configuration</span><span class="w"></span>
@@ -192,7 +192,7 @@
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hello_python_script&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Script path</span><span class="w"></span>
 <span class="w">      </span><span class="nt">script_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Requirements path</span><span class="w"></span>
@@ -243,7 +243,7 @@
 <span class="w">  </span><span class="nt">jobs</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="c1"># The name of a job does not affect the applications behaviour.</span><span class="w"></span>
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter_module&quot;</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">module</span><span class="w"></span>
 <span class="w">      </span><span class="nt">module_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="nt">module_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tableau_linter&quot;</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># Module plugins.</span><span class="w"></span>
@@ -342,8 +342,8 @@
 <span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># when job uses python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job operator python, can have a code or script_path option</span><span class="w"></span>
 <span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;First</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
@@ -360,8 +360,8 @@
 <span class="w">      </span><span class="c1"># - papermill</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - module</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - alteryx</span><span class="w"></span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
-<span class="w">      </span><span class="c1"># when job uses python, can have a code or script_path option</span><span class="w"></span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
+<span class="w">      </span><span class="c1"># when job operator python, can have a code or script_path option</span><span class="w"></span>
 <span class="w">      </span><span class="nt">code</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;print(&#39;Second</span><span class="nv"> </span><span class="s">Job!&#39;)&quot;</span><span class="w"> </span><span class="c1"># str</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># trigger can be</span><span class="w"></span>
 <span class="w">      </span><span class="c1"># - date</span><span class="w"></span>
