@@ -18,13 +18,31 @@ class TestWorkflowMapper:
         assert workflows[1].name == "test1"
         assert workflows[2].name == "test2"
 
-    def test_workflows_mapper_can_save_workflow(self, session):
+    def test_workflow_mapper_can_save_workflow(self, session):
         workflow = Workflow(name="test")
         session.add(workflow)
         session.commit()
 
         record = session.query(Workflow).first()
         assert record.name == "test"
+
+    def test_workflow_mapper_can_save_workflow_jobs(self, session):
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+
+        workflow = Workflow(name="test")
+        workflow.add_job(job)
+
+        session.add(workflow)
+        session.commit()
+
+        record = session.query(Workflow).first()
+        assert record.jobs[0].name == "test"
+        assert record.jobs[0].operator == "python"
+        assert record.jobs[0].definition == {"trigger": "date"}
 
 
 class TestJobMapper:
@@ -37,8 +55,36 @@ class TestJobMapper:
         )
         jobs = session.query(Job).all()
         assert jobs[0].name == "test0"
+        assert jobs[0].operator == "python"
+        assert jobs[0].definition == {"trigger": "date"}
 
-        # name,
-        # operator,
-        # definition,
-        # workflow,
+    def test_job_mapper_can_save_jobs(self, session):
+        job = Job(
+            name="test", operator="python", definition={"trigger": "date"}
+        )
+        session.add(job)
+        session.commit()
+
+        record = session.query(Job).first()
+        assert record.name == "test"
+        assert record.operator == "python"
+        assert record.definition == {"trigger": "date"}
+
+    def test_job_mapper_backpopulate_workflow(self, session):
+        workflow = Workflow(name="test")
+        session.add(workflow)
+        session.commit()
+
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+            workflow=workflow,
+        )
+        session.add(job)
+        session.commit()
+
+        record = session.query(Workflow).first()
+        assert record.jobs[0].name == "test"
+        assert record.jobs[0].operator == "python"
+        assert record.jobs[0].definition == {"trigger": "date"}

@@ -27,30 +27,31 @@ class Workflow:
 
     def __init__(
         self,
-        name,
-        is_active=True,
-        # File
-        file_path=None,
-        file_exists=None,
-        file_last_modified_at=None,
-        modified_since_last_load=False,
-        #  Jobs
+        name: str,
+        is_active: bool = True,
+        file_path: str = None,
+        file_exists: bool = None,
+        file_last_modified_at: str = None,
+        modified_since_last_load: bool = False,
         jobs: List[Job] = None,
     ):
         self.name = name
+        self.is_active = is_active
         self.file_path = file_path
         self.file_exists = file_exists
         self.file_last_modified_at = file_last_modified_at
         self.modified_since_last_load = modified_since_last_load
-        self.is_active = is_active
         self.jobs = jobs or []
 
     def __repr__(self) -> str:
         return (
-            f"Workflow(name={self.name}, file_path={self.file_path}, "
+            f"Workflow(name={self.name}, "
+            f"is_active={self.is_active}, "
+            f"file_path={self.file_path}, "
+            f"file_exists={self.file_exists}, "
             f"file_last_modified_at={self.file_last_modified_at}, "
             f"modified_since_last_load={self.modified_since_last_load}, "
-            f"is_active={self.is_active}"
+            f"jobs={self.jobs}, "
         )
 
     @classmethod
@@ -58,4 +59,17 @@ class Workflow:
         """
         Workflow from dict.
         """
-        return cls(dictionary["name"])
+        name = dictionary["name"]
+        return cls(name)
+
+    def add_job(self, job: Job):
+        """
+        Add job to workflow.
+        """
+        self.jobs.append(job)
+
+    def remove_job(self, job: Job):
+        """
+        Remove job from workflow.
+        """
+        self.jobs.remove(job)

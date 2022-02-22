@@ -25,15 +25,15 @@ class Job:
 
     def __init__(
         self,
-        name,
-        operator,
-        definition,
-        workflow,
-        depends_on=None,
-        dependency_logs_pattern=None,
-        run_if_pattern_match=True,
-        is_active=True,
-        next_run_time=None,
+        name: str,
+        operator: str,
+        definition: dict,
+        workflow=None,
+        depends_on: str = None,
+        dependency_logs_pattern: str = None,
+        run_if_pattern_match: bool = True,
+        is_active: bool = True,
+        next_run_time: bool = None,
     ):
         # TODO
         # Add state according with triggers
