@@ -1,8 +1,10 @@
 import logging
-from typing import List
 
-from workflower.adapters.repository import Entity, Model
-from workflower.application.interfaces.repository import Repository
+from workflower.application.interfaces.repository import (
+    Entity,
+    Model,
+    Repository,
+)
 
 from sqlalchemy.orm.session import Session
 
@@ -40,7 +42,7 @@ class SqlAlchemyRepository(Repository):
         logger.info(f"Getting one from {self.model} , {dict(**kwargs)}")
         return self.session.query(self.model).filter_by(**kwargs).first()
 
-    def list(self, **kwargs) -> List[Entity]:
+    def list(self, **kwargs):
         """
         Get list of objects of a model type.
         """
