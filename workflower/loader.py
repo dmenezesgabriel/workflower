@@ -1,6 +1,7 @@
 import logging
 import os
 import traceback
+from typing import List
 
 from workflower.config import Config
 from workflower.models.workflow import Workflow
@@ -13,7 +14,7 @@ class WorkflowLoader:
         self._workflows = None
 
     @property
-    def workflows(self):
+    def workflows(self) -> List[Workflow]:
         return self._workflows
 
     def load_one_from_file(
@@ -27,7 +28,7 @@ class WorkflowLoader:
 
     def load_all_from_dir(
         self, session, workflows_path: str = Config.WORKFLOWS_FILES_PATH
-    ) -> list:
+    ) -> List[Workflow]:
         """
         Load all.
         """

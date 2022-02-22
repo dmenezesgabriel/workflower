@@ -3,13 +3,17 @@ import logging
 import os
 import sys
 import traceback
+
 from workflower.cli.commands import FUNCTION_MAP
 from workflower.config import Config
 
 logger = logging.getLogger("workflower.cli.client")
 
 
-def _load_splash():
+def _load_splash() -> str:
+    """
+    Load Workflower splash ascii art.
+    """
     splash_path = os.path.join(
         Config.BASE_DIR, "workflower", "resources", "splash.txt"
     )
@@ -18,7 +22,10 @@ def _load_splash():
     return splash
 
 
-def _show_splash():
+def _show_splash() -> None:
+    """
+    Write Workflower splash ascii art to stdout.
+    """
     splash = _load_splash()
     clear_console = "clear" if os.name == "posix" else "CLS"
     os.system(clear_console)
@@ -26,7 +33,13 @@ def _show_splash():
     sys.stdout.write("\n")
 
 
-def _get_command(command, *args, **kwagrs):
+def _get_command(command: str, *args, **kwagrs):
+    """
+    Command Factory.
+    :command:
+    :args:
+    :kwargs:
+    """
     func = FUNCTION_MAP[command]
     func(*args)
 
@@ -77,8 +90,8 @@ class CLI:
                     else:
                         _get_command(command)
 
-            except Exception as e:
-                logger.error(f"{traceback.print_exc()}")
+            except Exception:
+                logger.error(f"Error: {traceback.print_exc()}")
                 sys.exit(1)
 
         else:

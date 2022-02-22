@@ -19,19 +19,23 @@ database_uri = f"sqlite:///{database_file}"
 
 
 class Runner:
+    """
+    Command line workflow runner.
+    """
+
     def __init__(self, database_uri=database_uri) -> None:
         self._database_uri = database_uri
         self._database = None
         self._is_running = False
 
-    def _setup(self):
+    def _setup(self) -> None:
         self._database = DatabaseManager(self._database_uri)
         #  Clean db
         BaseModel.metadata.drop_all(bind=self._database.engine)
         #  Init database
         init_db(self._database)
 
-    def run_workflow(self, path):
+    def run_workflow(self, path) -> None:
         self._setup()
         self._is_running = True
         with self._database.session_scope() as session:
@@ -59,6 +63,9 @@ class Runner:
         self._is_running = False
 
 
-def run_workflow(path):
+def run_workflow(path: str) -> None:
+    """
+    Run a single workflow by its path.
+    """
     runner = Runner()
-    return runner.run_workflow(path)
+    runner.run_workflow(path)
