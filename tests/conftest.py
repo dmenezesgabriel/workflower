@@ -1,4 +1,11 @@
+from typing import Generator
+
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
+from sqlalchemy.orm import Session, clear_mappers, sessionmaker
+from workflower.adapters.sqlalchemy.orm import run_mappers
+from workflower.adapters.sqlalchemy.setup import metadata
 from workflower.domain.entities.event import Event
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -60,3 +67,22 @@ def event_factory():
         return Event(name, model, model_id, exception, output)
 
     yield _event_factory
+
+
+@pytest.fixture
+def in_memory_db() -> Engine:
+    engine = create_engine("sqlite:///:memory:")
+    metadata.create_all(engine)
+    return engine
+
+
+@pytest.fixture
+def session_factory(in_memory_db) -> Generator[sessionmaker, None, None]:
+    run_mappers()
+    yield sessionmaker(bind=in_memory_db)
+    clear_mappers()
+
+
+@pytest.fixture
+def session(session_factory) -> Session:
+    return session_factory()
