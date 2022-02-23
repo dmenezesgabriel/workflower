@@ -40,3 +40,11 @@ class CreateWorkflowCommand:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
             logger.error(f"Error: {e}")
+
+
+class AddWorkflowJobCommand:
+    def __init__(self, unit_of_work: UnitOfWork) -> None:
+        self.unit_of_work = unit_of_work
+
+    def execute(self, workflow_id, job_id):
+        pass

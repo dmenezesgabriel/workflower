@@ -5,7 +5,7 @@ import os
 import logging
 from typing import List
 
-from workflower.models.job import Job
+from workflower.domain.entities.job import Job
 
 logger = logging.getLogger("workflower.models.workflow")
 
