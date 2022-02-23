@@ -6,6 +6,7 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from workflower.adapters.sqlalchemy.orm import run_mappers
 from workflower.adapters.sqlalchemy.setup import metadata
+from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.domain.entities.event import Event
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -86,3 +87,8 @@ def session_factory(in_memory_db) -> Generator[sessionmaker, None, None]:
 @pytest.fixture
 def session(session_factory) -> Session:
     return session_factory()
+
+
+@pytest.fixture
+def uow(session) -> SqlAlchemyUnitOfWork:
+    return SqlAlchemyUnitOfWork(session)

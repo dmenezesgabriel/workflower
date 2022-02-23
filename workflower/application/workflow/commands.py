@@ -35,6 +35,7 @@ class CreateWorkflowCommand:
                     jobs,
                 )
                 uow.workflows.add(workflow)
+                return workflow
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
