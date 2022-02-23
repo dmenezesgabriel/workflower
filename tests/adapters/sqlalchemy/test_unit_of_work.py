@@ -7,6 +7,18 @@ from workflower.domain.entities.workflow import Workflow
 
 
 class TestSqlAlchemyUnitOfWork:
+    def test_unif_of_work_calls_session_commit(self, session):
+
+        uow = SqlAlchemyUnitOfWork(session)
+
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.commit"
+        ) as mock:
+            with uow:
+                workflow = Workflow(name="test")
+                session.add(workflow)
+        assert mock.call_count == 1
+
     def test_unit_of_work_can_retrieve_workflow_and_add_a_job_on_it(
         self, session_factory
     ):
