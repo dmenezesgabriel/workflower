@@ -61,3 +61,13 @@ class Job:
             f"workflow={self.workflow}, "
             f"next_run_time={self.next_run_time}, "
         )
+
+    @classmethod
+    def from_dict(cls, dictionary):
+        """
+        Workflow from dict.
+        """
+        name = dictionary["name"]
+        operator = dictionary["operator"]
+        definition = dictionary["definition"]
+        return cls(name, operator, definition)
