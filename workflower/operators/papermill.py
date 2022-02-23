@@ -39,7 +39,7 @@ class PapermillOperator(BaseOperator):
                 pip_index_url,
                 pip_trusted_host,
             )
-
+        logger.info(f"Running notebook: {input_path}")
         try:
             notebook = pm.execute_notebook(
                 input_path=input_path,

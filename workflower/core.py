@@ -20,7 +20,7 @@ logger = logging.getLogger("workflower")
 
 def exit_handler(*args):
     logger.debug(f"Got shutting down signal for PID={os.getpid()}")
-    logger.debug("Gracefully shuting down")
+    logger.info("Gracefully shuting down")
     workflow_controller.stop()
     scheduler_service.stop()
     loop = asyncio.get_event_loop()

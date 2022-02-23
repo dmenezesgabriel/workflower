@@ -15,10 +15,7 @@ from workflower.models.event import Event
 from workflower.models.job import Job
 from workflower.models.workflow import Workflow
 
-sqlalchemy_logger = logging.getLogger("sqlalchemy")
-sqlalchemy_logger.setLevel(logging.DEBUG)
-
-logger = logging.getLogger("Init_db")
+logger = logging.getLogger("workflower.init_db")
 logger.setLevel(logging.INFO)
 
 
