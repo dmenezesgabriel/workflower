@@ -3,8 +3,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
+from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
-from workflower.models.job import Job
 
 logger = logging.getLogger("workflower.application.workflow.commands")
 
@@ -50,8 +50,18 @@ class AddWorkflowJobCommand:
         try:
             with self.unit_of_work as uow:
                 workflow = uow.workflows.get(id=workflow_id)
+                if not workflow:
+                    logger.info("No matching workflow found")
+
                 job = uow.jobs.get(id=job_id)
+                if not job:
+                    logger.info("No matching job found")
+
+                if workflow.has_job(job):
+                    logger.info(f"{workflow} already has {job}")
+
                 workflow.add_job(job)
+
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
