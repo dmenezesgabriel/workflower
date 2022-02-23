@@ -1,3 +1,6 @@
+import unittest
+import unittest.mock
+
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -40,5 +43,21 @@ class TestSqlAlchemyUnitOfWork:
             assert record.jobs[0].operator == "python"
             assert record.jobs[0].definition == {"trigger": "date"}
 
-    def test_unit_of_work_rolls_back_transaction_on_error(self, session):
-        pass
+    def test_unit_of_work_rolls_back_transaction_on_error(
+        self, session_factory
+    ):
+        first_session = session_factory()
+        uow = SqlAlchemyUnitOfWork(first_session)
+
+        with unittest.mock.patch(
+            "sqlalchemy.orm.session.Session.commit"
+        ) as mock_commit:
+            mock_commit.side_effect = Exception("Mock Exception")
+            #  Check if rollback is called
+            with unittest.mock.patch(
+                "sqlalchemy.orm.session.Session.rollback"
+            ) as mock_rollback:
+                with uow:
+                    workflow = Workflow(name="test")
+                    first_session.add(workflow)
+            assert mock_rollback.call_count == 1
