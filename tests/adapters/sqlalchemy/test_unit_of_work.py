@@ -16,7 +16,7 @@ class TestSqlAlchemyUnitOfWork:
         ) as mock:
             with uow:
                 workflow = Workflow(name="test")
-                session.add(workflow)
+                uow.workflows.add(workflow)
         assert mock.call_count == 1
 
     def test_unit_of_work_can_retrieve_workflow_and_add_a_job_on_it(
@@ -71,5 +71,5 @@ class TestSqlAlchemyUnitOfWork:
             ) as mock_rollback:
                 with uow:
                     workflow = Workflow(name="test")
-                    first_session.add(workflow)
+                    uow.workflows.add(workflow)
             assert mock_rollback.call_count == 1

@@ -1,6 +1,10 @@
 from typing import Any
 
+from workflower.adapters.sqlalchemy.repository import SqlAlchemyRepository
 from workflower.application.interfaces.unit_of_work import UnitOfWork
+from workflower.domain.entities.event import Event
+from workflower.domain.entities.job import Job
+from workflower.domain.entities.workflow import Workflow
 
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
@@ -13,6 +17,9 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         self.session = session
 
     def __enter__(self):
+        self.workflows = SqlAlchemyRepository(self.session, model=Workflow)
+        self.jobs = SqlAlchemyRepository(self.session, model=Job)
+        self.events = SqlAlchemyRepository(self.session, model=Event)
         return self
 
     def __exit__(self, *args: Any):
