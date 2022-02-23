@@ -43,17 +43,6 @@ class Workflow:
         self.modified_since_last_load = modified_since_last_load
         self.jobs = jobs or []
 
-    def __repr__(self) -> str:
-        return (
-            f"Workflow(name={self.name}, "
-            f"is_active={self.is_active}, "
-            f"file_path={self.file_path}, "
-            f"file_exists={self.file_exists}, "
-            f"file_last_modified_at={self.file_last_modified_at}, "
-            f"modified_since_last_load={self.modified_since_last_load}, "
-            f"jobs={self.jobs}, "
-        )
-
     @classmethod
     def from_dict(cls, dictionary):
         """
@@ -61,6 +50,10 @@ class Workflow:
         """
         name = dictionary["name"]
         return cls(name)
+
+    @property
+    def jobs_count(self) -> int:
+        return len(list(self.jobs))
 
     def add_job(self, job: Job):
         """
@@ -73,3 +66,26 @@ class Workflow:
         Remove job from workflow.
         """
         self.jobs.remove(job)
+
+    def has_job(self, job: Job) -> bool:
+        """
+        Check if job has already been added to workflow.
+        """
+        return True if job in self.jobs else False
+
+    def clear_jobs(self) -> None:
+        """
+        Remove all jobs from workflow.
+        """
+        self.jobs = []
+
+    def __repr__(self) -> str:
+        return (
+            f"Workflow(name={self.name}, "
+            f"is_active={self.is_active}, "
+            f"file_path={self.file_path}, "
+            f"file_exists={self.file_exists}, "
+            f"file_last_modified_at={self.file_last_modified_at}, "
+            f"modified_since_last_load={self.modified_since_last_load}, "
+            f"jobs={self.jobs}, "
+        )

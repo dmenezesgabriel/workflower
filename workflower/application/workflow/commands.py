@@ -47,4 +47,12 @@ class AddWorkflowJobCommand:
         self.unit_of_work = unit_of_work
 
     def execute(self, workflow_id, job_id):
-        pass
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=workflow_id)
+                job = uow.jobs.get(id=job_id)
+                workflow.add_job(job)
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")

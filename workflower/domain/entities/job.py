@@ -51,6 +51,16 @@ class Job:
         self.next_run_time = next_run_time
         self.job_scheduled_ref = None
 
+    @classmethod
+    def from_dict(cls, dictionary):
+        """
+        Workflow from dict.
+        """
+        name = dictionary["name"]
+        operator = dictionary["operator"]
+        definition = dictionary["definition"]
+        return cls(name, operator, definition)
+
     def __repr__(self) -> str:
         return (
             f"Job(name={self.name}, operator={self.operator}, "
@@ -61,13 +71,3 @@ class Job:
             f"workflow={self.workflow}, "
             f"next_run_time={self.next_run_time}, "
         )
-
-    @classmethod
-    def from_dict(cls, dictionary):
-        """
-        Workflow from dict.
-        """
-        name = dictionary["name"]
-        operator = dictionary["operator"]
-        definition = dictionary["definition"]
-        return cls(name, operator, definition)

@@ -1,3 +1,4 @@
+from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
 
 
@@ -12,3 +13,66 @@ class TestWorkflowEntity:
         workflow = Workflow.from_dict(workflow_dict)
         assert isinstance(workflow, Workflow)
         assert workflow.name == "test"
+
+    def test_jobs_count_property_retuns_number_of_jobs(self):
+        workflow = Workflow(
+            name="test",
+            jobs=[
+                Job(
+                    name="test",
+                    operator="python",
+                    definition={"trigger": "date"},
+                )
+            ],
+        )
+
+        assert workflow.jobs_count == 1
+
+    def test_add_job_method_add_job_to_workflow(self):
+        workflow = Workflow(name="test")
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+
+        workflow.add_job(job)
+        assert workflow.jobs[0].operator == "python"
+
+    def test_workflow_remove_job_method_removes_job(self):
+        workflow = Workflow(name="test")
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+        workflow.add_job(job)
+        assert workflow.jobs[0].operator == "python"
+        workflow.remove_job(job)
+        workflow.jobs == []
+
+    def test_workflow_has_job_check_if_workflow_has_job(self):
+        workflow = Workflow(name="test")
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+
+        workflow.add_job(job)
+        assert workflow.has_job(job)
+
+    def test_workflow_clear_jobs_remove_all_jobs(self):
+        workflow = Workflow(
+            name="test",
+            jobs=[
+                Job(
+                    name="test",
+                    operator="python",
+                    definition={"trigger": "date"},
+                )
+            ],
+        )
+        assert workflow.jobs[0].operator == "python"
+        workflow.clear_jobs()
+        workflow.jobs == []
