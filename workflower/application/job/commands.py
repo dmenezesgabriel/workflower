@@ -161,3 +161,83 @@ class ScheduleJobCommand:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
             logger.error(f"Error: {e}")
+
+
+# TODO
+# Tests
+class GetDependencyTriggerJobsCommand:
+    def __init__(
+        self, unit_of_work: UnitOfWork, job_id, job_return_value, scheduler
+    ):
+        self.unit_of_work = unit_of_work
+        self.job_id = job_id
+        self.job_id = job_id
+        self.job_return_value = job_return_value
+        self.scheduler = scheduler
+        self.kwargs
+
+    def execute(self):
+        try:
+            dependency_jobs_to_trigger = []
+            with self.unit_of_work as uow:
+                job = uow.jobs.get(id=self.job_id)
+                if job:
+                    dependency_jobs = uow.jobs.list(depends_on=self.job_id)
+                    if dependency_jobs:
+                        for dependency_job in dependency_jobs:
+                            if dependency_job.dependency_logs_pattern:
+                                logger.info(
+                                    "Dependency job has log pattern to match"
+                                )
+                                # Check pattern
+                                # TODO
+                                # Make it as Regex
+                                matches = (
+                                    str(
+                                        dependency_job.dependency_logs_pattern
+                                    ).lower()
+                                    in self.job_return_value.lower()
+                                )
+
+                                # ================================== ======== #
+                                # | matches | run_if_pattern_match | schedule |
+                                # | True    | True                 | True     |
+                                # | False   | True                 | False    |
+                                # | True    | False                | False    |
+                                # | False   | False                | True     |
+                                # =========================================== #
+
+                                if matches:
+                                    logger.debug(
+                                        "Dependency job pattern matches"
+                                    )
+                                    if not dependency_job.run_if_pattern_match:
+                                        # True False
+                                        logger.debug(
+                                            "Pattern matches but should"
+                                            " not run"
+                                        )
+                                        continue
+                                elif not matches:
+                                    logger.debug(
+                                        "Dependency job pattern did "
+                                        "not matches"
+                                    )
+                                    if dependency_job.run_if_pattern_match:
+                                        # False True
+                                        logger.debug(
+                                            "Pattern did not matched, should"
+                                            " not run"
+                                        )
+                                        continue
+
+                            logger.info(
+                                f"Dependency job {dependency_job.name} "
+                                "triggered"
+                            )
+                            dependency_jobs_to_trigger.append(dependency_job)
+            return dependency_jobs_to_trigger
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
