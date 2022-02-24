@@ -16,9 +16,13 @@ class Event:
     """
 
     def __init__(
-        self, name: str, model: str, model_id: str, exception: str, output: str
+        self,
+        name: str,
+        model: str,
+        model_id: str,
+        exception: str = None,
+        output: str = None,
     ) -> None:
-
         self.name = name
         self.model = model
         self.model_id = model_id
