@@ -36,6 +36,7 @@ prompt_help() {
     echo "- dev: init database and run app with dev config"
     echo "- prod: init database and run app with prod config"
     echo "- env: init database and run app with .env config"
+    echo "- workflow: run a single standalone workflow, see samples"
     echo "- test: run tests"
     echo "- exit: exit program"
     printf "\n"

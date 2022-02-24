@@ -123,19 +123,20 @@ class WorkflowRunnerService:
                         uow, job.id, scheduler
                     )
                     update_next_runtime_command.execute()
-                    change_job_status_command = ChangeJobStatusCommand(
-                        uow, job.id, "scheduled"
-                    )
-                    change_job_status_command.execute()
-                    create_event_command = CreateEventCommand(
-                        uow,
-                        name="job_scheduled",
-                        model="job",
-                        model_id=job.id,
-                        exception=None,
-                        output=None,
-                    )
-                    create_event_command.execute()
+                    if job.status != "scheduled":
+                        create_event_command = CreateEventCommand(
+                            uow,
+                            name="job_scheduled",
+                            model="job",
+                            model_id=job.id,
+                            exception=None,
+                            output=None,
+                        )
+                        create_event_command.execute()
+                        change_job_status_command = ChangeJobStatusCommand(
+                            uow, job.id, "scheduled"
+                        )
+                        change_job_status_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
