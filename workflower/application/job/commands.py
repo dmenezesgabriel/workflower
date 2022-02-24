@@ -113,11 +113,13 @@ class UnscheduleJobCommand:
 # TODO
 # Tests
 class ScheduleJobCommand:
-    def __init__(self, unit_of_work: UnitOfWork, job_id, scheduler, kwargs):
+    def __init__(
+        self, unit_of_work: UnitOfWork, job_id, scheduler, kwargs=None
+    ):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
         self.scheduler = scheduler
-        self.kwargs
+        self.kwargs = kwargs
 
     def execute(self):
         try:

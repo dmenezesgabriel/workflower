@@ -16,7 +16,6 @@ engine = create_engine(
     connect_args={
         "timeout": 15,
     },
-    echo=True,
 )
 
 Session = scoped_session(
