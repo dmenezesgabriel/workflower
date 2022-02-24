@@ -256,6 +256,7 @@ class DeactivateWorkflowJobsCommand:
                     if workflow.jobs:
                         for job in workflow.jobs:
                             job.is_active = False
+                            job.next_run_time = None
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")

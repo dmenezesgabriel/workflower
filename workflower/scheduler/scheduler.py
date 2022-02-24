@@ -21,7 +21,7 @@ from workflower.config import Config
 logger = logging.getLogger("workflower.scheduler")
 
 
-class SchedulerService:
+class WorkflowScheduler:
     """
     Scheduler service.
     """

@@ -1,1 +1,1 @@
-from workflower.scheduler.scheduler import SchedulerService
+from workflower.scheduler.scheduler import WorkflowScheduler

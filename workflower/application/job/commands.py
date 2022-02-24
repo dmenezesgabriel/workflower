@@ -168,38 +168,43 @@ class ScheduleJobCommand:
             with self.unit_of_work as uow:
                 job = uow.jobs.get(id=self.job_id)
                 if job:
-                    schedule_params = job.definition.copy()
-                    schedule_kwargs = schedule_params.get("kwargs")
-                    plugins = schedule_kwargs.get("plugins")
-                    if plugins:
-                        plugins_list = list(
-                            map(
-                                lambda plugin_name: create_plugin(plugin_name),
-                                plugins,
+                    if job.is_active:
+                        schedule_params = job.definition.copy()
+                        schedule_kwargs = schedule_params.get("kwargs")
+                        plugins = schedule_kwargs.get("plugins")
+                        if plugins:
+                            plugins_list = list(
+                                map(
+                                    lambda plugin_name: create_plugin(
+                                        plugin_name
+                                    ),
+                                    plugins,
+                                )
                             )
-                        )
-                        schedule_kwargs.update(dict(plugins=plugins_list))
-                    if schedule_kwargs and self.kwargs:
-                        schedule_kwargs.update(self.kwargs)
+                            schedule_kwargs.update(dict(plugins=plugins_list))
+                        if schedule_kwargs and self.kwargs:
+                            schedule_kwargs.update(self.kwargs)
 
-                    operator = create_operator(job.operator)
-                    schedule_params.update(
-                        dict(func=getattr(operator, "execute"))
-                    )
-
-                    try:
-                        self.scheduler.add_job(
-                            id=str(job.id), **schedule_params
+                        operator = create_operator(job.operator)
+                        schedule_params.update(
+                            dict(func=getattr(operator, "execute"))
                         )
-                        logger.debug(f"Job {job} successfully scheduled")
-                    except ConflictingIdError:
-                        logger.warning(f"{job}, already scheduled, skipping.")
-                    except ValueError as error:
-                        # If someone set an invalid date value it will lead
-                        # to this exception
-                        logger.error(f"{job} value error: {error}")
-                    except Exception as error:
-                        logger.error(f"Error: {error}")
+
+                        try:
+                            self.scheduler.add_job(
+                                id=str(job.id), **schedule_params
+                            )
+                            logger.debug(f"Job {job} successfully scheduled")
+                        except ConflictingIdError:
+                            logger.warning(
+                                f"{job}, already scheduled, skipping."
+                            )
+                        except ValueError as error:
+                            # If someone set an invalid date value it will lead
+                            # to this exception
+                            logger.error(f"{job} value error: {error}")
+                        except Exception as error:
+                            logger.error(f"Error: {error}")
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")

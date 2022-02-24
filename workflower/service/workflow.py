@@ -17,10 +17,10 @@ from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
 from workflower.loader import WorkflowLoader
 
-logger = logging.getLogger("workflower.controllers.workflow")
+logger = logging.getLogger("workflower.service.workflow")
 
 
-class WorkflowContoller:
+class WorkflowRunnerService:
     """
     Workflow Controller.
     """
@@ -80,11 +80,14 @@ class WorkflowContoller:
                 )
                 unschedule_jobs_command.execute()
             logger.info(f"{workflow.name} file removed, skipping")
-            return
-        logger.info("Scheduling jobs")
-        for job in workflow.jobs:
-            schedule_jobs_command = ScheduleJobCommand(uow, job.id, scheduler)
-            schedule_jobs_command.execute()
+
+        else:
+            logger.info("Scheduling jobs")
+            for job in workflow.jobs:
+                schedule_jobs_command = ScheduleJobCommand(
+                    uow, job.id, scheduler
+                )
+                schedule_jobs_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
