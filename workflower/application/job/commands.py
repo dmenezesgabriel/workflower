@@ -59,6 +59,49 @@ class CreateJobCommand:
             logger.error(f"Error: {traceback.print_exc()}")
 
 
+class DeactivateJobCommand:
+    def __init__(self, unit_of_work: UnitOfWork, job_id):
+        self.unit_of_work = unit_of_work
+        self.job_id = job_id
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                job = uow.jobs.get(id=self.job_id)
+                if job:
+                    job.is_active = False
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
+
+
+class RemoveJobCommand:
+    def __init__(self, unit_of_work: UnitOfWork, job_id):
+        self.unit_of_work = unit_of_work
+        self.job_id = job_id
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                job = uow.jobs.get(id=self.job_id)
+                if job:
+                    uow.jobs.remove(job)
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
+
+
+class UpdateJobStatusCommand:
+    # Added
+    # Scheduled
+    # Running
+    # Executed
+    # Removed
+    pass
+
+
 # TODO
 # Tests
 class UpdateNextRunTimeCommand:
@@ -72,9 +115,7 @@ class UpdateNextRunTimeCommand:
             with self.unit_of_work as uow:
                 job = uow.jobs.get(id=self.job_id)
                 if job:
-                    scheduled_job = self.scheduler.scheduler.get_job(
-                        self.job_id
-                    )
+                    scheduled_job = self.scheduler.get_job(self.job_id)
                     if scheduled_job:
                         job.next_run_time = scheduled_job.next_run_time
 
@@ -138,7 +179,7 @@ class ScheduleJobCommand:
                             )
                         )
                         schedule_kwargs.update(dict(plugins=plugins_list))
-                    if schedule_kwargs:
+                    if schedule_kwargs and self.kwargs:
                         schedule_kwargs.update(self.kwargs)
 
                     operator = create_operator(job.operator)
@@ -169,12 +210,14 @@ class ScheduleJobCommand:
 # TODO
 # Tests
 class GetDependencyTriggerJobsCommand:
-    def __init__(self, unit_of_work: UnitOfWork, job_id, job_return_value):
+    def __init__(
+        self, unit_of_work: UnitOfWork, job_id, job_return_value, kwargs=None
+    ):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
         self.job_id = job_id
         self.job_return_value = job_return_value
-        self.kwargs
+        self.kwargs = kwargs
 
     def execute(self):
         try:

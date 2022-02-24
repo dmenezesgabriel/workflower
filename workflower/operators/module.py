@@ -28,4 +28,5 @@ class ModuleOperator(BaseOperator):
         spec.loader.exec_module(module)
         module_instance = module.Module(plugins)
         logger.info(f"Running Module {module_name}")
+        logger.info(f"Running python module: {module_path}")
         module_instance.run(*args, **kwargs)

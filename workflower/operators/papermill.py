@@ -44,7 +44,7 @@ class PapermillOperator(BaseOperator):
             notebook = pm.execute_notebook(
                 input_path=input_path,
                 output_path=output_path,
-                log_output=True,
+                log_output=False,
                 progress_bar=False,
                 kernel_name=kernel_name,
                 request_save_on_cell_execute=True,

@@ -229,7 +229,11 @@ class LoadWorkflowFromYamlFileCommand:
                 jobs_list.append(job)
                 for old_job in workflow.jobs:
                     if old_job not in jobs_list:
+                        # Deactivate job
+                        old_job.is_active = False
                         workflow.remove_job(old_job)
+                        # Unschedule Job
+                        # Remove Job
         return workflow
 
 
