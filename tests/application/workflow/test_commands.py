@@ -143,8 +143,12 @@ class TestLoadWorkflowFromYamlFileCommand:
     ):
         file_path = str(workflow_file)
         command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        workflow = command.execute(file_path)
+        new_workflow = command.execute(file_path)
 
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
         assert workflow.name == "python_code_sample_interval_trigger"
 
     def test_load_workflow_form_yaml_file_command_loads_workflow_fail_by_name(
@@ -155,3 +159,17 @@ class TestLoadWorkflowFromYamlFileCommand:
         workflow = command.execute(file_path)
 
         assert workflow is None
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_exists_true(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        new_workflow = Workflow(
+            name="python_code_sample_interval_trigger", file_path=file_path
+        )
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        workflow = command.execute(file_path)
+        assert new_workflow.id == workflow.id

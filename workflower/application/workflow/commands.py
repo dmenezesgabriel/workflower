@@ -141,4 +141,5 @@ class LoadWorkflowFromYamlFileCommand:
                     name=workflow_name,
                     file_path=file_path,
                 )
+                uow.workflows.add(workflow)
         return workflow
