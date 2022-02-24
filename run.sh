@@ -102,11 +102,35 @@ install_deps() {
     ###########################################################################
     # Install deps
     ###########################################################################
-    echo "Installing python dependencies"
-    eval "$(cat .env)"  && \
-    $env_executable -m pip install -r requirements.txt
-    $env_executable -m pip install -r requirements-plugins.txt
-    $env_executable -m pip install -r requirements-dev.txt
+    if [ -z ${var+$PIP_INDEX_URL} ];
+        then
+        echo "Installing python dependencies"
+        eval "$(cat .env)"  && \
+        $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL}
+        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL}
+        $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL}
+
+    elif [ -z ${var+$PIP_TRUSTED_HOST} ];
+        then
+        echo "Installing python dependencies"
+        eval "$(cat .env)"  && \
+        $env_executable -m pip install -r requirements.txt --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-plugins.txt --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-dev.txt --trusted-host=${PIP_TRUSTED_HOST}
+    elif [ -z ${var+$PIP_INDEX_URL} ] && [ -z ${var+$PIP_TRUSTED_HOST} ];
+        then
+        echo "Installing python dependencies"
+        eval "$(cat .env)"  && \
+        $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
+    else
+        echo "Installing python dependencies"
+        eval "$(cat .env)"  && \
+        $env_executable -m pip install -r requirements.txt
+        $env_executable -m pip install -r requirements-plugins.txt
+        $env_executable -m pip install -r requirements-dev.txt
+    fi
 }
 
 build_docs() {
