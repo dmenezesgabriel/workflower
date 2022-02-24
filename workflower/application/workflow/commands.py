@@ -85,10 +85,21 @@ class UpdateModifiedWorkflowFileStateCommand:
                 elif not workflow.file_path:
                     logger.info("No workflow file")
 
-                workflow_last_modified_at = str(
-                    get_file_modification_date(workflow.file_path)
-                )
-                workflow.file_last_modified_at = workflow_last_modified_at
+                else:
+                    workflow_last_modified_at = str(
+                        get_file_modification_date(workflow.file_path)
+                    )
+
+                    if (
+                        workflow.file_last_modified_at is not None
+                        and workflow_last_modified_at
+                        != workflow.file_last_modified_at
+                    ):
+                        workflow.modified_since_last_load = True
+                    else:
+                        workflow.modified_since_last_load = False
+
+                    workflow.file_last_modified_at = workflow_last_modified_at
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")

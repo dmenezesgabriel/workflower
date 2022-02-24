@@ -48,7 +48,8 @@ class TestUpdateModifiedWorkflowFileStateCommand:
     def test_update_modified_file_state_command_updates_file_last_modified_at(
         self, session_factory, workflow_file, uow
     ):
-        new_workflow = Workflow(name="test", file_path=str(workflow_file))
+        file_path = str(workflow_file)
+        new_workflow = Workflow(name="test", file_path=file_path)
         with uow:
             uow.workflows.add(new_workflow)
 
@@ -62,5 +63,50 @@ class TestUpdateModifiedWorkflowFileStateCommand:
             session.query(Workflow).filter_by(id=new_workflow.id).first()
         )
         assert workflow.file_last_modified_at == str(
-            os.path.getmtime(str(workflow_file))
+            os.path.getmtime(file_path)
         )
+
+    def test_update_modified_file_state_command_updates_modified_since_load_f(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        new_workflow = Workflow(name="test", file_path=file_path)
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.UpdateModifiedWorkflowFileStateCommand(
+            unit_of_work=uow
+        )
+
+        command.execute(new_workflow.id)
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.modified_since_last_load is False
+
+    def test_update_modified_file_state_command_updates_modified_since_load_t(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        new_workflow = Workflow(name="test", file_path=file_path)
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.UpdateModifiedWorkflowFileStateCommand(
+            unit_of_work=uow
+        )
+
+        command.execute(new_workflow.id)
+
+        with open(file_path, "a") as f:
+            f.write("new line\n")
+
+        command.execute(new_workflow.id)
+
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+
+        assert workflow.modified_since_last_load is True
