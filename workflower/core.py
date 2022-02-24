@@ -8,7 +8,7 @@ from workflower.adapters.sqlalchemy.setup import engine
 from workflower.api import create_api
 from workflower.scheduler import WorkflowScheduler
 from workflower.server import create_server
-from workflower.service.workflow import WorkflowRunnerService
+from workflower.service.workflow_runner import WorkflowRunnerService
 
 workflow_scheduler = WorkflowScheduler(engine)
 api = create_api()

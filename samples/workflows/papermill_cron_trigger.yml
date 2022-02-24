@@ -2,7 +2,7 @@ version: "1.0"
 workflow:
   name: papermill_cron_trigger
   jobs:
-    - name: "notebook_install_packages_changed"
+    - name: "notebook_install_packages"
       operator: papermill
       # Papermill paths
       input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb"
