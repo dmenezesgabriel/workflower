@@ -183,18 +183,20 @@ class LoadWorkflowFromYamlFileCommand:
                     file_path=self.file_path,
                 )
                 uow.workflows.add(workflow)
-            # Add jobs
-            jobs_list = []
-            for job_dict in jobs_dict:
-                job_parser = JobSchemaParser()
-                (
-                    job_name,
-                    job_operator,
-                    job_depends_on,
-                    dependency_logs_pattern,
-                    run_if_pattern_match,
-                    job_definition,
-                ) = job_parser.parse_schema(job_dict)
+        # Add jobs
+        jobs_list = []
+        for job_dict in jobs_dict:
+            job_parser = JobSchemaParser()
+            (
+                job_name,
+                job_operator,
+                job_depends_on,
+                dependency_logs_pattern,
+                run_if_pattern_match,
+                job_definition,
+            ) = job_parser.parse_schema(job_dict)
+
+            with self.unit_of_work as uow:
                 if job_depends_on:
                     dependency_job = uow.jobs.get(
                         name=job_depends_on, workflow_id=workflow.id
@@ -222,19 +224,20 @@ class LoadWorkflowFromYamlFileCommand:
                         run_if_pattern_match=run_if_pattern_match,
                     )
 
-                if workflow.has_job(job):
-                    continue
-                else:
-                    workflow.add_job(job)
-                jobs_list.append(job)
-                for old_job in workflow.jobs:
-                    if old_job not in jobs_list:
-                        # Deactivate job
-                        old_job.is_active = False
-                        old_job.next_run_time = None
-                        workflow.remove_job(old_job)
-                        # Unschedule Job
-                        # Remove Job
+                    if workflow.has_job(job):
+                        continue
+                    else:
+                        workflow.add_job(job)
+                    jobs_list.append(job)
+                    for old_job in workflow.jobs:
+                        if old_job not in jobs_list:
+                            # Deactivate job
+                            old_job.is_active = False
+                            old_job.next_run_time = None
+                            workflow.remove_job(old_job)
+                            # Unschedule Job
+                            # Remove Job
+
         return workflow
 
 

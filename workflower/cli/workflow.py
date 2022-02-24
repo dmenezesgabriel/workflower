@@ -31,6 +31,7 @@ class Runner:
         self._is_running = False
 
     def _setup(self) -> None:
+        metadata.drop_all(bind=self.engine)
         metadata.create_all(bind=self.engine)
 
     def _session(self):
