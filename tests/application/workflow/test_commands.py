@@ -69,6 +69,9 @@ class TestUpdateModifiedWorkflowFileStateCommand:
     def test_update_modified_file_state_command_updates_modified_since_load_f(
         self, session_factory, workflow_file, uow
     ):
+        """
+        modified_since_last_load should be false.
+        """
         file_path = str(workflow_file)
         new_workflow = Workflow(name="test", file_path=file_path)
         with uow:
@@ -88,6 +91,9 @@ class TestUpdateModifiedWorkflowFileStateCommand:
     def test_update_modified_file_state_command_updates_modified_since_load_t(
         self, session_factory, workflow_file, uow
     ):
+        """
+        modified_since_last_load should be true.
+        """
         file_path = str(workflow_file)
         new_workflow = Workflow(name="test", file_path=file_path)
         with uow:
@@ -99,6 +105,7 @@ class TestUpdateModifiedWorkflowFileStateCommand:
 
         command.execute(new_workflow.id)
 
+        # File being modified
         with open(file_path, "a") as f:
             f.write("new line\n")
 
@@ -110,3 +117,14 @@ class TestUpdateModifiedWorkflowFileStateCommand:
         )
 
         assert workflow.modified_since_last_load is True
+
+
+class TestLoadWorkflowFromYamlFileCommand:
+    def test_load_workflow_form_yaml_file_command_loads_workflow_correctly(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        workflow = command.execute(file_path)
+
+        assert workflow.name == "python_code_sample_interval_trigger"

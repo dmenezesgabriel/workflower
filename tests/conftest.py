@@ -107,6 +107,8 @@ def workflow_file(tmpdir_factory):
           trigger: interval
           minutes: 2
     """
-    p = tmpdir_factory.mktemp("file").join("test_file.yaml")
+    p = tmpdir_factory.mktemp("file").join(
+        "python_code_sample_interval_trigger.yaml"
+    )
     p.write_text(file_content, encoding="utf-8")
     return p

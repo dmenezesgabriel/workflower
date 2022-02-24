@@ -5,7 +5,13 @@ from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
-from workflower.utils.file import get_file_modification_date
+from workflower.schema.parser import WorkflowSchemaParser
+from workflower.schema.validator import validate_schema
+from workflower.utils.file import (
+    get_file_modification_date,
+    get_file_name,
+    yaml_file_to_dict,
+)
 
 logger = logging.getLogger("workflower.application.workflow.commands")
 
@@ -105,3 +111,35 @@ class UpdateModifiedWorkflowFileStateCommand:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
             logger.error(f"Error: {e}")
+
+
+class LoadWorkflowFromYamlFileCommand:
+    def __init__(self, unit_of_work: UnitOfWork) -> None:
+        self.unit_of_work = unit_of_work
+
+    def execute(self, file_path):
+        workflow_parser = WorkflowSchemaParser()
+        configuration_dict = yaml_file_to_dict(file_path)
+        workflow_name, jobs_dict = workflow_parser.parse_schema(
+            configuration_dict
+        )
+        if file_path:
+            workflow_file_name = get_file_name(file_path)
+            logger.debug(f"Workflow file name: {workflow_file_name}")
+            # File name must match with workflow name to workflow be loaded
+            if workflow_name != workflow_file_name:
+                logger.warning(
+                    f"Workflow name from {workflow_name}"
+                    f"don't match with file name {file_path}, "
+                    "skipping load"
+                )
+                return
+        validate_schema(configuration_dict)
+        with self.unit_of_work as uow:
+            workflow = uow.workflows.get(name=workflow_name)
+            if not workflow:
+                workflow = Workflow(
+                    name=workflow_name,
+                    file_path=file_path,
+                )
+        return workflow
