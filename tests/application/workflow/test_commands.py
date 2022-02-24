@@ -138,6 +138,32 @@ class TestLoadWorkflowFromYamlFileCommand:
         p.write_text(file_content, encoding="utf-8")
         return p
 
+    @pytest.fixture
+    def workflow_file_with_dependencies(self, tmpdir_factory):
+        file_content = """
+        version: "1.0"
+        workflow:
+            name: dependency_log_pattern_match
+            jobs:
+              - name: "first_job"
+                operator: python
+                code: "print('First Job!')"
+                trigger: date
+              - name: "second_job"
+                operator: python
+                code: "print('Second Job!')"
+                trigger: dependency
+                depends_on: first_job
+                dependency_logs_pattern: "first"
+                run_if_pattern_match: True
+
+        """
+        p = tmpdir_factory.mktemp("file").join(
+            "dependency_log_pattern_match.yaml"
+        )
+        p.write_text(file_content, encoding="utf-8")
+        return p
+
     def test_load_workflow_form_yaml_file_command_loads_workflow_correctly(
         self, session_factory, workflow_file, uow
     ):
@@ -189,3 +215,23 @@ class TestLoadWorkflowFromYamlFileCommand:
         assert workflow.jobs_count == 1
         assert workflow.jobs[0].name == "hello_python_code"
         assert workflow.jobs[0].operator == "python"
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_add_jobs_deps(
+        self, session_factory, workflow_file_with_dependencies, uow
+    ):
+        file_path = str(workflow_file_with_dependencies)
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        new_workflow = command.execute(file_path)
+
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.name == "dependency_log_pattern_match"
+        assert workflow.jobs_count == 2
+        assert workflow.jobs[0].name == "first_job"
+        assert workflow.jobs[0].operator == "python"
+        assert workflow.jobs[0].depends_on is None
+        assert workflow.jobs[1].name == "second_job"
+        assert workflow.jobs[1].operator == "python"
+        assert workflow.jobs[1].depends_on == str(workflow.jobs[0].id)
