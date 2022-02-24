@@ -94,6 +94,7 @@ class SchedulerService:
             dependency_jobs = get_dependency_jobs_command.execute()
             for dependency_job in dependency_jobs:
                 schedule_job_command = ScheduleJobCommand(
+                    uow,
                     dependency_job.id,
                     self.scheduler,
                     job_return_value=event.retval,
