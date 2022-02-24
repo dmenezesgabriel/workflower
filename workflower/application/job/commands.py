@@ -174,11 +174,17 @@ class UnscheduleJobCommand:
 # Tests
 class ScheduleJobCommand:
     def __init__(
-        self, unit_of_work: UnitOfWork, job_id, scheduler, kwargs=None
+        self,
+        unit_of_work: UnitOfWork,
+        job_id,
+        scheduler,
+        job_return_value=None,
+        kwargs=None,
     ):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
         self.scheduler = scheduler
+        self.job_return_value = job_return_value
         self.kwargs = kwargs
 
     def execute(self):
@@ -189,6 +195,10 @@ class ScheduleJobCommand:
                     schedule_params = job.definition.copy()
                     schedule_kwargs = schedule_params.get("kwargs")
                     schedule_kwargs.update(dict(job_id=job.id))
+                    schedule_kwargs.update(
+                        dict(job_return_value=self.job_return_value)
+                    )
+
                     plugins = schedule_kwargs.get("plugins")
                     if plugins:
                         plugins_list = list(

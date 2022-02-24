@@ -4,6 +4,7 @@ import os
 
 from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
+from workflower.application.event.commands import CreateEventCommand
 from workflower.application.job.commands import (
     ChangeJobStatusCommand,
     RemoveJobCommand,
@@ -76,6 +77,15 @@ class WorkflowRunnerService:
                     uow, job.id, "unscheduled"
                 )
                 change_job_status_command.execute()
+                create_event_command = CreateEventCommand(
+                    uow,
+                    name="job_unscheduled",
+                    model="job",
+                    model_id=job.id,
+                    exception=None,
+                    output=None,
+                )
+                create_event_command.execute()
             logger.info(f"{workflow.name} file removed, skipping")
 
         elif workflow.file_exists:
@@ -93,7 +103,15 @@ class WorkflowRunnerService:
                         uow, job.id, "unscheduled"
                     )
                     change_job_status_command.execute()
-
+                    create_event_command = CreateEventCommand(
+                        uow,
+                        name="job_unscheduled",
+                        model="job",
+                        model_id=job.id,
+                        exception=None,
+                        output=None,
+                    )
+                    create_event_command.execute()
             logger.info("Scheduling jobs")
             for job in workflow.jobs:
                 if job.is_active:
@@ -109,6 +127,15 @@ class WorkflowRunnerService:
                         uow, job.id, "scheduled"
                     )
                     change_job_status_command.execute()
+                    create_event_command = CreateEventCommand(
+                        uow,
+                        name="job_scheduled",
+                        model="job",
+                        model_id=job.id,
+                        exception=None,
+                        output=None,
+                    )
+                    create_event_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
@@ -133,6 +160,15 @@ class WorkflowRunnerService:
                         uow, job.id, "unscheduled"
                     )
                     change_job_status_command.execute()
+                    create_event_command = CreateEventCommand(
+                        uow,
+                        name="job_unscheduled",
+                        model="job",
+                        model_id=job.id,
+                        exception=None,
+                        output=None,
+                    )
+                    create_event_command.execute()
                 if not job.workflow:
                     remove_job_command = RemoveJobCommand(uow, job.id)
                     remove_job_command.execute()

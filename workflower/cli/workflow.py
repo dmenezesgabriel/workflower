@@ -28,7 +28,7 @@ class Runner:
 
     def __init__(self) -> None:
         self.engine = create_engine(database_uri)
-        self._is_running = False
+        self._is_waiting = False
 
     def _setup(self) -> None:
         metadata.drop_all(bind=self.engine)
@@ -45,33 +45,30 @@ class Runner:
 
     def run_workflow(self, path) -> None:
         self._setup()
-        self._is_running = True
+        self._is_waiting = True
         session = self._session()
         uow = SqlAlchemyUnitOfWork(session)
+        workflow_scheduler = WorkflowScheduler(self.engine)
+        workflow_runner = WorkflowRunnerService(self.engine)
+        command = LoadWorkflowFromYamlFileCommand(uow, path)
+        workflow = command.execute()
+        workflow_runner.schedule_one_workflow_jobs(
+            uow, workflow, workflow_scheduler.scheduler
+        )
+        # Start after a job is scheduled will grantee scheduler is up
+        # until job finishess execution
+        expected_job_status = ["added"]
+        workflow_scheduler.start()
         with uow:
-            workflow_scheduler = WorkflowScheduler(self.engine)
-            workflow_runner = WorkflowRunnerService(self.engine)
-            command = LoadWorkflowFromYamlFileCommand(uow, path)
-            workflow = command.execute()
-            workflow_runner.schedule_one_workflow_jobs(
-                uow, workflow, workflow_scheduler.scheduler
-            )
-            # Start after a job is scheduled will grantee scheduler is up
-            # until job finishess execution
-            workflow_scheduler.start()
-            # TODO
-            # =============================================================== #
-            # As is
-            # After job is executed if we don 't wait till the next jobs is
-            # added to scheduler by the execution event, scheduler will be
-            # shutted down
-            # wait till trigger deps
-            time.sleep(10)
-            # To be
-            # Know which jobs must be executed
-            # Keep scheduler service running until last job finished
-            # =============================================================== #
-        self._is_running = False
+            workflow_record = uow.workflows.get(id=workflow.id)
+            while self._is_waiting:
+                not_pending = all(
+                    job.status in expected_job_status
+                    for job in workflow_record.jobs
+                )
+                time.sleep(1)
+                if not_pending:
+                    self._is_waiting = False
 
 
 def run_workflow(path: str) -> None:
