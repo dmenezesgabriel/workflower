@@ -143,6 +143,7 @@ class LoadWorkflowFromYamlFileCommand:
                 )
                 uow.workflows.add(workflow)
             # Add jobs
+            jobs_list = []
             for job_dict in jobs_dict:
                 job_parser = JobSchemaParser()
                 (
@@ -165,13 +166,11 @@ class LoadWorkflowFromYamlFileCommand:
                 if job:
                     if workflow.modified_since_last_load:
                         job.operator = job_operator
-                        job.definition = (job_definition,)
-                        job.depends_on = (job_depends_on_id,)
-                        job.dependency_logs_pattern = (
-                            dependency_logs_pattern,
-                        )
-                        job.run_if_pattern_match = (run_if_pattern_match,)
-                        job.is_active = (True,)
+                        job.definition = job_definition
+                        job.depends_on = job_depends_on_id
+                        job.dependency_logs_pattern = dependency_logs_pattern
+                        job.run_if_pattern_match = run_if_pattern_match
+                        job.is_active = True
                 elif not job:
                     job = Job(
                         name=job_name,
@@ -186,4 +185,8 @@ class LoadWorkflowFromYamlFileCommand:
                     continue
                 else:
                     workflow.add_job(job)
+                jobs_list.append(job)
+                for old_job in workflow.jobs:
+                    if old_job not in jobs_list:
+                        workflow.remove_job(old_job)
         return workflow

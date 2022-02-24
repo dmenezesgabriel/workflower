@@ -253,14 +253,67 @@ class TestLoadWorkflowFromYamlFileCommand:
 
         file_path = str(workflow_file)
         command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        new_workflow = command.execute(file_path)
+        workflow = command.execute(file_path)
 
-        session = session_factory()
-        workflow = (
-            session.query(Workflow).filter_by(id=new_workflow.id).first()
-        )
         assert workflow.name == "python_code_sample_interval_trigger"
         assert workflow.jobs_count == 1
         assert workflow.jobs[0].id == new_job.id
         assert workflow.jobs[0].name == "hello_python_code"
         assert workflow.jobs[0].operator == "python"
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_modified(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        first_load_command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow
+        )
+        new_workflow = first_load_command.execute(file_path)
+
+        assert new_workflow.name == "python_code_sample_interval_trigger"
+        assert new_workflow.jobs_count == 1
+        assert new_workflow.jobs[0].name == "hello_python_code"
+        assert new_workflow.jobs[0].operator == "python"
+
+        file_content = """
+        version: "1.0"
+        workflow:
+            name: python_code_sample_interval_trigger
+            jobs:
+              - name: "first_job"
+                operator: python
+                code: "print('First Job!')"
+                trigger: date
+              - name: "second_job"
+                operator: python
+                code: "print('Second Job!')"
+                trigger: dependency
+                depends_on: first_job
+                dependency_logs_pattern: "first"
+                run_if_pattern_match: True
+
+        """
+        with open(file_path, "w") as f:
+            f.write(file_content)
+
+        update_state_command = commands.UpdateModifiedWorkflowFileStateCommand(
+            unit_of_work=uow
+        )
+        update_state_command.execute(new_workflow.id)
+
+        second_load_command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow
+        )
+        workflow = second_load_command.execute(file_path)
+
+        session = session_factory()
+        record = session.query(Workflow).filter_by(id=new_workflow.id).first()
+
+        assert workflow.id == new_workflow.id
+        assert record.id == workflow.id
+        assert record.name == "python_code_sample_interval_trigger"
+        assert record.jobs_count == 2
+        assert record.jobs[0].name == "first_job"
+        assert record.jobs[0].operator == "python"
+        assert record.jobs[1].name == "second_job"
+        assert record.jobs[1].operator == "python"
