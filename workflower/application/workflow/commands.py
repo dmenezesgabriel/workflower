@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
+from workflower.utils.file import get_file_modification_date
 
 logger = logging.getLogger("workflower.application.workflow.commands")
 
@@ -50,17 +51,44 @@ class AddWorkflowJobCommand:
         try:
             with self.unit_of_work as uow:
                 workflow = uow.workflows.get(id=workflow_id)
+                job = uow.jobs.get(id=job_id)
+
                 if not workflow:
                     logger.info("No matching workflow found")
 
-                job = uow.jobs.get(id=job_id)
-                if not job:
+                elif not job:
                     logger.info("No matching job found")
 
-                if workflow.has_job(job):
+                elif workflow.has_job(job):
                     logger.info(f"{workflow} already has {job}")
 
-                workflow.add_job(job)
+                else:
+                    workflow.add_job(job)
+
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+
+class UpdateModifiedWorkflowFileStateCommand:
+    def __init__(self, unit_of_work: UnitOfWork) -> None:
+        self.unit_of_work = unit_of_work
+
+    def execute(self, workflow_id):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=workflow_id)
+
+                if not workflow:
+                    logger.info("No matching workflow found")
+                elif not workflow.file_path:
+                    logger.info("No workflow file")
+
+                workflow_last_modified_at = str(
+                    get_file_modification_date(workflow.file_path)
+                )
+                workflow.file_last_modified_at = workflow_last_modified_at
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")

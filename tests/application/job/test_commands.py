@@ -2,7 +2,7 @@ from workflower.application.job import commands
 
 
 class TestCreateJobCommand:
-    def test_create_workflow_command(self, uow):
+    def test_create_workflow_command_executes_correctly(self, uow):
         command = commands.CreateJobCommand(unit_of_work=uow)
         new_job = command.execute(
             name="test",
