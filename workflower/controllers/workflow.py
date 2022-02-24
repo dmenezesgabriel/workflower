@@ -102,13 +102,15 @@ class WorkflowContoller:
             workflows = uow.workflows.list()
             for workflow in workflows:
                 update_modified_file_state_command = (
-                    UpdateModifiedWorkflowFileStateCommand(uow, workflow)
+                    UpdateModifiedWorkflowFileStateCommand(uow, workflow.id)
                 )
                 update_modified_file_state_command = (
-                    UpdateWorkflowFileExistsStateCommand(uow, workflow)
+                    UpdateWorkflowFileExistsStateCommand(uow, workflow.id)
                 )
                 update_modified_file_state_command.execute()
-                self.schedule_one_workflow_jobs(session, workflow, scheduler)
+                self.schedule_one_workflow_jobs(
+                    session, workflow.id, scheduler
+                )
 
     async def run(self, scheduler):
         self.is_running = True

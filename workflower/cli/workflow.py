@@ -7,8 +7,7 @@ from workflower.config import Config
 from workflower.controllers.workflow import WorkflowContoller
 
 # from workflower.models.base import database
-from workflower.models import Workflow
-from workflower.models.base import BaseModel
+from workflower.domain.entities.workflow import Workflow
 from workflower.scheduler import SchedulerService
 
 logger = logging.getLogger("workflower.cli.workflow")
@@ -27,9 +26,7 @@ class Runner:
         self._is_running = False
 
     def _setup(self) -> None:
-        #  Clean db
-        BaseModel.metadata.drop_all(bind=self.engine)
-        #  Init database
+        pass
 
     def run_workflow(self, path) -> None:
         self._setup()

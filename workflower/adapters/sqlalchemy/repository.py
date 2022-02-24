@@ -33,20 +33,22 @@ class SqlAlchemyRepository(Repository):
         Args
             - object (Entity): Entity object.
         """
+        logger.debug(f"Adding {object}")
+
         self.session.add(object)
 
     def get(self, **kwargs):
         """
         Get one object from database.
         """
-        logger.info(f"Getting one from {self.model} , {dict(**kwargs)}")
+        logger.debug(f"Getting one from {self.model} , {dict(**kwargs)}")
         return self.session.query(self.model).filter_by(**kwargs).first()
 
     def list(self, **kwargs):
         """
         Get list of objects of a model type.
         """
-        logger.info(f"Getting all from {self.model} , {dict(**kwargs)}")
+        logger.debug(f"Getting all from {self.model} , {dict(**kwargs)}")
         return self.session.query(self.model).filter_by(**kwargs).all()
 
     def update(self, filter_dict: dict, new_attributes_dict: dict):

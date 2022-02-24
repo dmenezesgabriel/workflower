@@ -105,6 +105,9 @@ class TestSqlAlchemyRepository:
             """
         )
         session.commit()
+        repository = SqlAlchemyRepository(session, model=Workflow)
+        assert len(session.query(Workflow).all()) == 3
+        assert len(repository.list()) == 3
 
     def test_repository_update_calls_session_query(cls, session_factory):
         first_session = session_factory()

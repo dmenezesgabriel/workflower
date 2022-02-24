@@ -182,7 +182,6 @@ run_cli () {
                 . $venv_activate
                 eval "$(cat .env.dev.template)"  && \
                 python -c"import sys; sys.executable"
-                python . init-db && \
                 python . run
         # =================================================================== #
         # Run tests environment
@@ -222,7 +221,6 @@ run_cli () {
                 echo "Run with .env"
                 . $venv_activate
                 eval "$(cat .env)"  && \
-                python . init-db && \
                 python . run
         # =================================================================== #
         # Standalone cli workflow

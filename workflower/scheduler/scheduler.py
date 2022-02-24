@@ -89,7 +89,7 @@ class SchedulerService:
             )
             update_next_runtime_command.execute()
             get_dependency_jobs_command = GetDependencyTriggerJobsCommand(
-                event.job_id, event.retval
+                uow, event.job_id, event.retval
             )
             dependency_jobs = get_dependency_jobs_command.execute()
             for dependency_job in dependency_jobs:

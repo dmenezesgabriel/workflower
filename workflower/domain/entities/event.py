@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("workflower.models.event")
+logger = logging.getLogger("workflower.domain.entities.event")
 
 
 class Event:

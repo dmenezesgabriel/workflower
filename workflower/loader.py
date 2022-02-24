@@ -3,9 +3,8 @@ import os
 import traceback
 from typing import List
 
-from workflower.application.workflow.commands import (
-    LoadWorkflowFromYamlFileCommand,
-)
+from workflower.application.workflow.commands import \
+    LoadWorkflowFromYamlFileCommand
 from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
 
@@ -40,17 +39,17 @@ class WorkflowLoader:
         for root, dirs, files in os.walk(workflows_path):
             for file in files:
                 if file.endswith(".yml") or file.endswith(".yaml"):
-                    workflow_yaml_config_path = os.path.join(root, file)
+                    file_path = os.path.join(root, file)
                     try:
                         workflow = self.load_one_from_file(
-                            uow, workflow_yaml_config_path
+                            uow, file_path
                         )
                         counter += 1
                         if workflow:
                             self._workflows.append(workflow)
                     except Exception:
                         logger.error(
-                            f"Error loading {workflow_yaml_config_path}:"
+                            f"Error loading {file_path}:"
                             f" {traceback.format_exc()}"
                         )
         logger.info(f"Workflows Loaded {counter}")

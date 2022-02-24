@@ -14,7 +14,7 @@ scheduler_service = SchedulerService(engine)
 api = create_api()
 server = create_server(api)
 
-workflow_controller = WorkflowContoller()
+workflow_controller = WorkflowContoller(engine)
 
 logger = logging.getLogger("workflower")
 
