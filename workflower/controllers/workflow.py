@@ -2,12 +2,20 @@ import asyncio
 import logging
 import os
 
+from workflower.adapters.sqlalchemy.setup import Session
+from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
+from workflower.application.job.commands import (
+    ScheduleJobCommand,
+    UnscheduleJobCommand,
+)
+from workflower.application.workflow.commands import (
+    DeactivateWorkflowJobsCommand,
+    UpdateModifiedWorkflowFileStateCommand,
+    UpdateWorkflowFileExistsStateCommand,
+)
 from workflower.config import Config
-from workflower.database import DatabaseManager
+from workflower.domain.entities.workflow import Workflow
 from workflower.loader import WorkflowLoader
-from workflower.models.base import database
-from workflower.models.workflow import Workflow
-from workflower.utils import crud
 
 logger = logging.getLogger("workflower.controllers.workflow")
 
@@ -40,7 +48,7 @@ class WorkflowContoller:
         self.create_default_directories()
 
     def schedule_one_workflow_jobs(
-        self, session, workflow: Workflow, scheduler
+        self, uow, workflow: Workflow, scheduler
     ) -> None:
         """
         Schedule one workflow
@@ -52,38 +60,54 @@ class WorkflowContoller:
                     f"{workflow.name} file has been modified, "
                     "unscheduling jobs"
                 )
-                workflow.unschedule_jobs(scheduler)
+                for job in workflow.jobs:
+                    unschedule_jobs_command = UnscheduleJobCommand(
+                        uow, job.id, scheduler
+                    )
+                    unschedule_jobs_command.execute()
         elif not workflow.file_exists:
             logger.info(
                 f"{workflow.name} file has been removed, unscheduling jobs"
             )
-            crud.update(
-                session,
-                Workflow,
-                dict(id=workflow.id),
-                dict(is_active=False),
+            workflow.is_active = False
+            deactivate_workflow_jobs_command = DeactivateWorkflowJobsCommand(
+                uow, workflow.id
             )
-            workflow.deactivate_all_jobs(session)
-            workflow.unschedule_jobs(scheduler)
+            deactivate_workflow_jobs_command.execute()
+            for job in workflow.jobs:
+                unschedule_jobs_command = UnscheduleJobCommand(
+                    uow, job.id, scheduler
+                )
+                unschedule_jobs_command.execute()
             logger.info(f"{workflow.name} file removed, skipping")
             return
         logger.info("Scheduling jobs")
-        workflow.schedule_jobs(session, scheduler)
+        for job in workflow.jobs:
+            schedule_jobs_command = ScheduleJobCommand(uow, job.id, scheduler)
+            schedule_jobs_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
         run Workflow Controller.
         """
         logger.info("Scheduling workflows jobs")
-        with self._database.session_scope() as session:
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
             # Load all workflows into database, it won't load if file has been
             # removed.
-            self.workflow_loader.load_all_from_dir(session)
+            self.workflow_loader.load_all_from_dir(uow)
             # Load all workflows on database, including if the file has ben
             # removed.
-            workflows = crud.get_all(session, Workflow)
+            workflows = uow.workflows.list()
             for workflow in workflows:
-                self.update_workflow_files_exists_state(session, workflow)
+                update_modified_file_state_command = (
+                    UpdateModifiedWorkflowFileStateCommand(uow, workflow)
+                )
+                update_modified_file_state_command = (
+                    UpdateWorkflowFileExistsStateCommand(uow, workflow)
+                )
+                update_modified_file_state_command.execute()
                 self.schedule_one_workflow_jobs(session, workflow, scheduler)
 
     async def run(self, scheduler):

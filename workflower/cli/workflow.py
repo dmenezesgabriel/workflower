@@ -2,10 +2,9 @@ import logging
 import os
 import time
 
+from sqlalchemy import create_engine
 from workflower.config import Config
 from workflower.controllers.workflow import WorkflowContoller
-from workflower.database import DatabaseManager
-from workflower.init_db import init_db
 
 # from workflower.models.base import database
 from workflower.models import Workflow
@@ -23,24 +22,21 @@ class Runner:
     Command line workflow runner.
     """
 
-    def __init__(self, database_uri=database_uri) -> None:
-        self._database_uri = database_uri
-        self._database = None
+    def __init__(self) -> None:
+        self.engine = create_engine(database_uri)
         self._is_running = False
 
     def _setup(self) -> None:
-        self._database = DatabaseManager(self._database_uri)
         #  Clean db
-        BaseModel.metadata.drop_all(bind=self._database.engine)
+        BaseModel.metadata.drop_all(bind=self.engine)
         #  Init database
-        init_db(self._database)
 
     def run_workflow(self, path) -> None:
         self._setup()
         self._is_running = True
         with self._database.session_scope() as session:
-            scheduler_service = SchedulerService(self._database)
-            workflow_controller = WorkflowContoller(self._database)
+            scheduler_service = SchedulerService(self.engine)
+            workflow_controller = WorkflowContoller(self.engine)
             workflow = Workflow.from_yaml(session, path)
             workflow_controller.schedule_one_workflow_jobs(
                 session, workflow, scheduler_service.scheduler

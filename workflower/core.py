@@ -4,12 +4,13 @@ import os
 import signal
 from concurrent.futures import ThreadPoolExecutor
 
+from workflower.adapters.sqlalchemy.setup import engine
 from workflower.api import create_api
 from workflower.controllers.workflow import WorkflowContoller
 from workflower.scheduler import SchedulerService
 from workflower.server import create_server
 
-scheduler_service = SchedulerService()
+scheduler_service = SchedulerService(engine)
 api = create_api()
 server = create_server(api)
 
