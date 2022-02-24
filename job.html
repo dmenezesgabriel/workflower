@@ -40,6 +40,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Job</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#status">status</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#operator">Operator</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#alteryx">Alteryx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#papermill">Papermill</a></li>
@@ -85,6 +86,36 @@
   <section id="job">
 <h1>Job<a class="headerlink" href="#job" title="Permalink to this headline"></a></h1>
 <p>A task that can be execute python code, jupyter notebook or some other thing needed.</p>
+<section id="status">
+<h2>status<a class="headerlink" href="#status" title="Permalink to this headline"></a></h2>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Status</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pending</p></td>
+<td><p>Nothing happend yet, besides the database creation</p></td>
+</tr>
+<tr class="row-odd"><td><p>added</p></td>
+<td><p>Added to job scheduler</p></td>
+</tr>
+<tr class="row-even"><td><p>scheduled</p></td>
+<td><p>Scheduled and wiating to run</p></td>
+</tr>
+<tr class="row-odd"><td><p>submitted</p></td>
+<td><p>Submitted to it’s executor so it can run</p></td>
+</tr>
+<tr class="row-even"><td><p>unscheduled</p></td>
+<td><p>Removed from schedule, will not run anymore</p></td>
+</tr>
+<tr class="row-odd"><td><p>removed</p></td>
+<td><p>Removed from schedule, will not run anymore</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="operator">
 <h2>Operator<a class="headerlink" href="#operator" title="Permalink to this headline"></a></h2>
 <p>Operator definition, define which <strong>Operator</strong> to use.</p>

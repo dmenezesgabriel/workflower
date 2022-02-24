@@ -2,6 +2,17 @@
 
 A task that can be execute python code, jupyter notebook or some other thing needed.
 
+## status
+
+| Status      | Description                                        |
+| ----------- | -------------------------------------------------- |
+| pending     | Nothing happend yet, besides the database creation |
+| added       | Added to job scheduler                             |
+| scheduled   | Scheduled and wiating to run                       |
+| submitted   | Submitted to it's executor so it can run           |
+| unscheduled | Removed from schedule, will not run anymore        |
+| removed     | Removed from schedule, will not run anymore        |
+
 ## Operator
 
 Operator definition, define which **Operator** to use.
