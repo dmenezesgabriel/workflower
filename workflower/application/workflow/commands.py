@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
-from workflower.schema.parser import WorkflowSchemaParser
+from workflower.schema.parser import JobSchemaParser, WorkflowSchemaParser
 from workflower.schema.validator import validate_schema
 from workflower.utils.file import (
     get_file_modification_date,
@@ -142,4 +142,48 @@ class LoadWorkflowFromYamlFileCommand:
                     file_path=file_path,
                 )
                 uow.workflows.add(workflow)
+            # Add jobs
+            for job_dict in jobs_dict:
+                job_parser = JobSchemaParser()
+                (
+                    job_name,
+                    job_operator,
+                    job_depends_on,
+                    dependency_logs_pattern,
+                    run_if_pattern_match,
+                    job_definition,
+                ) = job_parser.parse_schema(job_dict)
+                if job_depends_on:
+                    dependency_job = uow.jobs.get(
+                        name=job_depends_on, workflow_id=workflow.id
+                    )
+                    job_depends_on_id = dependency_job.id
+                else:
+                    job_depends_on_id = None
+                # Check if job already exists
+                job = uow.jobs.get(name=job_name, workflow_id=workflow.id)
+                if job:
+                    if workflow.modified_since_last_load:
+                        job.operator = job_operator
+                        job.definition = (job_definition,)
+                        job.depends_on = (job_depends_on_id,)
+                        job.dependency_logs_pattern = (
+                            dependency_logs_pattern,
+                        )
+                        job.run_if_pattern_match = (run_if_pattern_match,)
+                        job.is_active = (True,)
+                elif not job:
+                    job = Job(
+                        name=job_name,
+                        operator=job_operator,
+                        definition=job_definition,
+                        depends_on=job_depends_on_id,
+                        dependency_logs_pattern=dependency_logs_pattern,
+                        run_if_pattern_match=run_if_pattern_match,
+                    )
+
+                if workflow.has_job(job):
+                    continue
+                else:
+                    workflow.add_job(job)
         return workflow

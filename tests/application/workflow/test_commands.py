@@ -173,3 +173,19 @@ class TestLoadWorkflowFromYamlFileCommand:
         command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
         workflow = command.execute(file_path)
         assert new_workflow.id == workflow.id
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_add_jobs(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        new_workflow = command.execute(file_path)
+
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.name == "python_code_sample_interval_trigger"
+        assert workflow.jobs_count == 1
+        assert workflow.jobs[0].name == "hello_python_code"
+        assert workflow.jobs[0].operator == "python"
