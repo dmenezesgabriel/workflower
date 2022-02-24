@@ -1,3 +1,5 @@
+import os
+
 from workflower.application.workflow import commands
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -46,13 +48,19 @@ class TestUpdateModifiedWorkflowFileStateCommand:
     def test_update_modified_file_state_command_updates_file_last_modified_at(
         self, session_factory, workflow_file, uow
     ):
-        workflow = Workflow(name="test", file_path=str(workflow_file))
+        new_workflow = Workflow(name="test", file_path=str(workflow_file))
         with uow:
-            uow.workflows.add(workflow)
+            uow.workflows.add(new_workflow)
 
         command = commands.UpdateModifiedWorkflowFileStateCommand(
             unit_of_work=uow
         )
 
-        command.execute(workflow.id)
-        print(workflow)
+        command.execute(new_workflow.id)
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.file_last_modified_at == str(
+            os.path.getmtime(str(workflow_file))
+        )
