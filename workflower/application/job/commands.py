@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from sqlalchemy.exc import IntegrityError
@@ -54,8 +55,8 @@ class CreateJobCommand:
                 return job
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
 
 
 # TODO
@@ -79,8 +80,8 @@ class UpdateNextRunTimeCommand:
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
 
 
 # TODO
@@ -106,8 +107,8 @@ class UnscheduleJobCommand:
                         )
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
 
 
 # TODO
@@ -161,8 +162,8 @@ class ScheduleJobCommand:
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
 
 
 # TODO
@@ -238,5 +239,5 @@ class GetDependencyTriggerJobsCommand:
             return dependency_jobs_to_trigger
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
