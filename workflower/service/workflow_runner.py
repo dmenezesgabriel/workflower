@@ -5,6 +5,7 @@ import os
 from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.job.commands import (
+    ChangeJobStatusCommand,
     RemoveJobCommand,
     ScheduleJobCommand,
     UnscheduleJobCommand,
@@ -71,6 +72,10 @@ class WorkflowRunnerService:
                     uow, job.id, scheduler
                 )
                 unschedule_job_command.execute()
+                change_job_status_command = ChangeJobStatusCommand(
+                    uow, job.id, "unscheduled"
+                )
+                change_job_status_command.execute()
             logger.info(f"{workflow.name} file removed, skipping")
 
         elif workflow.file_exists:
@@ -84,6 +89,10 @@ class WorkflowRunnerService:
                         uow, job.id, scheduler
                     )
                     unschedule_job_command.execute()
+                    change_job_status_command = ChangeJobStatusCommand(
+                        uow, job.id, "unscheduled"
+                    )
+                    change_job_status_command.execute()
 
             logger.info("Scheduling jobs")
             for job in workflow.jobs:
@@ -96,6 +105,10 @@ class WorkflowRunnerService:
                         uow, job.id, scheduler
                     )
                     update_next_runtime_command.execute()
+                    change_job_status_command = ChangeJobStatusCommand(
+                        uow, job.id, "scheduled"
+                    )
+                    change_job_status_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
@@ -116,6 +129,10 @@ class WorkflowRunnerService:
                         uow, job.id, scheduler
                     )
                     unschedule_job_command.execute()
+                    change_job_status_command = ChangeJobStatusCommand(
+                        uow, job.id, "unscheduled"
+                    )
+                    change_job_status_command.execute()
                 if not job.workflow:
                     remove_job_command = RemoveJobCommand(uow, job.id)
                     remove_job_command.execute()

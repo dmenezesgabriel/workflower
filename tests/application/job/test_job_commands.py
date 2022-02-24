@@ -44,6 +44,30 @@ class TestDeactivateJobCommand:
         assert job.is_active is False
 
 
+class TestChangeJobStatusCommand:
+    def test_create_workflow_command_executes_correctly(
+        self, session_factory, uow
+    ):
+        new_workflow = Workflow(name="test")
+        new_job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+
+        with uow:
+            uow.workflows.add(new_workflow)
+            uow.jobs.add(new_job)
+            new_workflow.add_job(new_job)
+
+        command = commands.ChangeJobStatusCommand(uow, new_job.id, "scheduled")
+        command.execute()
+
+        session = session_factory()
+        job = session.query(Job).filter_by(id=new_job.id).first()
+        assert job.status == "scheduled"
+
+
 class RemoveJobCommand:
     def test_create_workflow_command_executes_correctly(
         self, session_factory, uow

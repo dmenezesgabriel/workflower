@@ -92,6 +92,10 @@ job: Table = Table(
         String,
     ),
     Column(
+        "status",
+        String,
+    ),
+    Column(
         "operator",
         String,
     ),

@@ -59,6 +59,24 @@ class CreateJobCommand:
             logger.error(f"Error: {traceback.print_exc()}")
 
 
+class ChangeJobStatusCommand:
+    def __init__(self, unit_of_work: UnitOfWork, job_id, status):
+        self.unit_of_work = unit_of_work
+        self.job_id = job_id
+        self.status = status
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                job = uow.jobs.get(id=self.job_id)
+                if job:
+                    job.status = self.status
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
+
+
 class DeactivateJobCommand:
     def __init__(self, unit_of_work: UnitOfWork, job_id):
         self.unit_of_work = unit_of_work
@@ -170,6 +188,7 @@ class ScheduleJobCommand:
                 if job:
                     schedule_params = job.definition.copy()
                     schedule_kwargs = schedule_params.get("kwargs")
+                    schedule_kwargs.update(dict(job_id=job.id))
                     plugins = schedule_kwargs.get("plugins")
                     if plugins:
                         plugins_list = list(

@@ -28,6 +28,7 @@ class Job:
         name: str,
         operator: str,
         definition: dict,
+        status: str = "pending",
         workflow=None,
         depends_on: str = None,
         dependency_logs_pattern: str = None,
@@ -41,6 +42,7 @@ class Job:
         # running
         # executed (if trigger says tha should run only once)
         self.name = name
+        self.status = status
         self.operator = operator
         self.definition = definition
         self.depends_on = depends_on
@@ -63,7 +65,9 @@ class Job:
 
     def __repr__(self) -> str:
         return (
-            f"<Job(name={self.name}, operator={self.operator}, "
+            f"<Job(name={self.name}, "
+            f"status={self.status}, "
+            f"operator={self.operator}, "
             f"definition={self.definition}, "
             f"depends_on={self.depends_on}, "
             f"dependency_logs_pattern={self.dependency_logs_pattern}, "

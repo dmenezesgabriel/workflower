@@ -4,7 +4,10 @@ from apscheduler.events import (
     EVENT_JOB_ADDED,
     EVENT_JOB_ERROR,
     EVENT_JOB_EXECUTED,
+    EVENT_JOB_MAX_INSTANCES,
+    EVENT_JOB_MISSED,
     EVENT_JOB_REMOVED,
+    EVENT_JOB_SUBMITTED,
 )
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,6 +15,7 @@ from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.event.commands import CreateEventCommand
 from workflower.application.job.commands import (
+    ChangeJobStatusCommand,
     GetDependencyTriggerJobsCommand,
     ScheduleJobCommand,
     UpdateNextRunTimeCommand,
@@ -44,7 +48,7 @@ class WorkflowScheduler:
         session = Session()
         uow = SqlAlchemyUnitOfWork(session)
         with uow:
-            command = CreateEventCommand(
+            create_event_command = CreateEventCommand(
                 uow,
                 name="job_added",
                 model="job",
@@ -52,13 +56,68 @@ class WorkflowScheduler:
                 exception=None,
                 output=None,
             )
-            command.execute()
+            create_event_command.execute()
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "added"
+            )
+            change_job_status_command.execute()
+
+    def on_job_missed(self, event) -> None:
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            create_event_command = CreateEventCommand(
+                uow,
+                name="job_missed",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=None,
+            )
+            create_event_command.execute()
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "missed"
+            )
+            change_job_status_command.execute()
+
+    def on_job_max_instances(self, event) -> None:
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            create_event_command = CreateEventCommand(
+                uow,
+                name="job_max_instances",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=None,
+            )
+            create_event_command.execute()
+            logger.warning(f"Job{event.job_id} has reached max instances")
+
+    def on_job_submitted(self, event) -> None:
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            create_event_command = CreateEventCommand(
+                uow,
+                name="job_submitted",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=None,
+            )
+            create_event_command.execute()
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "submitted"
+            )
+            change_job_status_command.execute()
 
     def on_job_removed(self, event) -> None:
         session = Session()
         uow = SqlAlchemyUnitOfWork(session)
         with uow:
-            command = CreateEventCommand(
+            create_event_command = CreateEventCommand(
                 uow,
                 name="job_removed",
                 model="job",
@@ -66,7 +125,11 @@ class WorkflowScheduler:
                 exception=None,
                 output=None,
             )
-            command.execute()
+            create_event_command.execute()
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "removed"
+            )
+            change_job_status_command.execute()
 
     def on_job_executed(self, event) -> None:
         """
@@ -101,11 +164,16 @@ class WorkflowScheduler:
                 )
                 schedule_job_command.execute()
 
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "executed"
+            )
+            change_job_status_command.execute()
+
     def on_job_error(self, event) -> None:
         session = Session()
         uow = SqlAlchemyUnitOfWork(session)
         with uow:
-            command = CreateEventCommand(
+            create_event_command = CreateEventCommand(
                 uow,
                 name="job_error",
                 model="job",
@@ -113,7 +181,11 @@ class WorkflowScheduler:
                 exception=event.exception,
                 output=None,
             )
-            command.execute()
+            create_event_command.execute()
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "error"
+            )
+            change_job_status_command.execute()
 
     def setup_event_actions(self, scheduler) -> None:
         """
@@ -125,6 +197,12 @@ class WorkflowScheduler:
             {"func": self.on_job_executed, "event": EVENT_JOB_EXECUTED},
             {"func": self.on_job_error, "event": EVENT_JOB_ERROR},
             {"func": self.on_job_removed, "event": EVENT_JOB_REMOVED},
+            {"func": self.on_job_submitted, "event": EVENT_JOB_SUBMITTED},
+            {"func": self.on_job_missed, "event": EVENT_JOB_MISSED},
+            {
+                "func": self.on_job_max_instances,
+                "event": EVENT_JOB_MAX_INSTANCES,
+            },
         ]
         for event_action in event_actions:
             scheduler.add_listener(
