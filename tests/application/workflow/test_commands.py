@@ -235,3 +235,32 @@ class TestLoadWorkflowFromYamlFileCommand:
         assert workflow.jobs[1].name == "second_job"
         assert workflow.jobs[1].operator == "python"
         assert workflow.jobs[1].depends_on == str(workflow.jobs[0].id)
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_job_exists(
+        self, session_factory, workflow_file, uow
+    ):
+        new_workflow = Workflow(name="python_code_sample_interval_trigger")
+        new_job = Job(
+            name="hello_python_code",
+            operator="python",
+            definition={"trigger": "interval"},
+        )
+
+        with uow:
+            uow.workflows.add(new_workflow)
+            uow.jobs.add(new_job)
+            new_workflow.add_job(new_job)
+
+        file_path = str(workflow_file)
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        new_workflow = command.execute(file_path)
+
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.name == "python_code_sample_interval_trigger"
+        assert workflow.jobs_count == 1
+        assert workflow.jobs[0].id == new_job.id
+        assert workflow.jobs[0].name == "hello_python_code"
+        assert workflow.jobs[0].operator == "python"
