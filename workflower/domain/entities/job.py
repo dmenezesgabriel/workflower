@@ -4,7 +4,7 @@ Job class.
 
 import logging
 
-logger = logging.getLogger("workflower.job")
+logger = logging.getLogger("workflower.domain.entities.job")
 
 
 class Job:

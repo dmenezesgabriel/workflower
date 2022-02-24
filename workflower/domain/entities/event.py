@@ -6,9 +6,19 @@ logger = logging.getLogger("workflower.models.event")
 class Event:
     """
     Domain object for events.
+
+    Args:
+        - name (str): Name of the given event.
+        - model (str): event model.
+        - model_id (str): event model_id.
+        - exception (str, optional): exceptions.
+        - output (str, optional): output.
     """
 
-    def __init__(self, name, model, model_id, exception, output):
+    def __init__(
+        self, name: str, model: str, model_id: str, exception: str, output: str
+    ) -> None:
+
         self.name = name
         self.model = model
         self.model_id = model_id
