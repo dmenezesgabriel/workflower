@@ -123,17 +123,16 @@ class LoadWorkflowFromYamlFileCommand:
         workflow_name, jobs_dict = workflow_parser.parse_schema(
             configuration_dict
         )
-        if file_path:
-            workflow_file_name = get_file_name(file_path)
-            logger.debug(f"Workflow file name: {workflow_file_name}")
-            # File name must match with workflow name to workflow be loaded
-            if workflow_name != workflow_file_name:
-                logger.warning(
-                    f"Workflow name from {workflow_name}"
-                    f"don't match with file name {file_path}, "
-                    "skipping load"
-                )
-                return
+        workflow_file_name = get_file_name(file_path)
+        logger.debug(f"Workflow file name: {workflow_file_name}")
+        # File name must match with workflow name to workflow be loaded
+        if workflow_name != workflow_file_name:
+            logger.warning(
+                f"Workflow name from {workflow_name}"
+                f"don't match with file name {file_path}, "
+                "skipping load"
+            )
+            return
         validate_schema(configuration_dict)
         with self.unit_of_work as uow:
             workflow = uow.workflows.get(name=workflow_name)

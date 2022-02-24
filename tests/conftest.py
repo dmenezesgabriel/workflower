@@ -94,7 +94,7 @@ def uow(session) -> SqlAlchemyUnitOfWork:
     return SqlAlchemyUnitOfWork(session)
 
 
-@pytest.fixture()
+@pytest.fixture
 def workflow_file(tmpdir_factory):
     file_content = """
     version: "1.0"

@@ -1,5 +1,6 @@
 import os
 
+import pytest
 from workflower.application.workflow import commands
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
@@ -120,6 +121,23 @@ class TestUpdateModifiedWorkflowFileStateCommand:
 
 
 class TestLoadWorkflowFromYamlFileCommand:
+    @pytest.fixture
+    def workflow_file_wrong_name(self, tmpdir_factory):
+        file_content = """
+        version: "1.0"
+        workflow:
+            name: python_code_sample_interval_trigger
+            jobs:
+              - name: "hello_python_code"
+                operator: python
+                code: "print('Hello, World!')"
+                trigger: interval
+                minutes: 2
+        """
+        p = tmpdir_factory.mktemp("file").join("wrong_name.yaml")
+        p.write_text(file_content, encoding="utf-8")
+        return p
+
     def test_load_workflow_form_yaml_file_command_loads_workflow_correctly(
         self, session_factory, workflow_file, uow
     ):
@@ -128,3 +146,12 @@ class TestLoadWorkflowFromYamlFileCommand:
         workflow = command.execute(file_path)
 
         assert workflow.name == "python_code_sample_interval_trigger"
+
+    def test_load_workflow_form_yaml_file_command_loads_workflow_fail_by_name(
+        self, session_factory, workflow_file_wrong_name, uow
+    ):
+        file_path = str(workflow_file_wrong_name)
+        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
+        workflow = command.execute(file_path)
+
+        assert workflow is None
