@@ -6,4 +6,4 @@ workflow:
       operator: python
       code: "print('Hello, World!')"
       trigger: interval
-      minutes: 2
+      minutes: 1

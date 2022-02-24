@@ -3,11 +3,11 @@ import os
 import time
 
 from sqlalchemy import create_engine
+from workflower.adapters.scheduler.scheduler import WorkflowScheduler
 from workflower.config import Config
 
 # from workflower.models.base import database
 from workflower.domain.entities.workflow import Workflow
-from workflower.scheduler import WorkflowScheduler
 from workflower.service.workflow_runner import WorkflowRunnerService
 
 logger = logging.getLogger("workflower.cli.workflow")

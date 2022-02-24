@@ -5,6 +5,7 @@ import os
 from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.job.commands import (
+    RemoveJobCommand,
     ScheduleJobCommand,
     UnscheduleJobCommand,
     UpdateNextRunTimeCommand,
@@ -66,10 +67,10 @@ class WorkflowRunnerService:
             )
             deactivate_workflow_jobs_command.execute()
             for job in workflow.jobs:
-                unschedule_jobs_command = UnscheduleJobCommand(
+                unschedule_job_command = UnscheduleJobCommand(
                     uow, job.id, scheduler
                 )
-                unschedule_jobs_command.execute()
+                unschedule_job_command.execute()
             logger.info(f"{workflow.name} file removed, skipping")
 
         elif workflow.file_exists:
@@ -79,21 +80,22 @@ class WorkflowRunnerService:
                     "unscheduling jobs"
                 )
                 for job in workflow.jobs:
-                    unschedule_jobs_command = UnscheduleJobCommand(
+                    unschedule_job_command = UnscheduleJobCommand(
                         uow, job.id, scheduler
                     )
-                    unschedule_jobs_command.execute()
+                    unschedule_job_command.execute()
 
             logger.info("Scheduling jobs")
             for job in workflow.jobs:
-                schedule_jobs_command = ScheduleJobCommand(
-                    uow, job.id, scheduler
-                )
-                schedule_jobs_command.execute()
-                update_next_runtime_command = UpdateNextRunTimeCommand(
-                    uow, job.id, self.scheduler
-                )
-                update_next_runtime_command.execute()
+                if job.is_active:
+                    schedule_jobs_command = ScheduleJobCommand(
+                        uow, job.id, scheduler
+                    )
+                    schedule_jobs_command.execute()
+                    update_next_runtime_command = UpdateNextRunTimeCommand(
+                        uow, job.id, scheduler
+                    )
+                    update_next_runtime_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
@@ -105,6 +107,19 @@ class WorkflowRunnerService:
         with uow:
             # Load all workflows into database, it won't load if file has been
             # removed.
+
+            # Clean dangling jobs
+            jobs = uow.jobs.list()
+            for job in jobs:
+                if not job.is_active:
+                    unschedule_job_command = UnscheduleJobCommand(
+                        uow, job.id, scheduler
+                    )
+                    unschedule_job_command.execute()
+                if not job.workflow:
+                    remove_job_command = RemoveJobCommand(uow, job.id)
+                    remove_job_command.execute()
+
             self.workflow_loader.load_all_from_dir(uow)
             # Load all workflows on database, including if the file has ben
             # removed.
