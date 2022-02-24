@@ -17,11 +17,9 @@ logger = logging.getLogger("workflower.application.workflow.commands")
 
 
 class CreateWorkflowCommand:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
-        self.unit_of_work = unit_of_work
-
-    def execute(
+    def __init__(
         self,
+        unit_of_work: UnitOfWork,
         name: str,
         is_active: bool = True,
         file_path: str = None,
@@ -29,17 +27,27 @@ class CreateWorkflowCommand:
         file_last_modified_at: str = None,
         modified_since_last_load: bool = False,
         jobs: List[Job] = None,
-    ):
+    ) -> None:
+        self.unit_of_work = unit_of_work
+        self.name = name
+        self.is_active = is_active
+        self.file_path = file_path
+        self.file_exists = file_exists
+        self.file_last_modified_at = file_last_modified_at
+        self.modified_since_last_load = modified_since_last_load
+        self.jobs = jobs
+
+    def execute(self):
         try:
             with self.unit_of_work as uow:
                 workflow = Workflow(
-                    name,
-                    is_active,
-                    file_path,
-                    file_exists,
-                    file_last_modified_at,
-                    modified_since_last_load,
-                    jobs,
+                    self.name,
+                    self.is_active,
+                    self.file_path,
+                    self.file_exists,
+                    self.file_last_modified_at,
+                    self.modified_since_last_load,
+                    self.jobs,
                 )
                 uow.workflows.add(workflow)
                 return workflow
@@ -50,14 +58,16 @@ class CreateWorkflowCommand:
 
 
 class AddWorkflowJobCommand:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id, job_id) -> None:
         self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
+        self.job_id = job_id
 
-    def execute(self, workflow_id, job_id):
+    def execute(self):
         try:
             with self.unit_of_work as uow:
-                workflow = uow.workflows.get(id=workflow_id)
-                job = uow.jobs.get(id=job_id)
+                workflow = uow.workflows.get(id=self.workflow_id)
+                job = uow.jobs.get(id=self.job_id)
 
                 if not workflow:
                     logger.info("No matching workflow found")
@@ -78,13 +88,14 @@ class AddWorkflowJobCommand:
 
 
 class UpdateModifiedWorkflowFileStateCommand:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id) -> None:
         self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
 
-    def execute(self, workflow_id):
+    def execute(self):
         try:
             with self.unit_of_work as uow:
-                workflow = uow.workflows.get(id=workflow_id)
+                workflow = uow.workflows.get(id=self.workflow_id)
 
                 if not workflow:
                     logger.info("No matching workflow found")
@@ -114,22 +125,23 @@ class UpdateModifiedWorkflowFileStateCommand:
 
 
 class LoadWorkflowFromYamlFileCommand:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
+    def __init__(self, unit_of_work: UnitOfWork, file_path) -> None:
         self.unit_of_work = unit_of_work
+        self.file_path = file_path
 
-    def execute(self, file_path):
+    def execute(self):
         workflow_parser = WorkflowSchemaParser()
-        configuration_dict = yaml_file_to_dict(file_path)
+        configuration_dict = yaml_file_to_dict(self.file_path)
         workflow_name, jobs_dict = workflow_parser.parse_schema(
             configuration_dict
         )
-        workflow_file_name = get_file_name(file_path)
+        workflow_file_name = get_file_name(self.file_path)
         logger.debug(f"Workflow file name: {workflow_file_name}")
         # File name must match with workflow name to workflow be loaded
         if workflow_name != workflow_file_name:
             logger.warning(
                 f"Workflow name from {workflow_name}"
-                f"don't match with file name {file_path}, "
+                f"don't match with file name {self.file_path}, "
                 "skipping load"
             )
             return
@@ -139,7 +151,7 @@ class LoadWorkflowFromYamlFileCommand:
             if not workflow:
                 workflow = Workflow(
                     name=workflow_name,
-                    file_path=file_path,
+                    file_path=self.file_path,
                 )
                 uow.workflows.add(workflow)
             # Add jobs
@@ -190,3 +202,53 @@ class LoadWorkflowFromYamlFileCommand:
                     if old_job not in jobs_list:
                         workflow.remove_job(old_job)
         return workflow
+
+
+class DeactivateWorkflowJobs:
+    def __init__(self, unit_of_work: UnitOfWork) -> None:
+        self.unit_of_work = unit_of_work
+
+    def execute(self, workflow_id):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=workflow_id)
+
+                if not workflow:
+                    logger.info("No matching workflow found")
+                elif not workflow.file_path:
+                    logger.info("No workflow file")
+
+                else:
+                    if workflow.jobs:
+                        for job in workflow.jobs:
+                            job.is_active = False
+
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+
+class ActivateWorkflowJobs:
+    def __init__(self, unit_of_work: UnitOfWork) -> None:
+        self.unit_of_work = unit_of_work
+
+    def execute(self, workflow_id):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=workflow_id)
+
+                if not workflow:
+                    logger.info("No matching workflow found")
+                elif not workflow.file_path:
+                    logger.info("No workflow file")
+
+                else:
+                    if workflow.jobs:
+                        for job in workflow.jobs:
+                            job.is_active = True
+
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")

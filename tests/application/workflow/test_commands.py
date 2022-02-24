@@ -8,8 +8,8 @@ from workflower.domain.entities.workflow import Workflow
 
 class TestCreateWorkflowCommand:
     def test_create_workflow_command_executes_correctly(self, uow):
-        command = commands.CreateWorkflowCommand(unit_of_work=uow)
-        new_workflow = command.execute(name="test")
+        command = commands.CreateWorkflowCommand(unit_of_work=uow, name="test")
+        new_workflow = command.execute()
 
         new_workflow_id = new_workflow.id
         with uow:
@@ -32,8 +32,10 @@ class TestAddWorkflowJobCommand:
             uow.workflows.add(workflow)
             uow.jobs.add(job)
 
-        command = commands.AddWorkflowJobCommand(unit_of_work=uow)
-        command.execute(workflow_id=workflow.id, job_id=job.id)
+        command = commands.AddWorkflowJobCommand(
+            unit_of_work=uow, workflow_id=workflow.id, job_id=job.id
+        )
+        command.execute()
 
         session = session_factory()
         assert len(session.query(Workflow).all()) == 1
@@ -55,10 +57,10 @@ class TestUpdateModifiedWorkflowFileStateCommand:
             uow.workflows.add(new_workflow)
 
         command = commands.UpdateModifiedWorkflowFileStateCommand(
-            unit_of_work=uow
+            unit_of_work=uow, workflow_id=new_workflow.id
         )
 
-        command.execute(new_workflow.id)
+        command.execute()
         session = session_factory()
         workflow = (
             session.query(Workflow).filter_by(id=new_workflow.id).first()
@@ -79,10 +81,10 @@ class TestUpdateModifiedWorkflowFileStateCommand:
             uow.workflows.add(new_workflow)
 
         command = commands.UpdateModifiedWorkflowFileStateCommand(
-            unit_of_work=uow
+            unit_of_work=uow, workflow_id=new_workflow.id
         )
 
-        command.execute(new_workflow.id)
+        command.execute()
         session = session_factory()
         workflow = (
             session.query(Workflow).filter_by(id=new_workflow.id).first()
@@ -101,16 +103,16 @@ class TestUpdateModifiedWorkflowFileStateCommand:
             uow.workflows.add(new_workflow)
 
         command = commands.UpdateModifiedWorkflowFileStateCommand(
-            unit_of_work=uow
+            unit_of_work=uow, workflow_id=new_workflow.id
         )
 
-        command.execute(new_workflow.id)
+        command.execute()
 
         # File being modified
         with open(file_path, "a") as f:
             f.write("new line\n")
 
-        command.execute(new_workflow.id)
+        command.execute()
 
         session = session_factory()
         workflow = (
@@ -168,8 +170,10 @@ class TestLoadWorkflowFromYamlFileCommand:
         self, session_factory, workflow_file, uow
     ):
         file_path = str(workflow_file)
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        new_workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        new_workflow = command.execute()
 
         session = session_factory()
         workflow = (
@@ -181,8 +185,10 @@ class TestLoadWorkflowFromYamlFileCommand:
         self, session_factory, workflow_file_wrong_name, uow
     ):
         file_path = str(workflow_file_wrong_name)
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        workflow = command.execute()
 
         assert workflow is None
 
@@ -196,16 +202,20 @@ class TestLoadWorkflowFromYamlFileCommand:
         with uow:
             uow.workflows.add(new_workflow)
 
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        workflow = command.execute()
         assert new_workflow.id == workflow.id
 
     def test_load_workflow_form_yaml_file_command_loads_workflow_add_jobs(
         self, session_factory, workflow_file, uow
     ):
         file_path = str(workflow_file)
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        new_workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        new_workflow = command.execute()
 
         session = session_factory()
         workflow = (
@@ -220,8 +230,10 @@ class TestLoadWorkflowFromYamlFileCommand:
         self, session_factory, workflow_file_with_dependencies, uow
     ):
         file_path = str(workflow_file_with_dependencies)
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        new_workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        new_workflow = command.execute()
 
         session = session_factory()
         workflow = (
@@ -252,8 +264,10 @@ class TestLoadWorkflowFromYamlFileCommand:
             new_workflow.add_job(new_job)
 
         file_path = str(workflow_file)
-        command = commands.LoadWorkflowFromYamlFileCommand(unit_of_work=uow)
-        workflow = command.execute(file_path)
+        command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        workflow = command.execute()
 
         assert workflow.name == "python_code_sample_interval_trigger"
         assert workflow.jobs_count == 1
@@ -266,9 +280,9 @@ class TestLoadWorkflowFromYamlFileCommand:
     ):
         file_path = str(workflow_file)
         first_load_command = commands.LoadWorkflowFromYamlFileCommand(
-            unit_of_work=uow
+            unit_of_work=uow, file_path=file_path
         )
-        new_workflow = first_load_command.execute(file_path)
+        new_workflow = first_load_command.execute()
 
         assert new_workflow.name == "python_code_sample_interval_trigger"
         assert new_workflow.jobs_count == 1
@@ -297,14 +311,14 @@ class TestLoadWorkflowFromYamlFileCommand:
             f.write(file_content)
 
         update_state_command = commands.UpdateModifiedWorkflowFileStateCommand(
-            unit_of_work=uow
+            unit_of_work=uow, workflow_id=new_workflow.id
         )
-        update_state_command.execute(new_workflow.id)
+        update_state_command.execute()
 
         second_load_command = commands.LoadWorkflowFromYamlFileCommand(
-            unit_of_work=uow
+            unit_of_work=uow, file_path=file_path
         )
-        workflow = second_load_command.execute(file_path)
+        workflow = second_load_command.execute()
 
         session = session_factory()
         record = session.query(Workflow).filter_by(id=new_workflow.id).first()
