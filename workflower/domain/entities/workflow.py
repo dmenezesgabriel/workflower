@@ -81,11 +81,11 @@ class Workflow:
 
     def __repr__(self) -> str:
         return (
-            f"Workflow(name={self.name}, "
+            f"<Workflow(name={self.name}, "
             f"is_active={self.is_active}, "
             f"file_path={self.file_path}, "
             f"file_exists={self.file_exists}, "
             f"file_last_modified_at={self.file_last_modified_at}, "
             f"modified_since_last_load={self.modified_since_last_load}, "
-            f"jobs={self.jobs}, "
+            f"jobs={self.jobs})>"
         )

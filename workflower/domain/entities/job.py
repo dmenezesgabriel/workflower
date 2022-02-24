@@ -63,11 +63,11 @@ class Job:
 
     def __repr__(self) -> str:
         return (
-            f"Job(name={self.name}, operator={self.operator}, "
+            f"<Job(name={self.name}, operator={self.operator}, "
             f"definition={self.definition}, "
             f"depends_on={self.depends_on}, "
             f"dependency_logs_pattern={self.dependency_logs_pattern}, "
             f"run_if_pattern_match={self.run_if_pattern_match}, "
             f"workflow={self.workflow}, "
-            f"next_run_time={self.next_run_time}, "
+            f"next_run_time={self.next_run_time})>"
         )
