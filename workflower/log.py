@@ -66,5 +66,3 @@ def setup_loggers():
 
     handlers = [stream_handler, file_handler]
     set_logger_config("workflower", log_level, handlers)
-    # set_logger_config("apscheduler", log_level, handlers)
-    # set_logger_config("papermill", log_level, handlers)
