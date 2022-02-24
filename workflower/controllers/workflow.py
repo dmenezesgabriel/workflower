@@ -17,10 +17,10 @@ class WorkflowContoller:
     Workflow Controller.
     """
 
-    def __init__(self, database: DatabaseManager = database) -> None:
+    def __init__(self, engine) -> None:
         self.workflow_loader = WorkflowLoader()
         self.is_running = False
-        self._database = database
+        self.engine = engine
         self._init()
 
     def create_default_directories(self) -> None:
@@ -38,20 +38,6 @@ class WorkflowContoller:
         Workflow Controller Initial Setup.
         """
         self.create_default_directories()
-
-    def update_workflow_files_exists_state(self, session, workflow) -> None:
-        """
-        Check if file exists and update state.
-        """
-        file_exists = os.path.isfile(workflow.file_path)
-        if file_exists:
-            logger.debug(f"{workflow.name} file exists")
-            update_dict = {"file_exists": True}
-        else:
-            logger.info(f"{workflow.name} file not exists")
-            update_dict = {"file_exists": False}
-        filter_dict = {"name": workflow.name}
-        crud.update(session, Workflow, filter_dict, update_dict)
 
     def schedule_one_workflow_jobs(
         self, session, workflow: Workflow, scheduler

@@ -47,6 +47,46 @@ class TestAddWorkflowJobCommand:
         assert workflows[0].jobs[0].definition == {"trigger": "date"}
 
 
+class TestUpdateWorkflowFileExistsStateCommand:
+    def test_update_workflow_file_exists_state_command_updates_file_exists(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        new_workflow = Workflow(name="test", file_path=file_path)
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.UpdateWorkflowFileExistsStateCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+
+        command.execute()
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.file_exists is True
+
+    def test_update_workflow_file_exists_state_command_updates_file_not_exists(
+        self, session_factory, uow
+    ):
+
+        new_workflow = Workflow(name="test", file_path="test.yml")
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.UpdateWorkflowFileExistsStateCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+
+        command.execute()
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.file_exists is False
+
+
 class TestUpdateModifiedWorkflowFileStateCommand:
     def test_update_modified_file_state_command_updates_file_last_modified_at(
         self, session_factory, workflow_file, uow

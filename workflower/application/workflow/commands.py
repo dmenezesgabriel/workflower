@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List
 
 from sqlalchemy.exc import IntegrityError
@@ -81,6 +82,34 @@ class AddWorkflowJobCommand:
                 else:
                     workflow.add_job(job)
 
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+
+class UpdateWorkflowFileExistsStateCommand:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id) -> None:
+        self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=self.workflow_id)
+
+                if not workflow:
+                    logger.info("No matching workflow found")
+                elif not workflow.file_path:
+                    logger.info("No workflow file")
+
+                else:
+                    file_exists = os.path.isfile(workflow.file_path)
+                    if file_exists:
+                        workflow.file_exists = True
+                    else:
+                        logger.info(f"{workflow.name} file not exists")
+                        workflow.file_exists = False
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
