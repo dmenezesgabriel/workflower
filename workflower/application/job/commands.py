@@ -166,14 +166,11 @@ class ScheduleJobCommand:
 # TODO
 # Tests
 class GetDependencyTriggerJobsCommand:
-    def __init__(
-        self, unit_of_work: UnitOfWork, job_id, job_return_value, scheduler
-    ):
+    def __init__(self, unit_of_work: UnitOfWork, job_id, job_return_value):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
         self.job_id = job_id
         self.job_return_value = job_return_value
-        self.scheduler = scheduler
         self.kwargs
 
     def execute(self):

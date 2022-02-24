@@ -8,12 +8,17 @@ from apscheduler.events import (
 )
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
+from workflower.adapters.sqlalchemy.setup import Session
+from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
+from workflower.application.event.commands import CreateEventCommand
+from workflower.application.job.commands import (
+    GetDependencyTriggerJobsCommand,
+    ScheduleJobCommand,
+    UpdateNextRunTimeCommand,
+)
 from workflower.config import Config
-from workflower.database import DatabaseManager
-from workflower.models.base import database
-from workflower.models.event import Event
 
-logger = logging.getLogger("workflower.app")
+logger = logging.getLogger("workflower.scheduler")
 
 
 class SchedulerService:
@@ -21,10 +26,10 @@ class SchedulerService:
     Scheduler service.
     """
 
-    def __init__(self, database: DatabaseManager = database) -> None:
+    def __init__(self, engine) -> None:
         self._scheduler = BackgroundScheduler()
         self._is_running = False
-        self._database = database
+        self.engine = engine
         self._init()
 
     @property
@@ -36,23 +41,78 @@ class SchedulerService:
         return self._is_running
 
     def on_job_added(self, event) -> None:
-        with self._database.session_scope() as session:
-            Event.job_added(session, event)
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            command = CreateEventCommand(
+                uow,
+                name="job_added",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=None,
+            )
+            command.execute()
 
     def on_job_removed(self, event) -> None:
-        with self._database.session_scope() as session:
-            Event.job_removed(session, event)
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            command = CreateEventCommand(
+                uow,
+                name="job_removed",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=None,
+            )
+            command.execute()
 
     def on_job_executed(self, event) -> None:
         """
         On job executed event.
         """
-        with self._database.session_scope() as session:
-            Event.job_executed(session, event, self._scheduler)
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            create_event_command = CreateEventCommand(
+                uow,
+                name="job_executed",
+                model="job",
+                model_id=event.job_id,
+                exception=None,
+                output=event.retval,
+            )
+            create_event_command.execute()
+            update_next_runtime_command = UpdateNextRunTimeCommand(
+                uow, event.job_id, self.scheduler
+            )
+            update_next_runtime_command.execute()
+            get_dependency_jobs_command = GetDependencyTriggerJobsCommand(
+                event.job_id, event.retval
+            )
+            dependency_jobs = get_dependency_jobs_command.execute()
+            for dependency_job in dependency_jobs:
+                schedule_job_command = ScheduleJobCommand(
+                    dependency_job.id,
+                    self.scheduler,
+                    job_return_value=event.retval,
+                )
+                schedule_job_command.execute()
 
     def on_job_error(self, event) -> None:
-        with self._database.session_scope() as session:
-            Event.job_error(session, event)
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
+        with uow:
+            command = CreateEventCommand(
+                uow,
+                name="job_error",
+                model="job",
+                model_id=event.job_id,
+                exception=event.exception,
+                output=None,
+            )
+            command.execute()
 
     def setup_event_actions(self, scheduler) -> None:
         """
@@ -77,7 +137,7 @@ class SchedulerService:
         """
         logger.info("Setting Up Scheduler Service")
         jobstores = {
-            "default": SQLAlchemyJobStore(engine=self._database.engine),
+            "default": SQLAlchemyJobStore(engine=self.engine),
         }
         executors = {
             "default": {
