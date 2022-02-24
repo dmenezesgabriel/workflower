@@ -1,0 +1,9 @@
+version: "1.0"
+workflow:
+  name: python_code_interval_trigger
+  jobs:
+    - name: "hello_python_code"
+      operator: python
+      code: "print('Hello, World!')"
+      trigger: interval
+      minutes: 1

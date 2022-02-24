@@ -17,6 +17,7 @@ class AlteryxOperator(BaseOperator):
         # Logging configuration
 
         logger = logging.getLogger("workflower.operators.alteryx")
+        logger.info(f"Running alteryx workflow: {workflow_file_path}")
 
         process = Popen(
             [

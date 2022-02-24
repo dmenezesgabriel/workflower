@@ -3,8 +3,10 @@ import os
 import traceback
 from typing import List
 
+from workflower.application.workflow.commands import \
+    LoadWorkflowFromYamlFileCommand
 from workflower.config import Config
-from workflower.models.workflow import Workflow
+from workflower.domain.entities.workflow import Workflow
 
 logger = logging.getLogger("workflower.loader")
 
@@ -17,17 +19,16 @@ class WorkflowLoader:
     def workflows(self) -> List[Workflow]:
         return self._workflows
 
-    def load_one_from_file(
-        self, session, workflow_yaml_config_path: str
-    ) -> Workflow:
+    def load_one_from_file(self, uow, file_path: str) -> Workflow:
         """
         Load one workflow from a yaml file.
         """
-        logger.info(f"Loading pipeline file: {workflow_yaml_config_path}")
-        return Workflow.from_yaml(session, workflow_yaml_config_path)
+        logger.info(f"Loading pipeline file: {file_path}")
+        command = LoadWorkflowFromYamlFileCommand(uow, file_path)
+        return command.execute()
 
     def load_all_from_dir(
-        self, session, workflows_path: str = Config.WORKFLOWS_FILES_PATH
+        self, uow, workflows_path: str = Config.WORKFLOWS_FILES_PATH
     ) -> List[Workflow]:
         """
         Load all.
@@ -38,17 +39,17 @@ class WorkflowLoader:
         for root, dirs, files in os.walk(workflows_path):
             for file in files:
                 if file.endswith(".yml") or file.endswith(".yaml"):
-                    workflow_yaml_config_path = os.path.join(root, file)
+                    file_path = os.path.join(root, file)
                     try:
                         workflow = self.load_one_from_file(
-                            session, workflow_yaml_config_path
+                            uow, file_path
                         )
                         counter += 1
                         if workflow:
                             self._workflows.append(workflow)
                     except Exception:
                         logger.error(
-                            f"Error loading {workflow_yaml_config_path}:"
+                            f"Error loading {file_path}:"
                             f" {traceback.format_exc()}"
                         )
         logger.info(f"Workflows Loaded {counter}")

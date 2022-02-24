@@ -10,21 +10,12 @@ from workflower.config import Config
 logger = logging.getLogger("workflower.schema.parser")
 
 
-class ParseStrategyInterface(ABC):
+class ParseStrategy(ABC):
     """
     Parse Strategy interface.
     """
 
     @abstractclassmethod
-    def parse(self) -> None:
-        pass
-
-
-class ParseStrategy(ParseStrategyInterface):
-    """
-    Parse Strategy base class.
-    """
-
     def parse(self) -> None:
         pass
 

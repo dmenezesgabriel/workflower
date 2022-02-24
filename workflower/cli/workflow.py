@@ -2,15 +2,18 @@ import logging
 import os
 import time
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from workflower.adapters.scheduler.scheduler import WorkflowScheduler
+from workflower.adapters.sqlalchemy.setup import metadata
+from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
+from workflower.application.workflow.commands import (
+    LoadWorkflowFromYamlFileCommand,
+)
 from workflower.config import Config
-from workflower.controllers.workflow import WorkflowContoller
-from workflower.database import DatabaseManager
-from workflower.init_db import init_db
 
 # from workflower.models.base import database
-from workflower.models import Workflow
-from workflower.models.base import BaseModel
-from workflower.scheduler import SchedulerService
+from workflower.service.workflow_runner import WorkflowRunnerService
 
 logger = logging.getLogger("workflower.cli.workflow")
 # Must improve this
@@ -23,44 +26,49 @@ class Runner:
     Command line workflow runner.
     """
 
-    def __init__(self, database_uri=database_uri) -> None:
-        self._database_uri = database_uri
-        self._database = None
-        self._is_running = False
+    def __init__(self) -> None:
+        self.engine = create_engine(database_uri)
+        self._is_waiting = False
 
     def _setup(self) -> None:
-        self._database = DatabaseManager(self._database_uri)
-        #  Clean db
-        BaseModel.metadata.drop_all(bind=self._database.engine)
-        #  Init database
-        init_db(self._database)
+        metadata.drop_all(bind=self.engine)
+        metadata.create_all(bind=self.engine)
+
+    def _session(self):
+        return scoped_session(
+            sessionmaker(
+                autocommit=False,
+                autoflush=False,
+                bind=self.engine,
+            )
+        )
 
     def run_workflow(self, path) -> None:
         self._setup()
-        self._is_running = True
-        with self._database.session_scope() as session:
-            scheduler_service = SchedulerService(self._database)
-            workflow_controller = WorkflowContoller(self._database)
-            workflow = Workflow.from_yaml(session, path)
-            workflow_controller.schedule_one_workflow_jobs(
-                session, workflow, scheduler_service.scheduler
-            )
-            # Start after a job is scheduled will grantee scheduler is up
-            # until job finishess execution
-            scheduler_service.start()
-            # TODO
-            # =============================================================== #
-            # As is
-            # After job is executed if we don 't wait till the next jobs is
-            # added to scheduler by the execution event, scheduler will be
-            # shutted down
-            # wait till trigger deps
-            time.sleep(10)
-            # To be
-            # Know which jobs must be executed
-            # Keep scheduler service running until last job finished
-            # =============================================================== #
-        self._is_running = False
+        self._is_waiting = True
+        session = self._session()
+        uow = SqlAlchemyUnitOfWork(session)
+        workflow_scheduler = WorkflowScheduler(self.engine)
+        workflow_runner = WorkflowRunnerService(self.engine)
+        command = LoadWorkflowFromYamlFileCommand(uow, path)
+        workflow = command.execute()
+        workflow_runner.schedule_one_workflow_jobs(
+            uow, workflow, workflow_scheduler.scheduler
+        )
+        # Start after a job is scheduled will grantee scheduler is up
+        # until job finishess execution
+        expected_job_status = ["added"]
+        workflow_scheduler.start()
+        with uow:
+            workflow_record = uow.workflows.get(id=workflow.id)
+            while self._is_waiting:
+                not_pending = all(
+                    job.status in expected_job_status
+                    for job in workflow_record.jobs
+                )
+                time.sleep(1)
+                if not_pending:
+                    self._is_waiting = False
 
 
 def run_workflow(path: str) -> None:
