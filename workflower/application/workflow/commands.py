@@ -204,14 +204,15 @@ class LoadWorkflowFromYamlFileCommand:
         return workflow
 
 
-class DeactivateWorkflowJobs:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
+class DeactivateWorkflowJobsCommand:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id) -> None:
         self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
 
-    def execute(self, workflow_id):
+    def execute(self):
         try:
             with self.unit_of_work as uow:
-                workflow = uow.workflows.get(id=workflow_id)
+                workflow = uow.workflows.get(id=self.workflow_id)
 
                 if not workflow:
                     logger.info("No matching workflow found")
@@ -229,14 +230,15 @@ class DeactivateWorkflowJobs:
             logger.error(f"Error: {e}")
 
 
-class ActivateWorkflowJobs:
-    def __init__(self, unit_of_work: UnitOfWork) -> None:
+class ActivateWorkflowJobsCommand:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id) -> None:
         self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
 
-    def execute(self, workflow_id):
+    def execute(self):
         try:
             with self.unit_of_work as uow:
-                workflow = uow.workflows.get(id=workflow_id)
+                workflow = uow.workflows.get(id=self.workflow_id)
 
                 if not workflow:
                     logger.info("No matching workflow found")

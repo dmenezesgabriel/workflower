@@ -331,3 +331,81 @@ class TestLoadWorkflowFromYamlFileCommand:
         assert record.jobs[0].operator == "python"
         assert record.jobs[1].name == "second_job"
         assert record.jobs[1].operator == "python"
+
+
+class TestDeactivateWorkflowJobsCommand:
+    def test_deactivate_workflow_jobs_command_should_update_is_active_false(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        load_command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        new_workflow = load_command.execute()
+
+        assert new_workflow.name == "python_code_sample_interval_trigger"
+        assert new_workflow.jobs_count == 1
+        assert new_workflow.jobs[0].name == "hello_python_code"
+        assert new_workflow.jobs[0].operator == "python"
+        assert new_workflow.jobs[0].is_active is True
+
+        deactivate_command = commands.DeactivateWorkflowJobsCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+        deactivate_command.execute()
+
+        session = session_factory()
+        record = session.query(Workflow).filter_by(id=new_workflow.id).first()
+
+        assert record.name == "python_code_sample_interval_trigger"
+        assert record.jobs_count == 1
+        assert record.jobs[0].name == "hello_python_code"
+        assert record.jobs[0].operator == "python"
+        assert record.jobs[0].is_active is False
+
+
+class TestActivateWorkflowJobsCommand:
+    def test_deactivate_workflow_jobs_command_should_update_is_active_false(
+        self, session_factory, workflow_file, uow
+    ):
+        file_path = str(workflow_file)
+        load_command = commands.LoadWorkflowFromYamlFileCommand(
+            unit_of_work=uow, file_path=file_path
+        )
+        new_workflow = load_command.execute()
+
+        assert new_workflow.name == "python_code_sample_interval_trigger"
+        assert new_workflow.jobs_count == 1
+        assert new_workflow.jobs[0].name == "hello_python_code"
+        assert new_workflow.jobs[0].operator == "python"
+        assert new_workflow.jobs[0].is_active is True
+
+        deactivate_command = commands.DeactivateWorkflowJobsCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+        deactivate_command.execute()
+
+        session = session_factory()
+        record = session.query(Workflow).filter_by(id=new_workflow.id).first()
+
+        assert record.name == "python_code_sample_interval_trigger"
+        assert record.jobs_count == 1
+        assert record.jobs[0].name == "hello_python_code"
+        assert record.jobs[0].operator == "python"
+        assert record.jobs[0].is_active is False
+
+        activate_command = commands.ActivateWorkflowJobsCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+        activate_command.execute()
+
+        new_session = session_factory()
+        updated_record = (
+            new_session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+
+        assert updated_record.name == "python_code_sample_interval_trigger"
+        assert updated_record.jobs_count == 1
+        assert updated_record.jobs[0].name == "hello_python_code"
+        assert updated_record.jobs[0].operator == "python"
+        assert updated_record.jobs[0].is_active is True
