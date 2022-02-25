@@ -66,8 +66,6 @@ class PythonOperator(BaseOperator):
         #  Run script
         if script_path:
             logger.info(f"Running python script: {script_path}")
-
-            logger.debug(f"Python script path: {script_path}")
             run_python_args.append(script_path)
             output.update(dict(script_path=script_path))
 
@@ -77,7 +75,6 @@ class PythonOperator(BaseOperator):
 
         elif code:
             logger.info(f"Running python code: {code}")
-            logger.debug(f"Python shell command: {code}")
             run_python_args.append("-c")
             run_python_args.append(code)
             output.update(dict(code=code))

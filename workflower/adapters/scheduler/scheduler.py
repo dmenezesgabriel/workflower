@@ -151,10 +151,15 @@ class WorkflowScheduler:
                 exception=None,
                 output=event.retval,
             )
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, event.job_id, "executed"
+            )
+            change_job_status_command.execute()
             create_event_command.execute()
             update_next_runtime_command = UpdateNextRunTimeCommand(
                 uow, event.job_id, self.scheduler
             )
+        with uow:
             update_next_runtime_command.execute()
             get_dependency_jobs_command = GetDependencyTriggerJobsCommand(
                 uow, event.job_id, event.retval
@@ -168,11 +173,10 @@ class WorkflowScheduler:
                     job_return_value=event.retval,
                 )
                 schedule_job_command.execute()
-
-            change_job_status_command = ChangeJobStatusCommand(
-                uow, event.job_id, "executed"
-            )
-            change_job_status_command.execute()
+                change_dependency_job_status_command = ChangeJobStatusCommand(
+                    uow, dependency_job.id, "scheduled"
+                )
+                change_dependency_job_status_command.execute()
 
     def on_job_error(self, event) -> None:
         session = self._session()

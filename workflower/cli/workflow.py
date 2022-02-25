@@ -57,15 +57,15 @@ class Runner:
         )
         # Start after a job is scheduled will grantee scheduler is up
         # until job finishess execution
-        expected_job_status = ["added"]
         workflow_scheduler.start()
-        with uow:
-            workflow_record = uow.workflows.get(id=workflow.id)
-            while self._is_waiting:
+        while self._is_waiting:
+            with uow:
+                workflow_record = uow.workflows.get(id=workflow.id)
                 not_pending = all(
-                    job.status in expected_job_status
-                    for job in workflow_record.jobs
+                    job.status != "pending" for job in workflow_record.jobs
                 )
+                # check
+                logger.debug([job.status for job in workflow_record.jobs])
                 time.sleep(1)
                 if not_pending:
                     self._is_waiting = False
