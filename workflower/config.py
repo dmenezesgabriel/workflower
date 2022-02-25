@@ -49,9 +49,16 @@ class Config:
             "log",
         ),
     )
+    CSV_LOGGING_PATH = os.getenv(
+        "CSV_LOGGING_PATH",
+        os.path.join(
+            DATA_DIR,
+            "log",
+        ),
+    )
     LOGGING_FILE = os.getenv("LOGGING_FILE", "log.log")
-    LOGGING_FILE_MAX_BYTES = int(os.getenv("LOGGING_FILE_MAX_BYTES", 90000))
-    LOGGING_FILE_BACKUP_COUNT = int(os.getenv("LOGGING_FILE_BACKUP_COUNT", 1))
+    LOGGING_FILE_MAX_BYTES = int(os.getenv("LOGGING_FILE_MAX_BYTES", 4096))
+    LOGGING_FILE_BACKUP_COUNT = int(os.getenv("LOGGING_FILE_BACKUP_COUNT", 10))
     # ======================================================================= #
     # Virtual environments and jupyter kernels default directories
     # ======================================================================= #

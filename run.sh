@@ -187,6 +187,8 @@ run_cli () {
                 find . -name "*output.ipynb" -type f -delete
                 echo "Removing logs"
                 find . -name "*.log*" -type f -delete
+                find . -name "*log.csv*" -type f -delete
+
         # =================================================================== #
         # Setup env
         # =================================================================== #
