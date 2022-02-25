@@ -244,7 +244,6 @@ class GetDependencyTriggerJobsCommand:
     ):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
-        self.job_id = job_id
         self.job_return_value = job_return_value
         self.kwargs = kwargs
 

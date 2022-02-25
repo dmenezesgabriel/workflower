@@ -114,6 +114,11 @@ class WorkflowRunnerService:
                     create_event_command.execute()
             logger.info("Scheduling jobs")
             for job in workflow.jobs:
+                if job.depends_on:
+                    logger.debug(
+                        f"Job {job.id} depends on {job.depends_on}, skipping."
+                    )
+                    continue
                 if job.is_active:
                     schedule_jobs_command = ScheduleJobCommand(
                         uow, job.id, scheduler
