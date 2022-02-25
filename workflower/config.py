@@ -38,6 +38,17 @@ class Config:
     APP_DATABASE_URL = os.getenv(
         "APP_DATABASE_URL", f"sqlite:///{DEFAULT_DATABASE_DIR}"
     )
+    DATABASE_BACKUP_DEFAULT_DIR = os.path.join(DATA_DIR, "app-backup.sqlite")
+    APP_DATABASE_BACKUP_URL = os.getenv(
+        "APP_DATABASE_BACKUP_URL", DATABASE_BACKUP_DEFAULT_DIR
+    )
+    SQLITE_DATABASE_DUMP_PATH = os.getenv(
+        "SQLITE_DATABASE_DUMP_PATH",
+        os.path.join(
+            DATA_DIR,
+            "dump.sql",
+        ),
+    )
     # ======================================================================= #
     # Logging default configuration
     # ======================================================================= #
