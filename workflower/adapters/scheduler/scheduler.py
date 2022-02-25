@@ -27,7 +27,7 @@ logger = logging.getLogger("workflower.scheduler")
 
 class WorkflowScheduler:
     """
-    Scheduler service.
+    Scheduler services.
     """
 
     def __init__(self, engine) -> None:

@@ -7,11 +7,13 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from workflower.adapters.scheduler.scheduler import WorkflowScheduler
 from workflower.adapters.sqlalchemy.setup import metadata
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
-from workflower.application.workflow.commands import \
-    LoadWorkflowFromYamlFileCommand
+from workflower.application.workflow.commands import (
+    LoadWorkflowFromYamlFileCommand,
+)
 from workflower.config import Config
+
 # from workflower.models.base import database
-from workflower.service.workflow_runner import WorkflowRunnerService
+from workflower.services.workflow.runner import WorkflowRunnerService
 
 logger = logging.getLogger("workflower.cli.workflow")
 # Must improve this

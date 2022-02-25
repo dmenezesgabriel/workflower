@@ -7,7 +7,7 @@ from abc import ABC, abstractclassmethod
 
 from workflower.config import Config
 
-logger = logging.getLogger("workflower.schema.parser")
+logger = logging.getLogger("workflower.services.parser")
 
 
 class ParseStrategy(ABC):

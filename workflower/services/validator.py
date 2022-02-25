@@ -1,7 +1,7 @@
 import logging
 import os
 
-from workflower.exceptions import (
+from workflower.application.exceptions import (
     InvalidFilePathError,
     InvalidSchemaError,
     InvalidTypeError,

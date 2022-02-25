@@ -20,9 +20,9 @@ from workflower.application.workflow.commands import (
 )
 from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
-from workflower.loader import WorkflowLoader
+from workflower.services.workflow.loader import WorkflowLoader
 
-logger = logging.getLogger("workflower.service.workflow")
+logger = logging.getLogger("workflower.services.workflow")
 
 
 class WorkflowRunnerService:
