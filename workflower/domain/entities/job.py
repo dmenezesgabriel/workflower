@@ -68,7 +68,7 @@ class Job:
             f"<Job(name={self.name}, "
             f"status={self.status}, "
             f"operator={self.operator}, "
-            f"definition={self.definition}, "
+            # f"definition={self.definition}, "
             f"depends_on={self.depends_on}, "
             f"dependency_logs_pattern={self.dependency_logs_pattern}, "
             f"run_if_pattern_match={self.run_if_pattern_match}, "

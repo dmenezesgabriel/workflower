@@ -71,7 +71,8 @@ class PythonOperator(BaseOperator):
 
             # Get output from previous job
             if "job_return_value" in kwargs:
-                run_python_args.append(kwargs["job_return_value"])
+                job_return_value_arg = str(kwargs["job_return_value"])[:3000]
+                run_python_args.append(job_return_value_arg)
 
         elif code:
             logger.info(f"Running python code: {code}")
