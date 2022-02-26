@@ -111,8 +111,6 @@ class RemoveJobCommand:
             logger.error(f"Error: {traceback.print_exc()}")
 
 
-# TODO
-# Tests
 class UpdateNextRunTimeCommand:
     def __init__(self, unit_of_work: UnitOfWork, job_id, next_run_time):
         self.unit_of_work = unit_of_work
