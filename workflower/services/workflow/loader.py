@@ -3,8 +3,9 @@ import os
 import traceback
 from typing import List
 
-from workflower.application.workflow.commands import \
-    LoadWorkflowFromYamlFileCommand
+from workflower.application.workflow.commands import (
+    LoadWorkflowFromYamlFileCommand,
+)
 from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
 
@@ -19,14 +20,6 @@ class WorkflowLoader:
     def workflows(self) -> List[Workflow]:
         return self._workflows
 
-    def load_one_from_file(self, uow, file_path: str) -> Workflow:
-        """
-        Load one workflow from a yaml file.
-        """
-        logger.info(f"Loading pipeline file: {file_path}")
-        command = LoadWorkflowFromYamlFileCommand(uow, file_path)
-        return command.execute()
-
     def load_all_from_dir(
         self, uow, workflows_path: str = Config.WORKFLOWS_FILES_PATH
     ) -> List[Workflow]:
@@ -40,10 +33,9 @@ class WorkflowLoader:
             for file in files:
                 if file.endswith(".yml") or file.endswith(".yaml"):
                     file_path = os.path.join(root, file)
+                    command = LoadWorkflowFromYamlFileCommand(uow, file_path)
                     try:
-                        workflow = self.load_one_from_file(
-                            uow, file_path
-                        )
+                        workflow = command.execute()
                         counter += 1
                         if workflow:
                             self._workflows.append(workflow)
