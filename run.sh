@@ -38,6 +38,7 @@ prompt_help() {
     echo "- env: init database and run app with .env config"
     echo "- workflow: run a single standalone workflow, see samples"
     echo "- test: run tests"
+    echo "- clear: clear terminal"
     echo "- exit: exit program"
     printf "\n"
 }
@@ -276,6 +277,12 @@ run_cli () {
                 . $venv_activate
                 eval "$(cat .env)"  && \
                 python . run_workflow --i "${workflows_dict[$workflow_number]}"
+        # =================================================================== #
+        # Clear
+        # =================================================================== #
+        elif [ $cmd == "clear" ];
+            then
+                clear
         # =================================================================== #
         # Exit program
         # =================================================================== #

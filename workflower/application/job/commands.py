@@ -111,31 +111,20 @@ class RemoveJobCommand:
             logger.error(f"Error: {traceback.print_exc()}")
 
 
-class UpdateJobStatusCommand:
-    # Added
-    # Scheduled
-    # Running
-    # Executed
-    # Removed
-    pass
-
-
 # TODO
 # Tests
 class UpdateNextRunTimeCommand:
-    def __init__(self, unit_of_work: UnitOfWork, job_id, scheduler):
+    def __init__(self, unit_of_work: UnitOfWork, job_id, next_run_time):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
-        self.scheduler = scheduler
+        self.next_run_time = next_run_time
 
     def execute(self):
         try:
             with self.unit_of_work as uow:
                 job = uow.jobs.get(id=self.job_id)
                 if job:
-                    scheduled_job = self.scheduler.get_job(self.job_id)
-                    if scheduled_job:
-                        job.next_run_time = scheduled_job.next_run_time
+                    job.next_run_time = self.next_run_time
 
         except IntegrityError as e:
             logger.error(f"Integrity error: {e}")

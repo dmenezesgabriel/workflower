@@ -155,10 +155,16 @@ class WorkflowScheduler:
                 uow, event.job_id, "executed"
             )
             change_job_status_command.execute()
+
             create_event_command.execute()
-            update_next_runtime_command = UpdateNextRunTimeCommand(
-                uow, event.job_id, self.scheduler
-            )
+            executed_job = self.scheduler.get_job(event.job_id)
+            if executed_job:
+                next_run_time = executed_job.next_run_time
+                update_next_runtime_command = UpdateNextRunTimeCommand(
+                    uow, event.job_id, next_run_time
+                )
+                update_next_runtime_command.execute()
+
         with uow:
             update_next_runtime_command.execute()
             get_dependency_jobs_command = GetDependencyTriggerJobsCommand(

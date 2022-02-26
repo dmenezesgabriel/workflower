@@ -125,10 +125,15 @@ class WorkflowRunnerService:
                         uow, job.id, scheduler
                     )
                     schedule_jobs_command.execute()
-                    update_next_runtime_command = UpdateNextRunTimeCommand(
-                        uow, job.id, scheduler
-                    )
-                    update_next_runtime_command.execute()
+
+                    scheduled_job = scheduler.get_job(job.id)
+                    if scheduled_job:
+                        next_run_time = scheduled_job.next_run_time
+                        update_next_runtime_command = UpdateNextRunTimeCommand(
+                            uow, job.id, next_run_time
+                        )
+                        update_next_runtime_command.execute()
+
                     if job.status != "scheduled":
                         create_event_command = CreateEventCommand(
                             uow,
