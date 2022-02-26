@@ -52,9 +52,13 @@ class Runner:
         workflow_runner = WorkflowRunnerService(self.engine)
         command = LoadWorkflowFromYamlFileCommand(uow, path)
         workflow = command.execute()
-        workflow_runner.schedule_one_workflow_jobs(
-            uow, workflow, workflow_scheduler.scheduler
-        )
+        try:
+            workflow_runner.schedule_one_workflow_jobs(
+                uow, workflow, workflow_scheduler.scheduler
+            )
+        except Exception as error:
+            logger.error(f"Error: {error}")
+            return
         # Start after a job is scheduled will grantee scheduler is up
         # until job finishess execution
         workflow_scheduler.start()

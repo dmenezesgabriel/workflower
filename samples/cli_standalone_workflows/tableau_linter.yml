@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: module_run_instantly
+  name: tableau_linter
   jobs:
     - name: tableau_linter_module
       operator: module
