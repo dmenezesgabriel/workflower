@@ -166,12 +166,16 @@ class ScheduleJobCommand:
         job_id,
         scheduler,
         job_return_value=None,
+        jobstore="default",
+        executor="default",
         kwargs=None,
     ):
         self.unit_of_work = unit_of_work
         self.job_id = job_id
         self.scheduler = scheduler
         self.job_return_value = job_return_value
+        self.jobstore = jobstore
+        self.executor = executor
         self.kwargs = kwargs
 
     def execute(self):
@@ -205,7 +209,10 @@ class ScheduleJobCommand:
 
                     try:
                         self.scheduler.add_job(
-                            id=str(job.id), **schedule_params
+                            id=str(job.id),
+                            executor=self.executor,
+                            jobstore=self.jobstore,
+                            **schedule_params,
                         )
                         logger.debug(f"Job {job} successfully scheduled")
                     except ConflictingIdError:

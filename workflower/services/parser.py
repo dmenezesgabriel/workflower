@@ -444,9 +444,7 @@ class JobSchemaParser:
             run_if_pattern_match = None
         job_trigger_options = self._parse_job_trigger(configuration_dict)
         job_operator_options = self._parse_job_operator(configuration_dict)
-        job_config = dict(
-            executor="default", **job_trigger_options, **job_operator_options
-        )
+        job_config = dict(**job_trigger_options, **job_operator_options)
         return (
             job_name,
             job_operator,
