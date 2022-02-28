@@ -6,7 +6,7 @@ workflow:
   # in this case the file name should be dependency_log_pattern_match.yml
   # An easy way of deactivating an workflow is putting an underscore prefix in
   # it's name, like _dependency_log_pattern_match.yml
-  name: dependency_log_pattern_match # str
+  name: cli_dependency_log_pattern_match # str
   # Workflow can have one or more jobs
   jobs:
     # The job name does not affect in execution like workflow's, but it should

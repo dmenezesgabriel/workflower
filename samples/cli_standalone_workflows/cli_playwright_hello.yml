@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: playwright_hello
+  name: cli_playwright_hello
   jobs:
     - name: playwright_hello
       operator: module

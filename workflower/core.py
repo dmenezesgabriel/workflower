@@ -4,17 +4,15 @@ import os
 import signal
 from concurrent.futures import ThreadPoolExecutor
 
-from workflower.adapters.scheduler.scheduler import WorkflowScheduler
+from workflower.adapters.scheduler.setup import scheduler
 from workflower.adapters.server import create_server
-from workflower.adapters.sqlalchemy.setup import engine
 from workflower.api import create_api
 from workflower.services.workflow.runner import WorkflowRunnerService
 
-workflow_scheduler = WorkflowScheduler(engine)
 api = create_api()
 server = create_server(api)
 
-workflow_controller = WorkflowRunnerService(engine)
+workflow_controller = WorkflowRunnerService()
 
 logger = logging.getLogger("workflower")
 
@@ -23,7 +21,7 @@ def exit_handler(*args):
     logger.debug(f"Got shutting down signal for PID={os.getpid()}")
     logger.info("Gracefully shuting down")
     workflow_controller.stop()
-    workflow_scheduler.stop()
+    scheduler.shutdown()
     loop = asyncio.get_event_loop()
     tasks = asyncio.all_tasks(loop=loop)
     for t in tasks:
@@ -40,8 +38,8 @@ def run():
     logger.info("Starting Workflower")
     executor = ThreadPoolExecutor(max_workers=1)
     loop.run_in_executor(executor, server.run)
-    workflow_scheduler.start()
-    loop.create_task(workflow_controller.run(workflow_scheduler.scheduler))
+    scheduler.start()
+    loop.create_task(workflow_controller.run(scheduler))
 
     try:
         loop.run_forever()

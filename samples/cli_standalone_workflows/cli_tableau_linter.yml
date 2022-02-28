@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: tableau_linter
+  name: cli_tableau_linter
   jobs:
     - name: tableau_linter_module
       operator: module

@@ -1,15 +1,13 @@
 import logging
 import os
+import traceback
 from typing import List
 
 from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
-from workflower.services.parser import (
-    JobSchemaParser,
-    WorkflowSchemaParser,
-)
+from workflower.services.parser import JobSchemaParser, WorkflowSchemaParser
 from workflower.services.validator import validate_schema
 from workflower.utils.file import (
     get_file_modification_date,
@@ -59,6 +57,25 @@ class CreateWorkflowCommand:
             logger.error(f"Integrity error: {e}")
         except Exception as e:
             logger.error(f"Error: {e}")
+
+
+class SetWorkflowTriggerCommand:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id, trigger):
+        self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
+        self.trigger = trigger
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=self.workflow_id)
+                if workflow:
+                    workflow.trigger = self.trigger
+
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
 
 
 class AddWorkflowJobCommand:

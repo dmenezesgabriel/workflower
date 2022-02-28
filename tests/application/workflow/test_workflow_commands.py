@@ -17,6 +17,27 @@ class TestCreateWorkflowCommand:
         assert workflow.name == "test"
 
 
+class TestSetWorkflowTriggerCommand:
+    def test_set_workflow__trigger_command_executes_correctly(
+        self, session_factory, uow
+    ):
+        new_workflow = Workflow(name="test")
+
+        with uow:
+            uow.workflows.add(new_workflow)
+
+        command = commands.SetWorkflowTriggerCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id, trigger="manual"
+        )
+        command.execute()
+
+        session = session_factory()
+        workflow = (
+            session.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow.trigger == "manual"
+
+
 class TestAddWorkflowJobCommand:
     def test_add_job_to_workflow_command_executes_correctly(
         self, session_factory, uow

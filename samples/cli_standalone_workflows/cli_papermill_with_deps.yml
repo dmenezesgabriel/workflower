@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: papermill_with_deps
+  name: cli_papermill_with_deps
   jobs:
     - name: "notebook_install_packages"
       operator: papermill

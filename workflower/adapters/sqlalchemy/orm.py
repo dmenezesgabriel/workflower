@@ -47,6 +47,10 @@ workflow: Table = Table(
         unique=True,
     ),
     Column(
+        "trigger",
+        String,
+    ),
+    Column(
         "file_exists",
         Boolean,
         default=True,

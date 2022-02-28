@@ -276,6 +276,7 @@ run_cli () {
                 echo "Run with .env"
                 . $venv_activate
                 eval "$(cat .env)"  && \
+                python . init-db && \
                 python . run_workflow --i "${workflows_dict[$workflow_number]}"
         # =================================================================== #
         # Clear

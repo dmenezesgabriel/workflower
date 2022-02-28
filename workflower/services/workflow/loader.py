@@ -5,6 +5,7 @@ from typing import List
 
 from workflower.application.workflow.commands import (
     LoadWorkflowFromYamlFileCommand,
+    SetWorkflowTriggerCommand,
 )
 from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
@@ -34,8 +35,14 @@ class WorkflowLoader:
                 if file.endswith(".yml") or file.endswith(".yaml"):
                     file_path = os.path.join(root, file)
                     command = LoadWorkflowFromYamlFileCommand(uow, file_path)
+
                     try:
                         workflow = command.execute()
+                        set_trigger_command = SetWorkflowTriggerCommand(
+                            uow, workflow.id, "automatic"
+                        )
+                        set_trigger_command.execute()
+
                         counter += 1
                         if workflow:
                             self._workflows.append(workflow)

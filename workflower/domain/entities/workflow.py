@@ -23,12 +23,14 @@ class Workflow:
         - modified_since_last_load (bool, optional): Workflow has been modified
         since las load or not.
         - jobs (List[Job]): List of jobs for the workflow.
+        - trigger (str, optional): can be manual or automatic.
     """
 
     def __init__(
         self,
         name: str,
         is_active: bool = True,
+        trigger: str = None,
         file_path: str = None,
         file_exists: bool = None,
         file_last_modified_at: str = None,
@@ -37,6 +39,7 @@ class Workflow:
     ):
         self.name = name
         self.is_active = is_active
+        self.trigger = trigger
         self.file_path = file_path
         self.file_exists = file_exists
         self.file_last_modified_at = file_last_modified_at

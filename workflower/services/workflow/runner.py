@@ -30,10 +30,9 @@ class WorkflowRunnerService:
     Workflow Controller.
     """
 
-    def __init__(self, engine) -> None:
+    def __init__(self) -> None:
         self.workflow_loader = WorkflowLoader()
         self.is_running = False
-        self.engine = engine
         self._init()
 
     def create_default_directories(self) -> None:
@@ -59,12 +58,12 @@ class WorkflowRunnerService:
         Schedule one workflow
         """
         logger.info(f"Trying to schedule {workflow.name}")
-
         if not workflow.file_exists:
             logger.info(
                 f"{workflow.name} file has been removed, unscheduling jobs"
             )
             workflow.is_active = False
+        if not workflow.is_active:
             deactivate_workflow_jobs_command = DeactivateWorkflowJobsCommand(
                 uow, workflow.id
             )
@@ -190,6 +189,8 @@ class WorkflowRunnerService:
             # removed.
             workflows = uow.workflows.list()
             for workflow in workflows:
+                if not workflow.trigger == "automatic":
+                    continue
                 update_modified_file_state_command = (
                     UpdateModifiedWorkflowFileStateCommand(uow, workflow.id)
                 )

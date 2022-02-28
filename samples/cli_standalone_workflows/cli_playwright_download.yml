@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: playwright_download
+  name: cli_playwright_download
   jobs:
     - name: playwright_download
       operator: module

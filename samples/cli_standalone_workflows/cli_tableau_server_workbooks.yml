@@ -1,6 +1,6 @@
 version: "1.0"
 workflow:
-  name: tableau_server_workbooks
+  name: cli_tableau_server_workbooks
   jobs:
     - name: tableau_workbooks
       operator: module
