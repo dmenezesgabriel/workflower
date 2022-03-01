@@ -78,6 +78,24 @@ class SetWorkflowTriggerCommand:
             logger.error(f"Error: {traceback.print_exc()}")
 
 
+class DeactivateWorkflowCommand:
+    def __init__(self, unit_of_work: UnitOfWork, workflow_id):
+        self.unit_of_work = unit_of_work
+        self.workflow_id = workflow_id
+
+    def execute(self):
+        try:
+            with self.unit_of_work as uow:
+                workflow = uow.workflows.get(id=self.workflow_id)
+                if workflow:
+                    workflow.is_active = False
+
+        except IntegrityError as e:
+            logger.error(f"Integrity error: {e}")
+        except Exception:
+            logger.error(f"Error: {traceback.print_exc()}")
+
+
 class AddWorkflowJobCommand:
     def __init__(self, unit_of_work: UnitOfWork, workflow_id, job_id) -> None:
         self.unit_of_work = unit_of_work

@@ -14,6 +14,7 @@ from workflower.application.job.commands import (
     UpdateNextRunTimeCommand,
 )
 from workflower.application.workflow.commands import (
+    DeactivateWorkflowCommand,
     DeactivateWorkflowJobsCommand,
     UpdateModifiedWorkflowFileStateCommand,
     UpdateWorkflowFileExistsStateCommand,
@@ -67,7 +68,10 @@ class WorkflowRunnerService:
             logger.info(
                 f"{workflow.name} file has been removed, unscheduling jobs"
             )
-            workflow.is_active = False
+            deactivate_workflow_command = DeactivateWorkflowCommand(
+                uow, workflow.id
+            )
+            deactivate_workflow_command.execute()
         if not workflow.is_active:
             deactivate_workflow_jobs_command = DeactivateWorkflowJobsCommand(
                 uow, workflow.id
