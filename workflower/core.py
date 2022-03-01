@@ -26,13 +26,13 @@ executors = {
     },
 }
 
-api = create_api()
-server = create_server(api)
 scheduler = create_scheduler(
     executors=executors, jobstores=jobstores, timezone=Config.TIME_ZONE
 )
 
-workflow_controller = WorkflowRunnerService()
+api = create_api()
+server = create_server(api)
+workflow_runner_service = WorkflowRunnerService()
 
 logger = logging.getLogger("workflower")
 
@@ -40,7 +40,7 @@ logger = logging.getLogger("workflower")
 def exit_handler(*args):
     logger.debug(f"Got shutting down signal for PID={os.getpid()}")
     logger.info("Gracefully shuting down")
-    workflow_controller.stop()
+    workflow_runner_service.stop()
     loop = asyncio.get_event_loop()
     tasks = asyncio.all_tasks(loop=loop)
     for t in tasks:
@@ -49,16 +49,15 @@ def exit_handler(*args):
     loop.stop()
 
 
-def run():
+def start():
     signal.signal(signal.SIGINT, exit_handler)
-    signal.signal(signal.SIGBREAK, exit_handler)
     signal.signal(signal.SIGTERM, exit_handler)
     loop = asyncio.new_event_loop()
     logger.info("Starting Workflower")
     executor = ThreadPoolExecutor(max_workers=1)
     loop.run_in_executor(executor, server.run)
     scheduler.start()
-    loop.create_task(workflow_controller.run(scheduler))
+    loop.create_task(workflow_runner_service.run(scheduler))
 
     try:
         loop.run_forever()

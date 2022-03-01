@@ -8,7 +8,7 @@ def create_db():
 
 
 FUNCTION_MAP = {
-    "run": core.run,
+    "run": core.start,
     "init-db": create_db,
     "run_workflow": workflow.run_workflow,
 }
