@@ -52,7 +52,12 @@ class WorkflowRunnerService:
         self.create_default_directories()
 
     def schedule_one_workflow_jobs(
-        self, uow, workflow: Workflow, scheduler
+        self,
+        uow,
+        workflow: Workflow,
+        scheduler,
+        executor="default",
+        jobstore="default",
     ) -> None:
         """
         Schedule one workflow
@@ -121,7 +126,7 @@ class WorkflowRunnerService:
                     continue
                 if job.is_active:
                     schedule_jobs_command = ScheduleJobCommand(
-                        uow, job.id, scheduler
+                        uow, job.id, scheduler, executor, jobstore
                     )
                     schedule_jobs_command.execute()
 
@@ -189,7 +194,7 @@ class WorkflowRunnerService:
             # removed.
             workflows = uow.workflows.list()
             for workflow in workflows:
-                if not workflow.trigger == "automatic":
+                if not workflow.trigger == "on_schedule":
                     continue
                 update_modified_file_state_command = (
                     UpdateModifiedWorkflowFileStateCommand(uow, workflow.id)

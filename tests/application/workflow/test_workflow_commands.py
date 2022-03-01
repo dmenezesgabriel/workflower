@@ -27,7 +27,7 @@ class TestSetWorkflowTriggerCommand:
             uow.workflows.add(new_workflow)
 
         command = commands.SetWorkflowTriggerCommand(
-            unit_of_work=uow, workflow_id=new_workflow.id, trigger="manual"
+            unit_of_work=uow, workflow_id=new_workflow.id, trigger="on_demand"
         )
         command.execute()
 
@@ -35,7 +35,7 @@ class TestSetWorkflowTriggerCommand:
         workflow = (
             session.query(Workflow).filter_by(id=new_workflow.id).first()
         )
-        assert workflow.trigger == "manual"
+        assert workflow.trigger == "on_demand"
 
 
 class TestAddWorkflowJobCommand:

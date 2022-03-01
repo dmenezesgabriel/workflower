@@ -4,13 +4,30 @@ import os
 import signal
 from concurrent.futures import ThreadPoolExecutor
 
-from workflower.adapters.scheduler.setup import scheduler
+from workflower.adapters.scheduler.setup import (
+    create_scheduler,
+    create_sqlalchemy_jobstore,
+)
 from workflower.adapters.server import create_server
+from workflower.adapters.sqlalchemy.setup import engine
 from workflower.api import create_api
 from workflower.services.workflow.runner import WorkflowRunnerService
 
+jobstores = {
+    "default": create_sqlalchemy_jobstore(
+        engine=engine, tablename="on_schedule_jobs"
+    ),
+}
+executors = {
+    "default": {
+        "type": "threadpool",
+        "max_workers": 20,
+    },
+}
+
 api = create_api()
 server = create_server(api)
+scheduler = create_scheduler(executors=executors, jobstores=jobstores)
 
 workflow_controller = WorkflowRunnerService()
 
@@ -21,7 +38,6 @@ def exit_handler(*args):
     logger.debug(f"Got shutting down signal for PID={os.getpid()}")
     logger.info("Gracefully shuting down")
     workflow_controller.stop()
-    scheduler.shutdown()
     loop = asyncio.get_event_loop()
     tasks = asyncio.all_tasks(loop=loop)
     for t in tasks:

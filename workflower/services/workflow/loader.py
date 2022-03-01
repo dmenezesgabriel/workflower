@@ -38,13 +38,12 @@ class WorkflowLoader:
 
                     try:
                         workflow = command.execute()
-                        set_trigger_command = SetWorkflowTriggerCommand(
-                            uow, workflow.id, "automatic"
-                        )
-                        set_trigger_command.execute()
-
-                        counter += 1
                         if workflow:
+                            set_trigger_command = SetWorkflowTriggerCommand(
+                                uow, workflow.id, "on_schedule"
+                            )
+                            set_trigger_command.execute()
+                            counter += 1
                             self._workflows.append(workflow)
                     except Exception:
                         logger.error(

@@ -23,7 +23,7 @@ class Workflow:
         - modified_since_last_load (bool, optional): Workflow has been modified
         since las load or not.
         - jobs (List[Job]): List of jobs for the workflow.
-        - trigger (str, optional): can be manual or automatic.
+        - trigger (str, optional): can be on_demand or on_schedule.
     """
 
     def __init__(

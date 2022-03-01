@@ -1,9 +1,13 @@
 import logging
 import time
 
-from workflower.adapters.scheduler.setup import scheduler
-from workflower.adapters.sqlalchemy.setup import Session
+from workflower.adapters.scheduler.setup import (
+    create_scheduler,
+    create_sqlalchemy_jobstore,
+)
+from workflower.adapters.sqlalchemy.setup import Session, engine
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
+from workflower.application.job.commands import ChangeJobStatusCommand
 from workflower.application.workflow.commands import (
     LoadWorkflowFromYamlFileCommand,
     SetWorkflowTriggerCommand,
@@ -11,6 +15,20 @@ from workflower.application.workflow.commands import (
 from workflower.services.workflow.runner import WorkflowRunnerService
 
 logger = logging.getLogger("workflower.cli.workflow")
+
+jobstores = {
+    "default": create_sqlalchemy_jobstore(
+        engine=engine, tablename="on_demand_jobs"
+    ),
+}
+executors = {
+    "default": {
+        "type": "threadpool",
+        "max_workers": 20,
+    },
+}
+
+scheduler = create_scheduler(executors=executors, jobstores=jobstores)
 
 
 class Runner:
@@ -26,8 +44,13 @@ class Runner:
         load_command = LoadWorkflowFromYamlFileCommand(uow, path)
         workflow = load_command.execute()
         set_trigger_command = SetWorkflowTriggerCommand(
-            uow, workflow.id, "manual"
+            uow, workflow.id, "on_demand"
         )
+        for job in workflow.jobs:
+            change_job_status_command = ChangeJobStatusCommand(
+                uow, job.id, "pending"
+            )
+            change_job_status_command.execute()
         set_trigger_command.execute()
         try:
             workflow_runner.schedule_one_workflow_jobs(
