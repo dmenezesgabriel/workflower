@@ -3,6 +3,8 @@ import os
 import traceback
 from typing import List
 
+from workflower.adapters.sqlalchemy.setup import Session
+from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.workflow.commands import (
     LoadWorkflowFromYamlFileCommand,
     SetWorkflowTriggerCommand,
@@ -13,7 +15,7 @@ from workflower.domain.entities.workflow import Workflow
 logger = logging.getLogger("workflower.loader")
 
 
-class WorkflowLoader:
+class WorkflowLoaderService:
     def __init__(self) -> None:
         self._workflows = None
 
@@ -22,11 +24,13 @@ class WorkflowLoader:
         return self._workflows
 
     def load_all_from_dir(
-        self, uow, workflows_path: str = Config.WORKFLOWS_FILES_PATH
+        self, workflows_path: str = Config.WORKFLOWS_FILES_PATH
     ) -> List[Workflow]:
         """
         Load all.
         """
+        session = Session()
+        uow = SqlAlchemyUnitOfWork(session)
         self._workflows = []
         logger.info(f"Loading Workflows from directory: {workflows_path}")
         counter = 0

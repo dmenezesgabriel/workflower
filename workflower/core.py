@@ -12,7 +12,7 @@ from workflower.adapters.scheduler.setup import (
 from workflower.adapters.server import create_server
 from workflower.adapters.sqlalchemy.setup import engine
 from workflower.config import Config
-from workflower.services.workflow.runner import WorkflowRunnerService
+from workflower.controllers.workflow import WorkflowController
 
 jobstores = {
     "default": create_sqlalchemy_jobstore(
@@ -32,7 +32,7 @@ scheduler = create_scheduler(
 
 api = create_api()
 server = create_server(api)
-workflow_runner_service = WorkflowRunnerService()
+workflow_controller = WorkflowController()
 
 logger = logging.getLogger("workflower")
 
@@ -40,7 +40,7 @@ logger = logging.getLogger("workflower")
 def exit_handler(*args):
     logger.debug(f"Got shutting down signal for PID={os.getpid()}")
     logger.info("Gracefully shuting down")
-    workflow_runner_service.stop()
+    workflow_controller.stop()
     loop = asyncio.get_event_loop()
     tasks = asyncio.all_tasks(loop=loop)
     for t in tasks:
@@ -57,7 +57,7 @@ def start():
     executor = ThreadPoolExecutor(max_workers=1)
     loop.run_in_executor(executor, server.run)
     scheduler.start()
-    loop.create_task(workflow_runner_service.run(scheduler))
+    loop.create_task(workflow_controller.run(scheduler))
 
     try:
         loop.run_forever()

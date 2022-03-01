@@ -1,8 +1,5 @@
-import asyncio
 import logging
-import os
 
-from workflower.adapters.sqlalchemy.backup import backup_sqlite, dump_sqlite
 from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.event.commands import CreateEventCommand
@@ -19,39 +16,12 @@ from workflower.application.workflow.commands import (
     UpdateModifiedWorkflowFileStateCommand,
     UpdateWorkflowFileExistsStateCommand,
 )
-from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
-from workflower.services.workflow.loader import WorkflowLoader
 
 logger = logging.getLogger("workflower.services.workflow")
 
 
 class WorkflowRunnerService:
-    """
-    Workflow Controller.
-    """
-
-    def __init__(self) -> None:
-        self.workflow_loader = WorkflowLoader()
-        self.is_running = False
-        self._init()
-
-    def create_default_directories(self) -> None:
-        """
-        Create application default configuration directories.
-        """
-        if not os.path.isdir(Config.ENVIRONMENTS_DIR):
-            os.makedirs(Config.ENVIRONMENTS_DIR)
-
-        if not os.path.isdir(Config.DATA_DIR):
-            os.makedirs(Config.DATA_DIR)
-
-    def _init(self) -> None:
-        """
-        Workflow Controller Initial Setup.
-        """
-        self.create_default_directories()
-
     def schedule_one_workflow_jobs(
         self,
         uow,
@@ -193,7 +163,6 @@ class WorkflowRunnerService:
                     remove_job_command = RemoveJobCommand(uow, job.id)
                     remove_job_command.execute()
 
-            self.workflow_loader.load_all_from_dir(uow)
             # Load all workflows on database, including if the file has ben
             # removed.
             workflows = uow.workflows.list()
@@ -210,18 +179,3 @@ class WorkflowRunnerService:
                 )
                 update_Workflow_file_exists_command.execute()
                 self.schedule_one_workflow_jobs(uow, workflow, scheduler)
-
-    async def run(self, scheduler):
-        self.is_running = True
-        while self.is_running:
-            self.schedule_workflows_jobs(scheduler)
-            logger.info(f"Sleeping {Config.CYCLE} seconds")
-            await asyncio.sleep(Config.CYCLE)
-            # Backup sqlite
-            backup_sqlite(
-                Config.APP_DATABASE_URL, Config.APP_DATABASE_BACKUP_URL
-            )
-            dump_sqlite(Config.SQLITE_DATABASE_DUMP_PATH)
-
-    def stop(self):
-        self.is_running = False
