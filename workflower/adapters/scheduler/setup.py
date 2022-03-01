@@ -12,8 +12,6 @@ from apscheduler.events import (
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.adapters.scheduler import callbacks
-from workflower.adapters.sqlalchemy.setup import engine
-from workflower.config import Config
 
 logger = logging.getLogger("workflower.adapters.scheduler")
 
@@ -22,12 +20,12 @@ def create_sqlalchemy_jobstore(**kwargs):
     return SQLAlchemyJobStore(**kwargs)
 
 
-def create_scheduler(jobstores, executors):
+def create_scheduler(jobstores, executors, timezone):
     scheduler = BackgroundScheduler()
     scheduler.configure(
         jobstores=jobstores,
         executors=executors,
-        timezone=Config.TIME_ZONE,
+        timezone=timezone,
     )
 
     def on_job_added(event):

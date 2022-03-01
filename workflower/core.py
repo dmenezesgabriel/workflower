@@ -11,6 +11,7 @@ from workflower.adapters.scheduler.setup import (
 from workflower.adapters.server import create_server
 from workflower.adapters.sqlalchemy.setup import engine
 from workflower.api import create_api
+from workflower.config import Config
 from workflower.services.workflow.runner import WorkflowRunnerService
 
 jobstores = {
@@ -27,7 +28,9 @@ executors = {
 
 api = create_api()
 server = create_server(api)
-scheduler = create_scheduler(executors=executors, jobstores=jobstores)
+scheduler = create_scheduler(
+    executors=executors, jobstores=jobstores, timezone=Config.TIME_ZONE
+)
 
 workflow_controller = WorkflowRunnerService()
 

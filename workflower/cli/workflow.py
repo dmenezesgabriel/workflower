@@ -12,6 +12,7 @@ from workflower.application.workflow.commands import (
     LoadWorkflowFromYamlFileCommand,
     SetWorkflowTriggerCommand,
 )
+from workflower.config import Config
 from workflower.services.workflow.runner import WorkflowRunnerService
 
 logger = logging.getLogger("workflower.cli.workflow")
@@ -28,7 +29,9 @@ executors = {
     },
 }
 
-scheduler = create_scheduler(executors=executors, jobstores=jobstores)
+scheduler = create_scheduler(
+    executors=executors, jobstores=jobstores, timezone=Config.TIME_ZONE
+)
 
 
 class Runner:
