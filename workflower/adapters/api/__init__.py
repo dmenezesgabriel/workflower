@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from workflower.api.endpoints import router
+from workflower.adapters.api.endpoints import router
 
 
 def create_api():

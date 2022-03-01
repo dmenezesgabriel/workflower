@@ -4,13 +4,13 @@ import os
 import signal
 from concurrent.futures import ThreadPoolExecutor
 
+from workflower.adapters.api import create_api
 from workflower.adapters.scheduler.setup import (
     create_scheduler,
     create_sqlalchemy_jobstore,
 )
 from workflower.adapters.server import create_server
 from workflower.adapters.sqlalchemy.setup import engine
-from workflower.api import create_api
 from workflower.config import Config
 from workflower.services.workflow.runner import WorkflowRunnerService
 
