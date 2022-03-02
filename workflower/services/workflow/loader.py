@@ -7,8 +7,10 @@ from workflower.adapters.sqlalchemy.setup import Session
 from workflower.adapters.sqlalchemy.unit_of_work import SqlAlchemyUnitOfWork
 from workflower.application.event.commands import CreateEventCommand
 from workflower.application.workflow.commands import (
-    ActivateWorkflowCommand, LoadWorkflowFromYamlFileCommand,
-    SetWorkflowTriggerCommand)
+    ActivateWorkflowCommand,
+    LoadWorkflowFromYamlFileCommand,
+    SetWorkflowTriggerCommand,
+)
 from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
 
