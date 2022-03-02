@@ -61,6 +61,39 @@ class TestDeactivateWorkflowCommand:
         assert not workflow.is_active
 
 
+class TestActivateWorkflowCommand:
+    def test_set_workflow__trigger_command_executes_correctly(
+        self, session_factory, uow
+    ):
+        new_workflow = Workflow(name="test")
+
+        assert new_workflow.is_active
+
+        with uow:
+            uow.workflows.add(new_workflow)
+            new_workflow.is_active = False
+
+        session_before = session_factory()
+        workflow_before = (
+            session_before.query(Workflow)
+            .filter_by(id=new_workflow.id)
+            .first()
+        )
+
+        assert not workflow_before.is_active
+
+        command = commands.ActivateWorkflowCommand(
+            unit_of_work=uow, workflow_id=new_workflow.id
+        )
+        command.execute()
+
+        session_after = session_factory()
+        workflow_after = (
+            session_after.query(Workflow).filter_by(id=new_workflow.id).first()
+        )
+        assert workflow_after.is_active
+
+
 class TestAddWorkflowJobCommand:
     def test_add_job_to_workflow_command_executes_correctly(
         self, session_factory, uow

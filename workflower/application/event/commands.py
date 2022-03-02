@@ -14,8 +14,8 @@ class CreateEventCommand:
         name: str,
         model: str,
         model_id: str,
-        exception: str,
-        output: str,
+        exception: str = None,
+        output: str = None,
     ) -> None:
         self.unit_of_work = unit_of_work
         self.name = name
