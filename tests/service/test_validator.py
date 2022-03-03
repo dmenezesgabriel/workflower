@@ -2,7 +2,7 @@ import unittest
 import unittest.mock
 
 import pytest
-import workflower.services.validator as validator
+import workflower.services.schema.validator as validator
 from workflower.application.exceptions import (
     InvalidFilePathError,
     InvalidSchemaError,

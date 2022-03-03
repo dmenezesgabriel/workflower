@@ -7,8 +7,11 @@ from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
 from workflower.domain.entities.workflow import Workflow
-from workflower.services.parser import JobSchemaParser, WorkflowSchemaParser
-from workflower.services.validator import validate_schema
+from workflower.services.schema.parser import (
+    JobSchemaParser,
+    WorkflowSchemaParser,
+)
+from workflower.services.schema.validator import validate_schema
 from workflower.utils.file import (
     get_file_modification_date,
     get_file_name,
