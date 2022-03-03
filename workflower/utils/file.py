@@ -27,6 +27,6 @@ def yaml_file_to_dict(file_path: str) -> dict:
     try:
         with open(file_path) as yf:
             configuration_dict = yaml.safe_load(yf)
+        return configuration_dict
     except FileNotFoundError:
         logger.error(f"{file_path} not exist")
-    return configuration_dict
