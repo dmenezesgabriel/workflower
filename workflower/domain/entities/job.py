@@ -32,7 +32,7 @@ class Job:
         workflow=None,
         depends_on: str = None,
         dependency_logs_pattern: str = None,
-        run_if_pattern_match: bool = True,
+        run_if_pattern_match: bool = None,
         is_active: bool = True,
         next_run_time: bool = None,
     ):
@@ -62,6 +62,24 @@ class Job:
         operator = dictionary["operator"]
         definition = dictionary["definition"]
         return cls(name, operator, definition)
+
+    def to_dict(self):
+        dictionary = dict(
+            name=self.name,
+            operator=self.operator,
+            **self.definition,
+            depends_on=self.depends_on,
+            next_run_time=self.next_run_time,
+            run_if_pattern_match=self.run_if_pattern_match,
+        )
+
+        empty_attributes = list(
+            key for key, value in dictionary.items() if not value
+        )
+        for attribute in empty_attributes:
+            del dictionary[attribute]
+
+        return dictionary
 
     def __repr__(self) -> str:
         return (
