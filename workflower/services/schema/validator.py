@@ -114,7 +114,8 @@ def job_operator_options_in_expected(job_dict) -> bool:
     job_operator_options = ["alteryx", "papermill", "python", "module"]
     if job_dict["operator"] not in job_operator_options:
         raise InvalidSchemaError(
-            f"Job operator options must be in: {', '.join(job_operator_options)}"
+            f"Job operator options must be in: "
+            f"{', '.join(job_operator_options)}"
         )
     return True
 
