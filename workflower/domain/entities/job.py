@@ -63,7 +63,10 @@ class Job:
         definition = dictionary["definition"]
         return cls(name, operator, definition)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Job to dict.
+        """
         dictionary = dict(
             name=self.name,
             operator=self.operator,

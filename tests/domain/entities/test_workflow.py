@@ -21,7 +21,9 @@ class TestWorkflowEntity:
                 Job(
                     name="test",
                     operator="python",
-                    definition={"trigger": "date"},
+                    definition=dict(
+                        trigger="date", code="print('First Job!')"
+                    ),
                 )
             ],
         )
@@ -33,7 +35,7 @@ class TestWorkflowEntity:
         job = Job(
             name="test",
             operator="python",
-            definition={"trigger": "date"},
+            definition=dict(trigger="date", code="print('First Job!')"),
         )
 
         workflow.add_job(job)
@@ -44,7 +46,7 @@ class TestWorkflowEntity:
         job = Job(
             name="test",
             operator="python",
-            definition={"trigger": "date"},
+            definition=dict(trigger="date", code="print('First Job!')"),
         )
         workflow.add_job(job)
         assert workflow.jobs[0].operator == "python"
@@ -69,7 +71,9 @@ class TestWorkflowEntity:
                 Job(
                     name="test",
                     operator="python",
-                    definition={"trigger": "date"},
+                    definition=dict(
+                        trigger="date", code="print('First Job!')"
+                    ),
                 )
             ],
         )
@@ -89,9 +93,14 @@ class TestWorkflowEntity:
         job = Job(
             name="test",
             operator="python",
-            definition={"trigger": "date"},
+            definition=dict(trigger="date", code="print('First Job!')"),
         )
         workflow.add_job(job)
         workflow_dict = workflow.to_dict()
 
         assert len(workflow_dict["jobs"]) == 1
+        assert isinstance(workflow_dict["jobs"], list)
+        assert workflow_dict["jobs"][0]["name"] == "test"
+        assert workflow_dict["jobs"][0]["operator"] == "python"
+        assert workflow_dict["jobs"][0]["trigger"] == "date"
+        assert workflow_dict["jobs"][0]["code"] == "print('First Job!')"

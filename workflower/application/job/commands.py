@@ -21,7 +21,7 @@ class CreateJobCommand:
         workflow=None,
         depends_on: str = None,
         dependency_logs_pattern: str = None,
-        run_if_pattern_match: bool = True,
+        run_if_pattern_match: bool = None,
         is_active: bool = True,
         next_run_time: bool = None,
     ) -> None:

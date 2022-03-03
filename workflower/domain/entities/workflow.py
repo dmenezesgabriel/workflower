@@ -54,8 +54,13 @@ class Workflow:
         name = dictionary["name"]
         return cls(name)
 
-    def to_dict(self):
-        return dict(name=self.name, jobs=self.jobs)
+    def to_dict(self) -> dict:
+        """
+        Workflow to dict.
+        """
+        return dict(
+            name=self.name, jobs=list(job.to_dict() for job in self.jobs)
+        )
 
     @property
     def jobs_count(self) -> int:

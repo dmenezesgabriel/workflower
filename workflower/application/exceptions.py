@@ -19,3 +19,7 @@ class InvalidFilePathError(Exception):
     """Base class for invalid type error"""
 
     pass
+
+
+class BusinessRuleValidationException(Exception):
+    """A base class for all business rule validation exceptions"""
