@@ -76,3 +76,22 @@ class TestWorkflowEntity:
         assert workflow.jobs[0].operator == "python"
         workflow.clear_jobs()
         workflow.jobs == []
+
+    def test_workflow_to_dict_return_a_dict(self):
+        workflow = Workflow(name="test")
+        workflow_dict = workflow.to_dict()
+
+        assert isinstance(workflow_dict, dict)
+        assert workflow_dict["name"] == "test"
+        assert isinstance(workflow_dict["jobs"], list)
+        assert not workflow_dict["jobs"]
+
+        job = Job(
+            name="test",
+            operator="python",
+            definition={"trigger": "date"},
+        )
+        workflow.add_job(job)
+        workflow_dict = workflow.to_dict()
+
+        assert len(workflow_dict["jobs"]) == 1
