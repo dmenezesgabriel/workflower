@@ -106,7 +106,6 @@ install_deps() {
         # PIP_INDEX_URL and PIP_TRUSTED_HOST not setted
         then
         echo "Installing python dependencies"
-        eval "$(cat .env)"  && \
         $env_executable -m pip install -r requirements.txt
         $env_executable -m pip install -r requirements-plugins.txt
         $env_executable -m pip install -r requirements-dev.txt
