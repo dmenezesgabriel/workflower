@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from workflower.adapters.sqlalchemy.backup import backup_sqlite, dump_sqlite
+from workflower.adapters.sqlalchemy.backup import dump_sqlite
 from workflower.config import Config
 from workflower.services.workflow.loader import WorkflowLoaderService
 from workflower.services.workflow.runner import WorkflowRunnerService
@@ -27,9 +27,9 @@ class WorkflowController:
             logger.info(f"Sleeping {Config.CYCLE} seconds")
             await asyncio.sleep(Config.CYCLE)
             # Backup sqlite
-            backup_sqlite(
-                Config.APP_DATABASE_URL, Config.APP_DATABASE_BACKUP_URL
-            )
+            # backup_sqlite(
+            #     Config.APP_DATABASE_URL, Config.APP_DATABASE_BACKUP_URL
+            # )
             dump_sqlite(Config.SQLITE_DATABASE_DUMP_PATH)
 
     def stop(self):
