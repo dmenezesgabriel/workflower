@@ -273,9 +273,9 @@ run_cli () {
                 done
                 printf "\n"
                 read -p "Workflow path: " workflow_number
-                echo "Run with .env"
+                echo "Run with .env.cli.template"
                 . $venv_activate
-                eval "$(cat .env)"  && \
+                eval "$(cat .env.cli.template)"  && \
                 python . init-db && \
                 python . run_workflow --i "${workflows_dict[$workflow_number]}"
         # =================================================================== #
