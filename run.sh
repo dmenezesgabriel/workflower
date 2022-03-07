@@ -7,7 +7,6 @@ NAME="CLI Helper"
 
 ENV_PATH=~/environments/workflower
 LINE_BREAK="################################################################\n"
-CLI_WORKFLOWS_PATH=./samples/cli_standalone_workflows
 
 bold_green_prefix="\033[1;32m"
 bold_green_suffix="\033[00m"
@@ -103,34 +102,21 @@ install_deps() {
     ###########################################################################
     # Install deps
     ###########################################################################
-    if [ -z ${var+$PIP_INDEX_URL} ];
+    if [ -z ${var+$PIP_INDEX_URL} ] && [ -z ${var+$PIP_TRUSTED_HOST} ];
+        # PIP_INDEX_URL and PIP_TRUSTED_HOST not setted
         then
-        echo "Installing python dependencies"
-        eval "$(cat .env)"  && \
-        $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL}
-        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL}
-        $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL}
-
-    elif [ -z ${var+$PIP_TRUSTED_HOST} ];
-        then
-        echo "Installing python dependencies"
-        eval "$(cat .env)"  && \
-        $env_executable -m pip install -r requirements.txt --trusted-host=${PIP_TRUSTED_HOST}
-        $env_executable -m pip install -r requirements-plugins.txt --trusted-host=${PIP_TRUSTED_HOST}
-        $env_executable -m pip install -r requirements-dev.txt --trusted-host=${PIP_TRUSTED_HOST}
-    elif [ -z ${var+$PIP_INDEX_URL} ] && [ -z ${var+$PIP_TRUSTED_HOST} ];
-        then
-        echo "Installing python dependencies"
-        eval "$(cat .env)"  && \
-        $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
-        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
-        $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
-    else
         echo "Installing python dependencies"
         eval "$(cat .env)"  && \
         $env_executable -m pip install -r requirements.txt
         $env_executable -m pip install -r requirements-plugins.txt
         $env_executable -m pip install -r requirements-dev.txt
+    else
+        # PIP_INDEX_URL and PIP_TRUSTED_HOST setted
+        echo "Installing python dependencies with custom --index-url and --trusted-host "
+        eval "$(cat .env)"  && \
+        $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
+        $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
     fi
 }
 
@@ -151,6 +137,16 @@ publish_docs() {
         -H "Accept: application/vnd.github.v3+json" \
         -u ${GH_NAME}:${GH_TOKEN} -X POST \
         https://api.github.com/repos/${GH_NAME}/${GH_REPO}/pages/builds
+}
+
+set_standalone_workflows_path() {
+    if [ -z ${var+$CLI_WORKFLOWS_PATH} ];
+        then
+        CLI_WORKFLOWS_PATH=./samples/cli_standalone_workflows
+        echo "Setting standalone execution workflows path at ${CLI_WORKFLOWS_PATH}"
+    else
+        echo "Standalone workflows execution files at ${CLI_WORKFLOWS_PATH}"
+    fi
 }
 
 run_cli () {
@@ -261,6 +257,11 @@ run_cli () {
         # =================================================================== #
         elif [ $cmd == "workflow" ];
             then
+                echo "Run with .env.cli.template"
+                . $venv_activate
+                # Set workflows path
+                set_standalone_workflows_path
+                # Make view
                 declare -A workflows_dict
                 workflows_counter=0
                 echo "Choose a workflow number: "
@@ -272,12 +273,17 @@ run_cli () {
                 echo "$workflows_counter - $entry"
                 done
                 printf "\n"
-                read -p "Workflow path: " workflow_number
-                echo "Run with .env.cli.template"
-                . $venv_activate
-                eval "$(cat .env.cli.template)"  && \
-                python . init-db && \
-                python . run_workflow --i "${workflows_dict[$workflow_number]}"
+                read -p "Choose workflow: " workflow_number
+                # Back to menu
+                if [ $workflow_number == "exit" ];
+                    then
+                        clear
+                else
+                    #  Run workflow
+                    eval "$(cat .env.cli.template)"  && \
+                    python . init-db && \
+                    python . run_workflow --i "${workflows_dict[$workflow_number]}"
+                fi
         # =================================================================== #
         # Clear
         # =================================================================== #

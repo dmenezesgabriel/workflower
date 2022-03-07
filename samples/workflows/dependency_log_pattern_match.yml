@@ -26,7 +26,7 @@ workflow:
       # - cron
       # - dependency
       trigger: interval # str
-      minutes: 2
+      minutes: 4
       # if trigger is type date and has no other key reference like :run_date:
       # it will be executed immediately accordingly to configured scheduler
       # sleep cycle
