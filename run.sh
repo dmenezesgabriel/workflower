@@ -177,10 +177,7 @@ run_cli () {
         elif [ $cmd == "clean" ];
             then
                 echo "Removing development sqlite databases"
-                find . -name "*dev.sqlite*" -type f -delete
-                find . -name "*temp.sqlite*" -type f -delete
-                find . -name "*backup.sqlite*" -type f -delete
-                find . -name "*test.sqlite*" -type f -delete
+                find . -name "*.sqlite*" -type f -delete
                 find . -name "*dump.sql*" -type f -delete
                 echo "Removing notebooks outputs"
                 find . -name "*output.ipynb" -type f -delete

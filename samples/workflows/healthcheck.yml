@@ -1,0 +1,9 @@
+version: "1.0"
+workflow:
+  name: healthcheck
+  jobs:
+    - name: "health_check"
+      operator: python
+      code: "print('Still alive!')"
+      trigger: interval
+      minutes: 1

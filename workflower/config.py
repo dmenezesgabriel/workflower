@@ -92,3 +92,27 @@ class Config:
     # ======================================================================= #
     PIP_INDEX_URL = os.getenv("PIP_INDEX_URL", None)
     PIP_TRUSTED_HOST = os.getenv("PIP_TRUSTED_HOST", None)
+
+
+class DevelopmentConfig(Config):
+    pass
+
+
+class ProductionConfig(Config):
+    pass
+
+
+class TestConfig(Config):
+    APP_DATABASE_URL = "sqlite://"
+
+
+class ConfigurationFactory:
+    configuration_dict = dict(
+        development=DevelopmentConfig,
+        production=ProductionConfig,
+        test=TestConfig,
+    )
+
+    @classmethod
+    def get_config(cls, config_name):
+        return cls.configuration_dict[config_name]
