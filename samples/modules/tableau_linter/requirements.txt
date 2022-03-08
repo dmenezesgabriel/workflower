@@ -1,2 +1,0 @@
-tableauserverclient==0.15.0
-pandas==1.4.0

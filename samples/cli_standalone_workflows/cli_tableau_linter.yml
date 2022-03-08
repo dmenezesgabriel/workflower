@@ -9,8 +9,3 @@ workflow:
       plugins:
         - tableau_document_plugin
       trigger: date
-    - name: "hello_python_code"
-      operator: python
-      code: "print('Hello, World!')"
-      trigger: dependency
-      depends_on: tableau_linter_module
