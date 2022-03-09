@@ -19,7 +19,7 @@ workflow:
       # - alteryx
       operator: alteryx
       # when job operator alteryx, it should have path
-      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd" # str
+      path: "samples/alteryx/sample_combine_two_sheets.yxmd" # str
       # trigger can be
       # - date
       # - interval

@@ -4,13 +4,13 @@ workflow:
   jobs:
     - name: sqlite_backup
       operator: module
-      module_path: "c://Users/gabri/Documents/repos/workflower/samples/modules/maintenance/sqlite_backup.py"
+      module_path: "samples/modules/maintenance/sqlite_backup.py"
       module_name: "sqlite_backup"
       trigger: cron
       minute: "*/2"
     - name: sqlite_dump
       operator: module
-      module_path: "c://Users/gabri/Documents/repos/workflower/samples/modules/maintenance/sqlite_dump.py"
+      module_path: "samples/modules/maintenance/sqlite_dump.py"
       module_name: sqlite_dump
       trigger: dependency
       depends_on: sqlite_backup

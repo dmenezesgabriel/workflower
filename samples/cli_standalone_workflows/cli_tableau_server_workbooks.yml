@@ -4,7 +4,7 @@ workflow:
   jobs:
     - name: tableau_workbooks
       operator: module
-      module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_server\\tableau_server_workbooks.py"
+      module_path: "samples/modules/tableau_server/tableau_server_workbooks.py"
       module_name: "tableau_server_workbooks"
       plugins:
         - tableau_server_plugin

@@ -4,6 +4,6 @@ workflow:
   jobs:
     - name: playwright_download
       operator: module
-      module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\playwright\\playwright_download.py"
+      module_path: "samples/modules/playwright/playwright_download.py"
       module_name: "playwright_download"
       trigger: date

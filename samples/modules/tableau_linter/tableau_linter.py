@@ -23,9 +23,7 @@ class Module(BaseModule):
     def run(self, *args, **kwargs):
         # Load and unzip files
         tableau_document_plugin = self.get_plugin("tableau_document_plugin")
-        base_directory = (
-            r"C:\Users\gabri\Documents\repos\workflower\samples\tableau"
-        )
+        base_directory = "samples/tableau"
         output_directory = os.path.join(base_directory, "output")
 
         # Makedirs

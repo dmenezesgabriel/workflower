@@ -4,6 +4,6 @@ workflow:
   jobs:
     - name: "combine_two_sheets"
       operator: alteryx
-      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
+      path: "samples/alteryx/sample_combine_two_sheets.yxmd"
       trigger: interval
       minutes: 1

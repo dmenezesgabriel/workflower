@@ -4,7 +4,7 @@ workflow:
   jobs:
     - name: "tableau_linter_module"
       operator: module
-      module_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\modules\\tableau_linter\\tableau_linter.py"
+      module_path: "samples/modules/tableau_linter/tableau_linter.py"
       module_name: "tableau_linter"
       plugins:
         - tableau_document_plugin

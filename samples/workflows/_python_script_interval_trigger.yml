@@ -4,7 +4,7 @@ workflow:
   jobs:
     - name: "hello_python_script"
       operator: python
-      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\hello.py"
-      requirements_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\hello_script\\requirements.txt"
+      script_path: "samples/python/hello_script/hello.py"
+      requirements_path: "samples/python/hello_script/requirements.txt"
       trigger: interval
       minutes: 1

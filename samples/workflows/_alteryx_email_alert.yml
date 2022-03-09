@@ -4,13 +4,13 @@ workflow:
   jobs:
     - name: "combine_two_sheets"
       operator: alteryx
-      path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\alteryx\\sample_combine_two_sheets.yxmd"
+      path: "samples/alteryx/sample_combine_two_sheets.yxmd"
       trigger: interval
       minutes: 1
     - name: "send_email_alert"
       operator: python
       # Papermill paths
-      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\parse_alteryx_logs_send_email\\send_email_alert.py"
-      requirements_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\parse_alteryx_logs_send_email\\requirements.txt"
+      script_path: "samples/python/parse_alteryx_logs_send_email/send_email_alert.py"
+      requirements_path: "samples/python/parse_alteryx_logs_send_email/requirements.txt"
       trigger: dependency
       depends_on: combine_two_sheets

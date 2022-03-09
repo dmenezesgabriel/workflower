@@ -5,14 +5,14 @@ workflow:
     - name: "notebook_install_packages"
       operator: papermill
       # Papermill paths
-      input_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages.ipynb"
-      output_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\notebooks\\notebook_install_packages_output.ipynb"
+      input_path: "samples/notebooks/notebook_install_packages.ipynb"
+      output_path: "samples/notebooks/notebook_install_packages_output.ipynb"
       # trigger config
       trigger: date
       # Second job, triggered after first
     - name: "python_get_argv"
       operator: python
       # Papermill paths
-      script_path: "C:\\Users\\gabri\\Documents\\repos\\workflower\\samples\\python\\sys_argv\\get_argv.py"
+      script_path: "samples/python/sys_argv/get_argv.py"
       trigger: dependency
       depends_on: notebook_install_packages
