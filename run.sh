@@ -102,7 +102,8 @@ install_deps() {
     ###########################################################################
     # Install deps
     ###########################################################################
-    if [ -z ${var+$PIP_INDEX_URL} ] && [ -z ${var+$PIP_TRUSTED_HOST} ];
+    eval "$(cat .env)"
+    if [[ -z "${PIP_INDEX_URL}" ]] && [[ -z"${$PIP_TRUSTED_HOST}" ]];
         # PIP_INDEX_URL and PIP_TRUSTED_HOST not setted
         then
         echo "Installing python dependencies"
@@ -111,8 +112,7 @@ install_deps() {
         $env_executable -m pip install -r requirements-dev.txt
     else
         # PIP_INDEX_URL and PIP_TRUSTED_HOST setted
-        echo "Installing python dependencies with custom --index-url and --trusted-host "
-        eval "$(cat .env)"  && \
+        echo "Installing python dependencies with custom --index-url=${PIP_INDEX_URL} and --trusted-host=${PIP_TRUSTED_HOST}"
         $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
         $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
         $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
@@ -139,7 +139,8 @@ publish_docs() {
 }
 
 set_standalone_workflows_path() {
-    if [ -z ${var+$CLI_WORKFLOWS_PATH} ];
+    eval "$(cat .env.cli.template)"
+    if [[ -z "${CLI_WORKFLOWS_PATH}" ]];
         then
         CLI_WORKFLOWS_PATH=./samples/cli_standalone_workflows
         echo "Setting standalone execution workflows path at ${CLI_WORKFLOWS_PATH}"
