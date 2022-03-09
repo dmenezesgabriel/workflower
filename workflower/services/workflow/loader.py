@@ -52,13 +52,6 @@ class WorkflowLoaderService:
                 uow, workflow.id
             )
             activate_Workflow_command.execute()
-            create_event_command = CreateEventCommand(
-                uow,
-                model="workflow",
-                model_id=workflow.id,
-                name="workflow_loaded",
-            )
-            create_event_command.execute()
 
             return workflow
 

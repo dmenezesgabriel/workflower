@@ -93,11 +93,24 @@ class WorkflowRunnerService:
                     create_event_command.execute()
             logger.info("Scheduling jobs")
             for job in workflow.jobs:
+                # Job should be scheduled to run immediately after it's
+                # dependency
                 if job.depends_on:
                     logger.debug(
                         f"Job {job.id} depends on {job.depends_on}, skipping."
                     )
                     continue
+                # Job Already scheduled
+                scheduled_job = scheduler.get_job(job.id)
+                if scheduled_job:
+                    logger.debug(f"Job {job.id} already added, skipping.")
+                    next_run_time = scheduled_job.next_run_time
+                    update_next_runtime_command = UpdateNextRunTimeCommand(
+                        uow, job.id, next_run_time
+                    )
+                    update_next_runtime_command.execute()
+                    continue
+                # Job should be scheduled
                 if job.is_active:
                     schedule_jobs_command = ScheduleJobCommand(
                         uow, job.id, scheduler, executor, jobstore
@@ -112,20 +125,19 @@ class WorkflowRunnerService:
                         )
                         update_next_runtime_command.execute()
 
-                    if job.status != "scheduled":
-                        create_event_command = CreateEventCommand(
-                            uow,
-                            name="job_scheduled",
-                            model="job",
-                            model_id=job.id,
-                            exception=None,
-                            output=None,
-                        )
-                        create_event_command.execute()
-                        change_job_status_command = ChangeJobStatusCommand(
-                            uow, job.id, "scheduled"
-                        )
-                        change_job_status_command.execute()
+                    create_event_command = CreateEventCommand(
+                        uow,
+                        name="job_scheduled",
+                        model="job",
+                        model_id=job.id,
+                        exception=None,
+                        output=None,
+                    )
+                    create_event_command.execute()
+                    change_job_status_command = ChangeJobStatusCommand(
+                        uow, job.id, "scheduled"
+                    )
+                    change_job_status_command.execute()
 
     def schedule_workflows_jobs(self, scheduler) -> None:
         """
