@@ -103,7 +103,7 @@ install_deps() {
     # Install deps
     ###########################################################################
     eval "$(cat .env)"
-    if [[ -z "${PIP_INDEX_URL}" ]] && [[ -z"${$PIP_TRUSTED_HOST}" ]];
+    if [[ -z "${PIP_INDEX_URL}" ]] && [[ -z"${PIP_TRUSTED_HOST}" ]];
         # PIP_INDEX_URL and PIP_TRUSTED_HOST not setted
         then
         echo "Installing python dependencies"
