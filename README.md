@@ -1,6 +1,6 @@
 # Workflower
 
-[![dmenezesgabriel](https://circleci.com/gh/dmenezesgabriel/workflower.svg?style=shield)](https://github.com/dmenezesgabriel/workflower)
+[![CircleCI](https://circleci.com/gh/dmenezesgabriel/workflower/tree/master.svg?style=shield)](https://circleci.com/gh/dmenezesgabriel/workflower/tree/master)
 
 Make your workday smell like daisies.
 
