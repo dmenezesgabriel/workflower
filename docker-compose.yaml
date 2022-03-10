@@ -1,0 +1,26 @@
+# docker-compose run --rm workflower bash
+version: "3.9"
+services:
+  # Initialize database
+  # docker-compose run --rm init-db
+  workflower-init-db:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    command: python __main__.py init-db
+    volumes:
+      - ./data:/app/data
+      - ./samples:/app/samples
+    env_file:
+      - ./.env
+  # docker-compose up workflower
+  workflower:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    command: python __main__.py run
+    volumes:
+      - ./data:/app/data
+      - ./samples:/app/samples
+    env_file:
+      - ./.env

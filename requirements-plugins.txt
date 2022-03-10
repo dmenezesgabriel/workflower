@@ -1,4 +1,0 @@
-# Tableau server Plugin
-tableauserverclient==0.17.0
-# Playwright Plugin
-playwright==1.17.2

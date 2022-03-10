@@ -108,13 +108,11 @@ install_deps() {
         then
         echo "Installing python dependencies"
         $env_executable -m pip install -r requirements.txt
-        $env_executable -m pip install -r requirements-plugins.txt
         $env_executable -m pip install -r requirements-dev.txt
     else
         # PIP_INDEX_URL and PIP_TRUSTED_HOST setted
         echo "Installing python dependencies with custom --index-url=${PIP_INDEX_URL} and --trusted-host=${PIP_TRUSTED_HOST}"
         $env_executable -m pip install -r requirements.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
-        $env_executable -m pip install -r requirements-plugins.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
         $env_executable -m pip install -r requirements-dev.txt --index-url=${PIP_INDEX_URL} --trusted-host=${PIP_TRUSTED_HOST}
     fi
 }

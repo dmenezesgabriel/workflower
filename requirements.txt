@@ -1,3 +1,6 @@
+# =========================================================================== #
+# Application
+# =========================================================================== #
 APScheduler==3.8.1
 # Meant to run on python 3.6.8
 # pandas==1.1.5
@@ -14,3 +17,10 @@ uvicorn==0.17.1
 # python-json-logger==2.0.2
 # Microsoft Visual C++ 14.0 or greater is required
 # pyodbc==4.0.32
+# =========================================================================== #
+# Plugins
+# =========================================================================== #
+# Tableau server Plugin
+tableauserverclient==0.17.0
+# Playwright Plugin
+playwright==1.17.2
