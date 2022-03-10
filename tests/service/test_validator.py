@@ -133,7 +133,7 @@ class TestWorkflowSchemaValidation:
         cls, workflow_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.workflow_value_is_dict_type"
+            "workflower.services.schema.validator.workflow_value_is_dict_type"
         ) as mock:
             validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
@@ -142,7 +142,7 @@ class TestWorkflowSchemaValidation:
         cls, workflow_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.workflow_has_expected_keys"
+            "workflower.services.schema.validator.workflow_has_expected_keys"
         ) as mock:
             validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
@@ -151,7 +151,7 @@ class TestWorkflowSchemaValidation:
         cls, workflow_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.workflow_name_is_string_type"
+            "workflower.services.schema.validator.workflow_name_is_string_type"
         ) as mock:
             validator.validate_workflow_definition(workflow_dict)
         assert mock.call_count == 1
@@ -424,7 +424,7 @@ class TestPapermillJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.papermill_job_use_has_expected_keys"
+            "workflower.services.schema.validator.papermill_job_use_has_expected_keys"
         ) as mock:
             validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
@@ -433,7 +433,7 @@ class TestPapermillJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.papermill_job_input_path_is_file"
+            "workflower.services.schema.validator.papermill_job_input_path_is_file"
         ) as mock:
             validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
@@ -442,7 +442,7 @@ class TestPapermillJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.papermill_job_paths_ends_with_ipynb"
+            "workflower.services.schema.validator.papermill_job_paths_ends_with_ipynb"
         ) as mock:
             validator.validate_papermill_job(job_dict)
         assert mock.call_count == 1
@@ -545,7 +545,7 @@ class TestAlteryxJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.alteryx_job_use_has_expected_keys"
+            "workflower.services.schema.validator.alteryx_job_use_has_expected_keys"
         ) as mock:
             validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
@@ -554,7 +554,7 @@ class TestAlteryxJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.alteryx_job_path_is_file"
+            "workflower.services.schema.validator.alteryx_job_path_is_file"
         ) as mock:
             validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1
@@ -563,7 +563,7 @@ class TestAlteryxJobSchemaValidation:
         cls, job_dict
     ):
         with unittest.mock.patch(
-            "workflower.services.validator.alteryx_job_paths_ends_with_yxmd"
+            "workflower.services.schema.validator.alteryx_job_paths_ends_with_yxmd"
         ) as mock:
             validator.validate_alteryx_job(job_dict)
         assert mock.call_count == 1

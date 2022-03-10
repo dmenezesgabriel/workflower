@@ -14,6 +14,3 @@ def create_app():
 
     run_mappers()
     setup_loggers()
-
-
-create_app()
