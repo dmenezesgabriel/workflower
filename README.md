@@ -1,5 +1,7 @@
 # Workflower
 
+[![dmenezesgabriel](https://circleci.com/gh/dmenezesgabriel/workflower.svg?style=shield)](LINK)
+
 Make your workday smell like daisies.
 
 From developers to data people (engineers, analysts and scientists).
