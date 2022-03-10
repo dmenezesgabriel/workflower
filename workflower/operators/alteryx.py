@@ -4,6 +4,7 @@ Alteryx helper module
 import logging
 from subprocess import PIPE, STDOUT, CalledProcessError, Popen
 
+from workflower.config import Config
 from workflower.operators.operator import BaseOperator
 
 
@@ -20,10 +21,7 @@ class AlteryxOperator(BaseOperator):
         logger.info(f"Running alteryx workflow: {workflow_file_path}")
 
         process = Popen(
-            [
-                r"C:\Program Files\Alteryx\bin\AlteryxEngineCmd.exe",
-                workflow_file_path,
-            ],
+            [Config.ALTERYX_ENGINE_PATH, workflow_file_path],
             shell=True,
             stdout=PIPE,
             stderr=STDOUT,

@@ -92,6 +92,13 @@ class Config:
     # ======================================================================= #
     PIP_INDEX_URL = os.getenv("PIP_INDEX_URL", None)
     PIP_TRUSTED_HOST = os.getenv("PIP_TRUSTED_HOST", None)
+    # ======================================================================= #
+    # Pip default options
+    # ======================================================================= #
+    ALTERYX_ENGINE_PATH = os.getenv(
+        "ALTERYX_ENGINE_PATH",
+        "c:/Program Files/Alteryx/bin/AlteryxEngineCmd.exe",
+    )
 
 
 class DevelopmentConfig(Config):

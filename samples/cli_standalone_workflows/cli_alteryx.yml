@@ -1,0 +1,8 @@
+version: "1.0" # str
+workflow:
+  name: cli_alteryx # str
+  jobs:
+    - name: "sample_combine_two_sheets" # str
+      operator: alteryx
+      path: "samples/alteryx/sample_combine_two_sheets.yxmd" # str
+      trigger: date # str
