@@ -66,7 +66,9 @@ def create_and_install_kernel(
     # Install kernel
     kernel_spec_manager = KernelSpecManager()
     kernel_spec_manager.install_kernel_spec(
-        source_dir=kernel_spec_folder, kernel_name=kernel_name
+        source_dir=kernel_spec_folder,
+        kernel_name=kernel_name,
+        user=True,
     )
 
     ipykenerl_install_args = [
