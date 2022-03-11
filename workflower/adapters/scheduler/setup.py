@@ -1,14 +1,9 @@
 import logging
 
-from apscheduler.events import (
-    EVENT_JOB_ADDED,
-    EVENT_JOB_ERROR,
-    EVENT_JOB_EXECUTED,
-    EVENT_JOB_MAX_INSTANCES,
-    EVENT_JOB_MISSED,
-    EVENT_JOB_REMOVED,
-    EVENT_JOB_SUBMITTED,
-)
+from apscheduler.events import (EVENT_JOB_ADDED, EVENT_JOB_ERROR,
+                                EVENT_JOB_EXECUTED, EVENT_JOB_MAX_INSTANCES,
+                                EVENT_JOB_MISSED, EVENT_JOB_REMOVED,
+                                EVENT_JOB_SUBMITTED)
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from workflower.adapters.scheduler import callbacks
@@ -20,13 +15,9 @@ def create_sqlalchemy_jobstore(**kwargs):
     return SQLAlchemyJobStore(**kwargs)
 
 
-def create_scheduler(jobstores, executors, timezone):
+def create_scheduler(**options):
     scheduler = BackgroundScheduler()
-    scheduler.configure(
-        jobstores=jobstores,
-        executors=executors,
-        timezone=timezone,
-    )
+    scheduler.configure(**options)
 
     def on_job_added(event):
         callbacks.job_added_callback(event)

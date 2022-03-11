@@ -14,20 +14,29 @@ from workflower.adapters.sqlalchemy.setup import engine
 from workflower.config import Config
 from workflower.controllers.workflow import WorkflowController
 
-jobstores = {
-    "default": create_sqlalchemy_jobstore(
+jobstores = dict(
+    default=create_sqlalchemy_jobstore(
         engine=engine, tablename="on_schedule_jobs"
     ),
-}
-executors = {
-    "default": {
-        "type": "threadpool",
-        "max_workers": 20,
+)
+executors = dict(
+    default={
+        "type": "processpool",
+        "max_workers": 50,
     },
-}
+)
+job_defaults = dict(
+    # No matter how much instances are late of same job, execute one only
+    coalesce=True,
+    # 10 minutos of tolerance for missed jobs
+    misfire_grace_time=10 * 60,
+)
 
 scheduler = create_scheduler(
-    executors=executors, jobstores=jobstores, timezone=Config.TIME_ZONE
+    executors=executors,
+    jobstores=jobstores,
+    timezone=Config.TIME_ZONE,
+    job_defaults=job_defaults,
 )
 
 api = create_api()
