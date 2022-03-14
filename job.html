@@ -127,7 +127,7 @@
 </ul>
 <section id="alteryx">
 <h3>Alteryx<a class="headerlink" href="#alteryx" title="Permalink to this headline"></a></h3>
-<p>Alteryx job use definition tell the job to use <code class="docutils literal notranslate"><span class="pre">workflower.operators.alteryx.AlteryxOperator</span></code>, which once called will run an Alteryx <code class="docutils literal notranslate"><span class="pre">.xymd</span></code> file on command line, if the machine has a valid Alteryx installation and active license.</p>
+<p>Alteryx job use definition tell the job to use <code class="docutils literal notranslate"><span class="pre">workflower.application.operators.alteryx.AlteryxOperator</span></code>, which once called will run an Alteryx <code class="docutils literal notranslate"><span class="pre">.xymd</span></code> file on command line, if the machine has a valid Alteryx installation and active license.</p>
 <p>The Alteryx workflow <code class="docutils literal notranslate"><span class="pre">path</span></code> must be present on job’s yaml definition.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># alteryx_interval_trigger.yml</span><span class="w"></span>
 <span class="c1"># workflow definition&#39;s version, for application control only.</span><span class="w"></span>
@@ -152,7 +152,7 @@
 <section id="papermill">
 <h3>Papermill<a class="headerlink" href="#papermill" title="Permalink to this headline"></a></h3>
 <p><a class="reference external" href="https://github.com/nteract/papermill">Papermill</a> is a python library to run <a class="reference external" href="https://jupyter.org/">Jupyter</a> notebooks <strong>programmatically</strong>.</p>
-<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.papermill.PapermillOperator</span></code>.</p>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.application.operators.papermill.PapermillOperator</span></code>.</p>
 <p>Papermill expects a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file’s path as input so it can execute programmatically, and after it’s execution, an <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> executed file is generated with it’s cell’s outputs and erros if there were any. The <em>output</em> path is also expected, and must be in an existing directory.</p>
 <p>At every execution a python virtual environment <a class="reference external" href="https://docs.python.org/3/library/venv.html">(venv)</a> is created, so the packages needed for the job won’t conflict with applications’s packages, after the execution the environment is deleted.</p>
 <p>You can install the packages with <code class="docutils literal notranslate"><span class="pre">%pip</span></code> cell magic:</p>
@@ -188,7 +188,7 @@
 <section id="python">
 <h3>Python<a class="headerlink" href="#python" title="Permalink to this headline"></a></h3>
 <p>The python job use can run a script or a code string, the execution happens on a temporary virtual environment <a class="reference external" href="https://docs.python.org/3/library/venv.html">(venv)</a> that is deleted at the end of execution.</p>
-<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.operators.python.PythonOperator</span></code>, and it expects a <code class="docutils literal notranslate"><span class="pre">code</span></code> string definition or <code class="docutils literal notranslate"><span class="pre">script</span> <span class="pre">path</span></code>, both can use a <em>requirements.txt</em> file for external libraries.</p>
+<p>The operator used by the application is <code class="docutils literal notranslate"><span class="pre">workflower.application.operators.python.PythonOperator</span></code>, and it expects a <code class="docutils literal notranslate"><span class="pre">code</span></code> string definition or <code class="docutils literal notranslate"><span class="pre">script</span> <span class="pre">path</span></code>, both can use a <em>requirements.txt</em> file for external libraries.</p>
 <p>A script execution expects a <code class="docutils literal notranslate"><span class="pre">.py</span></code> existing file.</p>
 <ul class="simple">
 <li><p><strong>code</strong>:</p></li>
@@ -240,10 +240,10 @@
 </section>
 <section id="module">
 <h3>Module<a class="headerlink" href="#module" title="Permalink to this headline"></a></h3>
-<p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.modules.module.BaseModule</span></code> subclass which will execute what is defined on run function. This class will be used by <code class="docutils literal notranslate"><span class="pre">workflower.operators.module.ModuleOperator</span></code>.</p>
+<p>Module is a <code class="docutils literal notranslate"><span class="pre">workflower.application.modules.module.BaseModule</span></code> subclass which will execute what is defined on run function. This class will be used by <code class="docutils literal notranslate"><span class="pre">workflower.application.operators.module.ModuleOperator</span></code>.</p>
 <p>The module operator expects a valid module path, containing a file with a <code class="docutils literal notranslate"><span class="pre">Module</span></code> class and a <code class="docutils literal notranslate"><span class="pre">run</span></code> function.</p>
 <p><strong>Module example</strong>:</p>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">workflower.modules.module</span> <span class="kn">import</span> <span class="n">BaseModule</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">workflower.application.modules.module</span> <span class="kn">import</span> <span class="n">BaseModule</span>
 
 <span class="kn">from</span> <span class="nn">playwright.sync_api</span> <span class="kn">import</span> <span class="n">sync_playwright</span>
 
