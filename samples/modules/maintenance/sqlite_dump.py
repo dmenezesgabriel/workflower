@@ -2,7 +2,7 @@ import time
 
 from workflower.adapters.sqlalchemy.backup import dump_sqlite
 from workflower.config import Config
-from workflower.modules.module import BaseModule
+from workflower.application.modules.module import BaseModule
 
 
 class Module(BaseModule):

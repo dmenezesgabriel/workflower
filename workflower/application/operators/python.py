@@ -5,10 +5,10 @@ import subprocess
 import traceback
 import uuid
 
-from workflower.operators.operator import BaseOperator
+from workflower.application.operators.operator import BaseOperator
 from workflower.utils.environment import create_venv
 
-logger = logging.getLogger("workflower.operators.python")
+logger = logging.getLogger("workflower.application.operators.python")
 
 
 class PythonOperator(BaseOperator):

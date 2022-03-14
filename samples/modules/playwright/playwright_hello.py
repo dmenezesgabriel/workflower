@@ -1,4 +1,4 @@
-from workflower.modules.module import BaseModule
+from workflower.application.modules.module import BaseModule
 
 from playwright.sync_api import sync_playwright
 

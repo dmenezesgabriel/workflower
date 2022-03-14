@@ -1,12 +1,12 @@
 import logging
 import shutil
 
-from workflower.operators.operator import BaseOperator
+from workflower.application.operators.operator import BaseOperator
 from workflower.utils.environment import create_and_install_kernel
 
 import papermill as pm
 
-logger = logging.getLogger("workflower.operators.papermill")
+logger = logging.getLogger("workflower.application.operators.papermill")
 
 
 class PapermillOperator(BaseOperator):

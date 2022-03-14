@@ -24,7 +24,7 @@ Operator definition, define which **Operator** to use.
 
 ### Alteryx
 
-Alteryx job use definition tell the job to use `workflower.operators.alteryx.AlteryxOperator`, which once called will run an Alteryx `.xymd` file on command line, if the machine has a valid Alteryx installation and active license.
+Alteryx job use definition tell the job to use `workflower.application.operators.alteryx.AlteryxOperator`, which once called will run an Alteryx `.xymd` file on command line, if the machine has a valid Alteryx installation and active license.
 
 The Alteryx workflow `path` must be present on job's yaml definition.
 
@@ -52,7 +52,7 @@ workflow:
 
 [Papermill](https://github.com/nteract/papermill) is a python library to run [Jupyter](https://jupyter.org/) notebooks **programmatically**.
 
-The operator used by the application is `workflower.operators.papermill.PapermillOperator`.
+The operator used by the application is `workflower.application.operators.papermill.PapermillOperator`.
 
 Papermill expects a `.ipynb` file's path as input so it can execute programmatically, and after it's execution, an `.ipynb` executed file is generated with it's cell's outputs and erros if there were any. The _output_ path is also expected, and must be in an existing directory.
 
@@ -94,7 +94,7 @@ workflow:
 
 The python job use can run a script or a code string, the execution happens on a temporary virtual environment [(venv)](https://docs.python.org/3/library/venv.html) that is deleted at the end of execution.
 
-The operator used by the application is `workflower.operators.python.PythonOperator`, and it expects a `code` string definition or `script path`, both can use a _requirements.txt_ file for external libraries.
+The operator used by the application is `workflower.application.operators.python.PythonOperator`, and it expects a `code` string definition or `script path`, both can use a _requirements.txt_ file for external libraries.
 
 A script execution expects a `.py` existing file.
 
@@ -148,14 +148,14 @@ requests
 
 ### Module
 
-Module is a `workflower.modules.module.BaseModule` subclass which will execute what is defined on run function. This class will be used by `workflower.operators.module.ModuleOperator`.
+Module is a `workflower.application.modules.module.BaseModule` subclass which will execute what is defined on run function. This class will be used by `workflower.application.operators.module.ModuleOperator`.
 
 The module operator expects a valid module path, containing a file with a `Module` class and a `run` function.
 
 **Module example**:
 
 ```py
-from workflower.modules.module import BaseModule
+from workflower.application.modules.module import BaseModule
 
 from playwright.sync_api import sync_playwright
 

@@ -5,8 +5,8 @@ from apscheduler.jobstores.base import ConflictingIdError, JobLookupError
 from sqlalchemy.exc import IntegrityError
 from workflower.application.interfaces.unit_of_work import UnitOfWork
 from workflower.domain.entities.job import Job
-from workflower.operators.factory import create_operator
-from workflower.plugins.factory import create_plugin
+from workflower.application.operators.factory import create_operator
+from workflower.application.plugins.factory import create_plugin
 
 logger = logging.getLogger("workflower.application.job.commands")
 

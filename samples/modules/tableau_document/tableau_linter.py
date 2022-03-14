@@ -2,7 +2,7 @@ import os
 import zipfile
 
 import pandas as pd
-from workflower.modules.module import BaseModule
+from workflower.application.modules.module import BaseModule
 
 
 def extract_zipped_files(file_path, output_folder):

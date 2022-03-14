@@ -5,7 +5,7 @@ import importlib
 import importlib.util
 import logging
 
-from workflower.operators.operator import BaseOperator
+from workflower.application.operators.operator import BaseOperator
 
 
 class ModuleOperator(BaseOperator):
@@ -18,7 +18,7 @@ class ModuleOperator(BaseOperator):
         *args,
         **kwargs,
     ) -> None:
-        logger = logging.getLogger("workflower.operators.module")
+        logger = logging.getLogger("workflower.application.operators.module")
         logger.info(f"Loading module {module_name} from path {module_path}")
         spec = importlib.util.spec_from_file_location(
             module_name,

@@ -11,7 +11,9 @@ class Module(ABC):
 class BaseModule(Module):
     def __init__(self, plugins=None) -> None:
         self._plugins = plugins
-        self.logger = logging.getLogger(f"workflower.modules.{self.__name__}")
+        self.logger = logging.getLogger(
+            f"workflower.application.modules.{self.__name__}"
+        )
 
     @property
     def plugins(self):

@@ -5,7 +5,7 @@ import logging
 from subprocess import PIPE, STDOUT, CalledProcessError, Popen
 
 from workflower.config import Config
-from workflower.operators.operator import BaseOperator
+from workflower.application.operators.operator import BaseOperator
 
 
 class AlteryxOperator(BaseOperator):
@@ -17,7 +17,7 @@ class AlteryxOperator(BaseOperator):
         """
         # Logging configuration
 
-        logger = logging.getLogger("workflower.operators.alteryx")
+        logger = logging.getLogger("workflower.application.operators.alteryx")
         logger.info(f"Running alteryx workflow: {workflow_file_path}")
 
         process = Popen(

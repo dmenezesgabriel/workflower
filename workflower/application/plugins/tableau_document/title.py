@@ -1,4 +1,6 @@
-from workflower.plugins.tableau_document.formatted_text import FormattedText
+from workflower.application.plugins.tableau_document.formatted_text import (
+    FormattedText,
+)
 
 
 def _formatted_text_object_from_xml(formatted_text_xml):

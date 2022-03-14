@@ -1,4 +1,4 @@
-from workflower.plugins.tableau_document.run import Run
+from workflower.application.plugins.tableau_document.run import Run
 
 
 def _run_object_from_run_xml(run_xml):

@@ -1,5 +1,5 @@
-from workflower.plugins.plugin import BasePlugin
-from workflower.plugins.tableau_server.server import ServerManager
+from workflower.application.plugins.plugin import BasePlugin
+from workflower.application.plugins.tableau_server.server import ServerManager
 
 
 class TableauServerPlugin(BasePlugin):

@@ -1,5 +1,5 @@
 import tableauserverclient as TSC
-from workflower.modules.module import BaseModule
+from workflower.application.modules.module import BaseModule
 
 
 class Module(BaseModule):

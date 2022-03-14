@@ -1,4 +1,6 @@
-from workflower.plugins.tableau_document.layout_options import LayoutOptions
+from workflower.application.plugins.tableau_document.layout_options import (
+    LayoutOptions,
+)
 
 
 def _layout_options_object_from_xml(layout_options_xml):
