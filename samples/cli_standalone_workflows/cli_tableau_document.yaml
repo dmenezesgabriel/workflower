@@ -1,0 +1,17 @@
+version: "1.0"
+workflow:
+  name: cli_tableau_document
+  jobs:
+    - name: tableau_twbx_to_twb_conversion
+      operator: module
+      module_path: "samples/modules/tableau_document/twbx_to_twb.py"
+      module_name: "twbx_to_twb"
+      trigger: date
+    - name: tableau_document_parsing
+      operator: module
+      module_path: "samples/modules/tableau_document/tableau_linter.py"
+      module_name: "tableau_linter"
+      plugins:
+        - tableau_document_plugin
+      trigger: dependency
+      depends_on: tableau_twbx_to_twb_conversion
