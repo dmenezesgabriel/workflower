@@ -1,4 +1,3 @@
-import logging
 import os
 import zipfile
 
@@ -10,19 +9,18 @@ def extract_zipped_files(file_path, output_folder):
         zip_ref.extractall(output_folder)
 
 
-# TODO
-# Make logger part of base module
-logger = logging.getLogger("workflower.modules.tableau_linter")
-
-
 class Module(BaseModule):
-    def __init__(self, plugins=None) -> None:
-        self._plugins = plugins
+    __name__ = "tableau_twbx_to_twb"
+
+    def __init__(self, plugins) -> None:
+        super().__init__(plugins)
 
     def run(self, *args, **kwargs):
         #  Define directories
         base_directory = "samples/tableau"
         workbooks_directory = os.path.join(base_directory, "workbooks")
+
+        self.logger.info(f"Gathering workbooks from {workbooks_directory}")
 
         # Itereate through workbooks dir
         for root, dirs, files in os.walk(workbooks_directory):
