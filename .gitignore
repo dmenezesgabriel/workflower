@@ -21,6 +21,7 @@ unzipped/
 *.xls
 *.twb*
 *.twbx*
+*.twbr*
 *.hyper*
 *.jpg*
 *.png*

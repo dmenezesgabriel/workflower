@@ -1,5 +1,8 @@
+import xml.etree.ElementTree as et
+
 import pytest
 from workflower.application.plugins.tableau_document.workbook import Workbook
+from workflower.application.plugins.tableau_document.worksheet import Worksheet
 
 
 class TestWorkbookInstance:
@@ -12,8 +15,20 @@ class TestWorkbookInstance:
         return p
 
     def test_Workbook_initialize_correctly(self, workbook_file):
+
         workbook_path = str(workbook_file)
+
+        # Xml parser
+        tree = et.parse(workbook_path)
+        tree.getroot()
+
+        #  Workbook instance
         workbook = Workbook(workbook_path)
 
         assert isinstance(workbook, Workbook)
         assert workbook.name == "sample"
+        assert len(workbook.worksheets) == len(tree.findall(".//worksheet"))
+        assert all(
+            isinstance(worksheet, Worksheet)
+            for worksheet in workbook.worksheets
+        )
