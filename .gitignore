@@ -1,17 +1,22 @@
+# Application
+data/
+*.log*
+# Database
 *.db
 *.sqlite*
+# Variables
 *.env*
 !*.template
+# Python
 *venv*
 *_output.ipynb
-*.log*
 .pytest_cache
 environments/
 kernel_specs/
 __pycache__
 .coverage
-data/
 sdx.ipynb
+# Tableau
 unzipped/
 *.xls
 *.twb*
@@ -21,5 +26,9 @@ unzipped/
 *.png*
 *.bin*
 *.key*
+# Folders
 *download/
+# Docs
 _build/
+# Workbook sample
+!tests/resources/sample.twb
