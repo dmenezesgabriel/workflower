@@ -32,7 +32,7 @@
       <connection class='federated'>
         <named-connections>
           <named-connection caption='sample_dataset' name='semistructpassivestore-direct.0j9p27o1jhmxzr1drybo51glfesw'>
-            <connection class='semistructpassivestore-direct' directory='C:/Users/gabri/Documents/repos/workflower/tests/resources' filename='sample_dataset.json' password='' server=''>
+            <connection class='semistructpassivestore-direct' directory='C:/Users/gabri/Documents/repos/workflower/tests/resources' filename='meteorite_fall_nasa.json' password='' server=''>
               <semistruct-schemas>
                 <semistruct-schema table='[meteorite_fall_nasa.json]'>
                   <map key='geolocation' value='false' />
@@ -312,6 +312,9 @@
         <folder-item name='[reclong]' type='field' />
         <folder-item name='[year]' type='field' />
       </_.fcp.SchemaViewerObjectModel.false...folder>
+      <_.fcp.SchemaViewerObjectModel.false...folder name='Meteorite Fall Nasa' role='measures'>
+        <folder-item name='[mass]' type='field' />
+      </_.fcp.SchemaViewerObjectModel.false...folder>
       <_.fcp.SchemaViewerObjectModel.true...folders-common>
         <folder name='Meteorite Fall Nasa'>
           <folder-item name='[:@computed_region_cbhk_fwbd]' type='field' />
@@ -319,6 +322,7 @@
           <folder-item name='[Document Index (generated)]' type='field' />
           <folder-item name='[fall]' type='field' />
           <folder-item name='[id]' type='field' />
+          <folder-item name='[mass]' type='field' />
           <folder-item name='[name]' type='field' />
           <folder-item name='[nametype]' type='field' />
           <folder-item name='[recclass]' type='field' />
@@ -591,8 +595,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='72' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98000' id='71' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+            <zone h='100000' id='76' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98000' id='75' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
                 <zone forceUpdate='true' friendly-name='main_title' h='9750' id='5' type-v2='text' w='98400' x='800' y='1000'>
                   <formatted-text>
                     <run bold='true' fontcolor='#898989' fontsize='15'>EVERY RECORDED METEORITE IMPACT ON EARTH FROM 2,500 BCE TO 2012 </run>

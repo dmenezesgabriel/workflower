@@ -1,9 +1,12 @@
 _ATTRIBUTES = [
     "id",
+    "name",
     "h",
     "w",
     "x",
     "y",
+    "mode",
+    "values",
 ]
 
 
@@ -12,8 +15,7 @@ class Zone:
     Zone class.
     """
 
-    def __init__(self, name=None, zone_xml=None) -> None:
-        self._name = name
+    def __init__(self, zone_xml=None) -> None:
         # Initialize all the possible attributes
         for attrib in _ATTRIBUTES:
             setattr(self, f"_{attrib}", None)
@@ -28,6 +30,26 @@ class Zone:
     @property
     def name(self):
         return self._name
+
+    @property
+    def friendly_name(self):
+        return self._friendly_name
+
+    @property
+    def type(self):
+        return self._type
+
+    @property
+    def show_apply(self):
+        return self._show_apply
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def values(self):
+        return self._values
 
     @property
     def x(self):
@@ -50,6 +72,9 @@ class Zone:
             f"<Zone(name={self.name}, "
             f"id={self.id}, "
             f"name={self.name}, "
+            f"friendly_name={self.friendly_name}, "
+            f"type={self.type}, "
+            f"show_apply={self.show_apply}, "
             f"x={self.x}, "
             f"y={self.y}, "
             f"height={self.height}, "
@@ -72,7 +97,12 @@ class Zone:
         setattr(self, f"_{attrib}", value)
 
     def _initialize_from_zone_xml(self, xml_data):
-        self._name = xml_data.get("friendly-name", None)
+        # TODO
+        # Improve this
+        self._friendly_name = xml_data.get("friendly-name", None)
+        self._type = xml_data.get("type-v2", None)
+        self._show_apply = xml_data.get("show-apply", None)
+
         for attrib in _ATTRIBUTES:
             self._apply_attribute(
                 xml_data, attrib, lambda x: xml_data.attrib.get(x, None)
