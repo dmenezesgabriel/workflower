@@ -16,14 +16,17 @@ class FormattedText:
 
         if formatted_text_xml is not None:
             self._initialize_from_formatted_text_xml(self._formatted_text_xml)
-            self.runs = self._get_run_objects()
+            self._runs = self._get_run_objects()
 
     def _initialize_from_formatted_text_xml(self, xml_data):
         self._run = self._get_run_objects()
 
     @property
-    def run(self):
-        return self._run
+    def runs(self):
+        return self._runs
+
+    def __repr__(self) -> str:
+        return f"<FormattedText(runs={self.runs})>"
 
     @classmethod
     def from_formatted_text_xml(cls, xml_data):

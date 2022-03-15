@@ -1,3 +1,10 @@
+from workflower.plugins.tableau_document.formatted_text import FormattedText
+
+
+def _formatted_text_object_from_xml(formatted_text_xml):
+    return FormattedText.from_formatted_text_xml(formatted_text_xml)
+
+
 _ATTRIBUTES = [
     "id",
     "name",
@@ -67,11 +74,14 @@ class Zone:
     def width(self):
         return self._w
 
+    @property
+    def formatted_text(self):
+        return self._formatted_text
+
     def __repr__(self) -> str:
         return (
             f"<Zone(name={self.name}, "
             f"id={self.id}, "
-            f"name={self.name}, "
             f"friendly_name={self.friendly_name}, "
             f"type={self.type}, "
             f"show_apply={self.show_apply}, "
@@ -79,6 +89,7 @@ class Zone:
             f"y={self.y}, "
             f"height={self.height}, "
             f"width={self.width}, "
+            f"_formatted_text={self._formatted_text}"
             ")>"
         )
 
@@ -107,3 +118,10 @@ class Zone:
             self._apply_attribute(
                 xml_data, attrib, lambda x: xml_data.attrib.get(x, None)
             )
+
+        self._formatted_text = self._get_formatted_text_object(xml_data)
+
+    def _get_formatted_text_object(self, xml_data):
+        return _formatted_text_object_from_xml(
+            xml_data.find(".//formatted-text")
+        )

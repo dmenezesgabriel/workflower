@@ -55,6 +55,19 @@ class Run:
                 xml_data, attrib, lambda x: xml_data.attrib.get(x, None)
             )
 
+    def __repr__(self) -> str:
+        return (
+            f"<Run(bold={self.bold}, "
+            f"underline={self.underline}, "
+            f"fontname={self.fontname}, "
+            f"fontsize={self.fontsize}, "
+            f"fontsize={self.fontsize}, "
+            f"fontcolor={self.fontcolor}, "
+            f"fontalignment={self.fontalignment}, "
+            f"content={self.content}"
+            ")>"
+        )
+
     @classmethod
     def from_run_xml(cls, xml_data):
         return cls(run_xml=xml_data)

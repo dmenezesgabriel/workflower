@@ -1,6 +1,4 @@
-from workflower.plugins.tableau_document.formatted_text import (
-    FormattedText,
-)
+from workflower.plugins.tableau_document.formatted_text import FormattedText
 
 
 def _formatted_text_object_from_xml(formatted_text_xml):
@@ -26,11 +24,14 @@ class Title:
     def formatted_text(self):
         return self._formatted_text
 
+    def __repr__(self) -> str:
+        return f"<Title(formatted_text={self.formatted_text})>"
+
     @classmethod
     def from_title_xml(cls, xml_data):
         return cls(title_xml=xml_data)
 
     def _get_formatted_text_object(self, xml_data):
         return _formatted_text_object_from_xml(
-            self._title_xml.find(".//formatted-text")
+            xml_data.find(".//formatted-text")
         )

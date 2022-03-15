@@ -24,6 +24,9 @@ class LayoutOptions:
     def title(self):
         return self._title
 
+    def __repr__(self) -> str:
+        return f"<LayoutOptions(title={self.title})>"
+
     @classmethod
     def from_layout_options_xml(cls, xml_data):
         return cls(layout_options_xml=xml_data)
