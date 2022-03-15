@@ -31,49 +31,86 @@ class Module(BaseModule):
 
         # Gather workbooks
         _workbooks = []
-        counter = 0
-        # Try twice in case of stranger things
-        while counter < 2:
-            counter += 1
-            for root, dirs, files in os.walk(workbooks_directory):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    if file_path.endswith(".twb"):
-                        workbook = tableau_document_plugin.create_component(
-                            "workbook", file_path
-                        )
-                        _workbooks.append(workbook)
+
+        for root, dirs, files in os.walk(workbooks_directory):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if file_path.endswith(".twb"):
+                    workbook = tableau_document_plugin.create_component(
+                        "workbook", file_path
+                    )
+                    _workbooks.append(workbook)
 
         # Parse Workbooks
-        _rows = []
+        EXPECTED_FONT_NAME = "Tableau Book"
+        EXPECTED_WORKSHEET_TITLE_FONT_SIZE = "12"
+        EXPECTED_WORKSHEET_TITLE_FONT_COLOR = "#343a40"
+
+        EXPECTED_DASHBOARD_HEIGHTS = ["768", "1800"]
+        EXPECTED_DASHBOARD_WIDTH = "1200"
+
         workbooks = set(_workbooks)
+
+        worksheet_validation_rows = []
+        dashboard_validation_rows = []
         for workbook in workbooks:
+            # Validate worksheets
             for worksheet in workbook.worksheets:
-                print(worksheet)
                 layout_options = worksheet.layout_options
-                if layout_options:
-                    print(layout_options)
-                    title = layout_options.title
-                    if title:
-                        print(title)
-                        formatted_text = title.formatted_text
-                        if formatted_text:
-                            print(formatted_text)
-                            runs = formatted_text.run
-                            if runs:
-                                for run in runs:
-                                    _row = dict(
-                                        workbook_name=workbook.name,
-                                        worksheet_name=worksheet.name,
-                                        bold=run.bold,
-                                        underline=run.underline,
-                                        fontname=run.fontname,
-                                        fontsize=run.fontsize,
-                                        fontcolor=run.fontcolor,
-                                        fontalignment=run.fontalignment,
-                                        type="worksheet_title_part",
-                                        content=run.content,
-                                    )
-                                    _rows.append(_row)
-        _df = pd.DataFrame(_rows)
-        print(_df.head())
+                title = layout_options.title if layout_options else None
+                formatted_text = title.formatted_text if title else None
+                runs = formatted_text.runs if formatted_text else None
+                if runs:
+                    for run in runs:
+                        worksheet_validation_row = dict(
+                            workbook_name=workbook.name,
+                            worksheet_name=worksheet.name,
+                            bold=run.bold,
+                            underline=run.underline,
+                            fontname=run.fontname,
+                            fontsize=run.fontsize,
+                            fontcolor=run.fontcolor,
+                            fontalignment=run.fontalignment,
+                            type="worksheet_title_part",
+                            content=run.content,
+                            fontname_compliant=(
+                                run.fontname == EXPECTED_FONT_NAME
+                            ),
+                            fontsize_compliant=(
+                                run.fontsize
+                                == EXPECTED_WORKSHEET_TITLE_FONT_SIZE
+                            ),
+                            fontcolor_compliant=(
+                                run.fontcolor
+                                == EXPECTED_WORKSHEET_TITLE_FONT_COLOR
+                            ),
+                        )
+                        worksheet_validation_rows.append(
+                            worksheet_validation_row
+                        )
+
+            # Validate dashboards
+            for dashboard in workbook.dashboards:
+                size = dashboard.size
+                dashboard_validation_row = dict(
+                    workbook_name=workbook.name,
+                    maxheight=size.maxheight,
+                    maxwidth=size.maxwidth,
+                    minheight=size.minheight,
+                    minwidth=size.minwidth,
+                    maxheight_compliant=size.maxheight
+                    in EXPECTED_DASHBOARD_HEIGHTS,
+                    maxwidth_compliant=size.maxwidth
+                    == EXPECTED_DASHBOARD_WIDTH,
+                    minheight_compliant=size.minheight
+                    in EXPECTED_DASHBOARD_HEIGHTS,
+                    minwidth_compliant=size.minwidth
+                    == EXPECTED_DASHBOARD_WIDTH,
+                )
+                dashboard_validation_rows.append(dashboard_validation_row)
+
+        worksheet_validation_df = pd.DataFrame(worksheet_validation_rows)
+        dashboard_validation_df = pd.DataFrame(dashboard_validation_rows)
+
+        print(worksheet_validation_df.head())
+        print(dashboard_validation_df.head())
