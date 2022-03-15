@@ -1,4 +1,4 @@
-from workflower.application.plugins.tableau_document.layout_options import (
+from workflower.plugins.tableau_document.layout_options import (
     LayoutOptions,
 )
 

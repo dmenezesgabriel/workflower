@@ -1,7 +1,7 @@
-from workflower.application.plugins.tableau_document.plugin import (
+from workflower.plugins.tableau_document.plugin import (
     TableauDocumentPlugin,
 )
-from workflower.application.plugins.tableau_server.plugin import (
+from workflower.plugins.tableau_server.plugin import (
     TableauServerPlugin,
 )
 

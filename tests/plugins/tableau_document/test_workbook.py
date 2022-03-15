@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as et
 
 import pytest
-from workflower.application.plugins.tableau_document.workbook import Workbook
-from workflower.application.plugins.tableau_document.worksheet import Worksheet
+from workflower.plugins.tableau_document.workbook import Workbook
+from workflower.plugins.tableau_document.worksheet import Worksheet
 
 
 class TestWorkbookInstance:

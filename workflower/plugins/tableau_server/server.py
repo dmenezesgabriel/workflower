@@ -1,11 +1,11 @@
 import tableauserverclient as TSC
-from workflower.application.plugins.tableau_server import (
+from workflower.plugins.tableau_server import (
     TABLEAU_SERVER_URL,
     TABLEAU_SITE_ID,
     TABLEAU_TOKEN_NAME,
     TABLEAU_TOKEN_VALUE,
 )
-from workflower.application.plugins.tableau_server.auth import AuthHelper
+from workflower.plugins.tableau_server.auth import AuthHelper
 
 
 class ServerManager:

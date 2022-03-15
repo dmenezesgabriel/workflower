@@ -1,4 +1,4 @@
-from workflower.application.plugins.tableau_document.formatted_text import (
+from workflower.plugins.tableau_document.formatted_text import (
     FormattedText,
 )
 
