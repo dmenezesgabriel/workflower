@@ -1,0 +1,79 @@
+_ATTRIBUTES = [
+    "id",
+    "h",
+    "w",
+    "x",
+    "y",
+]
+
+
+class Zone:
+    """
+    Zone class.
+    """
+
+    def __init__(self, name=None, zone_xml=None) -> None:
+        self._name = name
+        # Initialize all the possible attributes
+        for attrib in _ATTRIBUTES:
+            setattr(self, f"_{attrib}", None)
+
+        if zone_xml is not None:
+            self._initialize_from_zone_xml(zone_xml)
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
+    @property
+    def height(self):
+        return self._h
+
+    @property
+    def width(self):
+        return self._w
+
+    def __repr__(self) -> str:
+        return (
+            f"<Zone(name={self.name}, "
+            f"id={self.id}, "
+            f"name={self.name}, "
+            f"x={self.x}, "
+            f"y={self.y}, "
+            f"height={self.height}, "
+            f"width={self.width}, "
+            ")>"
+        )
+
+    @classmethod
+    def from_zone_xml(cls, xml_data):
+        return cls(zone_xml=xml_data)
+
+    def _apply_attribute(self, xml_data, attrib, default_func, read_name=None):
+        if read_name is None:
+            read_name = attrib
+        if hasattr(self, f"_read_{read_name}"):
+            value = getattr(self, f"_read_{read_name}")(xml_data)
+        else:
+            value = default_func(attrib)
+
+        setattr(self, f"_{attrib}", value)
+
+    def _initialize_from_zone_xml(self, xml_data):
+        self._name = xml_data.get("friendly-name", None)
+        for attrib in _ATTRIBUTES:
+            self._apply_attribute(
+                xml_data, attrib, lambda x: xml_data.attrib.get(x, None)
+            )

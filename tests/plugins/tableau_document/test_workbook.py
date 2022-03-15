@@ -28,6 +28,7 @@ class TestWorkbookInstance:
         assert isinstance(workbook, Workbook)
         assert workbook.name == "sample"
         assert len(workbook.worksheets) == len(tree.findall(".//worksheet"))
+        assert len(workbook.dashboards) == len(tree.findall(".//dashboard"))
         assert all(
             isinstance(worksheet, Worksheet)
             for worksheet in workbook.worksheets
