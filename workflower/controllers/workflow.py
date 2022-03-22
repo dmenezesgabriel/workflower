@@ -19,9 +19,12 @@ class WorkflowController:
         self.is_running = False
 
     async def run(self, scheduler):
+        """
+        Run workflow controller.
+        """
         self.is_running = True
         while self.is_running:
-            self.workflow_loader.load_all_from_dir()
+            self.workflow_loader.load_all_from_dir(Config.WORKFLOWS_FILES_PATH)
             self.workflow_runner.schedule_workflows_jobs(scheduler)
             logger.info(f"Sleeping {Config.CYCLE} seconds")
             await asyncio.sleep(Config.CYCLE)

@@ -11,7 +11,6 @@ from workflower.application.workflow.commands import (
     LoadWorkflowFromYamlFileCommand,
     SetWorkflowTriggerCommand,
 )
-from workflower.config import Config
 from workflower.domain.entities.workflow import Workflow
 
 logger = logging.getLogger("workflower.loader")
@@ -25,9 +24,18 @@ class WorkflowLoaderService:
     def workflows(self) -> List[Workflow]:
         return self._workflows
 
-    def load_one_workflow_file(self, path, trigger: str = "on_schedule"):
+    def load_one_workflow_file(self, path: str, trigger: str = "on_schedule"):
+        """
+        Load one workflow from file.
+
+        Args:
+            - path (str): workflow file path
+            - trigger (str): expects "on_schedule" or "on_demand".
+        """
         session = Session()
         uow = SqlAlchemyUnitOfWork(session)
+        # TODO
+        #  Add strategy pattern
         command = LoadWorkflowFromYamlFileCommand(uow, path)
         workflow = None
         try:
@@ -56,21 +64,25 @@ class WorkflowLoaderService:
             return workflow
 
     def load_all_from_dir(
-        self, workflows_path: str = Config.WORKFLOWS_FILES_PATH
+        self, path: str, trigger: str = "on_schedule"
     ) -> List[Workflow]:
         """
-        Load all.
+        Load all workflow files from a given directory
+
+        Args:
+            - path (str): workflows file path
+            - trigger (str): expects "on_schedule" or "on_demand".
         """
 
         self._workflows = []
-        logger.info(f"Loading Workflows from directory: {workflows_path}")
+        logger.info(f"Loading Workflows from directory: {path}")
         counter = 0
-        for root, dirs, files in os.walk(workflows_path):
+        for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith(".yml") or file.endswith(".yaml"):
                     workflow_path = os.path.join(root, file)
                     workflow = self.load_one_workflow_file(
-                        workflow_path, trigger="on_schedule"
+                        workflow_path, trigger=trigger
                     )
                     if workflow:
                         self._workflows.append(workflow)

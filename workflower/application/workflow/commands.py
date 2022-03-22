@@ -266,13 +266,12 @@ class LoadWorkflowFromYamlFileCommand:
                 # Check if job already exists
                 job = uow.jobs.get(name=job_name, workflow_id=workflow.id)
                 if job:
-                    if workflow.modified_since_last_load:
-                        job.operator = job_operator
-                        job.definition = job_definition
-                        job.depends_on = job_depends_on_id
-                        job.dependency_logs_pattern = dependency_logs_pattern
-                        job.run_if_pattern_match = run_if_pattern_match
-                        job.is_active = True
+                    job.operator = job_operator
+                    job.definition = job_definition
+                    job.depends_on = job_depends_on_id
+                    job.dependency_logs_pattern = dependency_logs_pattern
+                    job.run_if_pattern_match = run_if_pattern_match
+                    job.is_active = True
                 elif not job:
                     job = Job(
                         name=job_name,
