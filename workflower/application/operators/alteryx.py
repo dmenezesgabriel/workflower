@@ -4,8 +4,8 @@ Alteryx helper module
 import logging
 from subprocess import PIPE, STDOUT, CalledProcessError, Popen
 
-from workflower.config import Config
 from workflower.application.operators.operator import BaseOperator
+from workflower.config import Config
 
 
 class AlteryxOperator(BaseOperator):
@@ -37,5 +37,5 @@ class AlteryxOperator(BaseOperator):
                     logger.info(decoded_line)
                     output["logs"].append({"message": decoded_line})
             except CalledProcessError as e:
-                logger.error(f"{str(e)}")
+                logger.error(f"Error: {str(e)}")
         return str(output)

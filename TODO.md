@@ -44,6 +44,8 @@
               - build
   ```
 
+**Fail Jobs**: Fail jobs depending on process return code
+
 **Keep track of big files in commits**:
 
 .twb
