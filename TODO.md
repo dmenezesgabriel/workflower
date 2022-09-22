@@ -53,3 +53,10 @@
 
 - 5a7fe480540ebc6e83564a9dd26c0352961a6f2e
 - 715459c3ee27c7fe529157a1977641f08b27fb24
+
+## Other
+
+- study how jupyterlab and airflow use serverside rendering with react/vue
+- call jupyterlab server programatically and access as a microfrontend
+- interface for creating venvs and kernels programatically
+- bash and batch files for bootstrap aplications (install envs) like pentaho
